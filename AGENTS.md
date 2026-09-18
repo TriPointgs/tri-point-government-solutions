@@ -1,0 +1,6 @@
+# Tri-Point implementation rules
+Preserve existing agency-facing capabilities and production content. Never fabricate opportunities, awards, registrations, contractor verification, testimonials, or traffic metrics. Never place contractor contact information, licenses, tax documents, or credentials in this public repository. Preview data and production data must stay separated. All administration endpoints require server-side authentication; frontend hiding is not access control. Test before deploying and preserve a rollback commit.
+
+Delegation / token rule: start with the cheapest capable lower-tier models for bounded or mechanical work. Use mid-tier models for moderately complex implementation and analysis. Reserve premium/highest-tier models for lead architecture, security-critical judgment, conflict resolution, final review, and production-readiness decisions. Delegate independent work in parallel and request concise worker summaries. Do not claim delegation happened unless it actually did.
+
+Solicitation workflow: review full solicitation and pricing files; bid/no-bid assessment; compliance checklist; pricing/profitability; suppliers and incumbents; risks, questions, deadlines; practical award strategy. Profile matches are preliminary, not a substitute for that review. Evaluate prime and subcontractor requirements separately.

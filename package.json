@@ -1,0 +1,16 @@
+{
+  "name": "tripoint-contractor-network",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/check.mjs && node --test tests/*.test.mjs && node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@vercel/blob": "2.8.0"
+  }
+}
