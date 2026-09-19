@@ -21,6 +21,22 @@ function canonicalRequirements(source){
  for(const key of ['availability','experience','equipment','travel','compliance'])out[key]=string(r[key],`requirements.${key}`);
  return out;
 }
+function scheduleText(s,scope){
+ const parts=[];
+ for(const [key,label] of [['contract_start_date','Contract start'],['contract_end_date','Contract end']]){const value=string(s[key],`solicitation.${key}`);if(value)parts.push(`${label}: ${value}`);}
+ const labels={day_shift:'Day shift',night_shift:'Night shift',start:'Start time',end:'End time',start_time:'Start time',end_time:'End time',days:'Working days',hours:'Working hours',schedule:'Schedule',weekends_required:'Weekend work required',holidays_required:'Holiday work required'};
+ const working=record(scope.working_hours,'scope.working_hours');
+ function append(value,label){
+  if(value==null||value===''||value===false)return;
+  if(value===true){parts.push(label);return;}
+  if(Array.isArray(value)){for(const item of value)append(item,label);return;}
+  if(typeof value==='object'){for(const [key,item] of Object.entries(value))append(item,`${label} — ${labels[key]||key.replaceAll('_',' ')}`);return;}
+  if(typeof value==='string'){const trimmed=value.trim();if(trimmed)parts.push(`${label}: ${trimmed}`);return;}
+  if(typeof value==='number')parts.push(`${label}: ${value}`);
+ }
+ for(const [key,value] of Object.entries(working))append(value,labels[key]||key.replaceAll('_',' '));
+ return string(parts.join('\n'),'requirements.availability');
+}
 
 export function parseOpportunityImport(raw){
  let input=raw;
@@ -53,7 +69,7 @@ export function parseOpportunityImport(raw){
  const matchingNotes=pick(matching,['needed','trade_categories','service_area','minimum_requirements']);
  const opportunity={
   title:title(s.title,input.requisition_id,warnings),
-  requirements:{trade,state:/^[A-Z]{2}$/.test(state)?state:'',county:'',crewSize:null,maxProject:null,insurance:false,workersComp:false,licensed:false,sam:false,role:'subcontractor',availability:privateText('requirements.availability',['Contract start',s.contract_start_date],['Contract end',s.contract_end_date],['Working hours',scope.working_hours]),experience:privateText('requirements.experience',['Experience requirements',compliance.experience_requirements]),equipment:'',travel:'',compliance:privateText('requirements.compliance',['Minimum subcontractor requirements',matching.minimum_requirements])},
+  requirements:{trade,state:/^[A-Z]{2}$/.test(state)?state:'',county:'',crewSize:null,maxProject:null,insurance:false,workersComp:false,licensed:false,sam:false,role:'subcontractor',availability:scheduleText(s,scope),experience:privateText('requirements.experience',['Experience requirements',compliance.experience_requirements]),equipment:'',travel:'',compliance:privateText('requirements.compliance',['Minimum subcontractor requirements',matching.minimum_requirements])},
   internal:{source:privateText('internal.source',['Source',source]),solicitationUrl:string(source.source_url,'source.source_url'),procurementPortal:string(submission.submission_portal??submission.portal,'submission.submission_portal'),agency:string(s.agency,'solicitation.agency'),solicitationNumber:string(s.solicitation_number,'solicitation.solicitation_number'),deadline:string(s.bid_due,'solicitation.bid_due'),timezone:'',pricing:privateText('internal.pricing',['Financials',financials]),margins:privateText('internal.margins',['Estimated gross profit',review.estimated_gross_profit],['Estimated margin percent',review.estimated_margin_percent]),bidStrategy:privateText('internal.bidStrategy',['Internal management',internal])},
   review:{fullScope:privateText('review.fullScope',['Requisition ID',input.requisition_id],['Solicitation',s],['Scope',scope],['Documents',input.documents],['Solicitation contacts',input.contacts]),bidNoBid:privateText('review.bidNoBid',['Bid status',review.bid_status],['Bid / no-bid reason',review.bid_no_bid_reason],['Fit notes',review.fit_notes]),compliance:privateText('review.compliance',['Solicitation compliance (applicability requires review)',compliance],['Submission',submission]),pricingProfitability:privateText('review.pricingProfitability',['Pricing notes',review.pricing_notes],['Estimated cost',review.estimated_cost],['Target bid price',review.target_bid_price],['Estimated gross profit',review.estimated_gross_profit],['Estimated margin percent',review.estimated_margin_percent]),suppliersSubcontractors:privateText('review.suppliersSubcontractors',['Subcontractor matching requirements',matchingNotes],['Suppliers',input.suppliers],['Subcontractors',input.subcontractors]),competitorsIncumbents:privateText('review.competitorsIncumbents',['Competitors',input.competitors],['Incumbents',input.incumbents]),risksQuestionsDeadlines:privateText('review.risksQuestionsDeadlines',['Major risks',review.major_risks],['Questions to ask',review.questions_to_ask],['Dates and schedule',schedule]),awardStrategy:privateText('review.awardStrategy',['Award strategy',review.award_strategy])},
   disclosure:Object.fromEntries(DISCLOSURE.map(key=>[key,'']))
