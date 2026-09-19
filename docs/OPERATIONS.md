@@ -1,5 +1,7 @@
 # Tri-Point Contractor Network — Launch Operations
 
+For the new private Opportunities workflow, structured imports, draft approval, pending profile updates and deployment gates, see [OPPORTUNITIES.md](OPPORTUNITIES.md). The launch-only statements below describe the original release; this addition introduces a disabled-by-default email transport but does not enable a sender or mailbox ingestion.
+
 ## Release scope
 Static SEO pages generated at build time, private server-side intake, an authenticated internal directory, preliminary matching, CSV exports, referral/source attribution, explicit optional marketing consent, and privacy/participation notices. Existing agency-facing homepage and branding are preserved.
 
