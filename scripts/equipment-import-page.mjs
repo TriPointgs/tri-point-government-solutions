@@ -13,7 +13,7 @@ export function equipmentImportPage(){
  </div>
  <div class="panel narrow">
   <p><strong>Staff sign-in required.</strong> The same <a href="/contractors/admin">Tri-Point administrator session</a> is used for this tool.</p>
-  <p class="fine">Only the `TP_SYNTHETIC_CATALOG_CSV_V1` and `TP_SYNTHETIC_HOURLY_STOCK_CSV_V1` test formats are accepted. SKU values must start with `SYN-`. Do not paste real supplier catalog files, credentials, customer contact records or confidential prices.</p>
+  <p class="fine">Only the <code>TP_SYNTHETIC_CATALOG_CSV_V1</code> and <code>TP_SYNTHETIC_HOURLY_STOCK_CSV_V1</code> test formats are accepted. SKU values must start with <code>SYN-</code>. Do not paste real supplier catalog files, credentials, customer contact records or confidential prices.</p>
   <form id="equipment-import-form">
    <label class="field">Synthetic catalog CSV
     <textarea name="catalogCsv" id="equipment-import-catalog" rows="9" maxlength="131072" required placeholder="sku,mfgPN,manufacturer,description,category,status,priceType,unitCost"></textarea>
