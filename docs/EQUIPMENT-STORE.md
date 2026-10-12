@@ -44,3 +44,25 @@ DO NOT commit client IDs with secrets, sandbox/prod API keys, OAuth bearer token
 - Phase 4: private lead/opportunity product-match intake in the existing Opportunity Bot; save raw solicitation references, deadlines, manufacturer requirements, authorized equivalents and comprehensive bid/no-bid review. No external scraping contrary to access rules.
 - Phase 5: buyer-facing quote-request persistence (privacy policy, consent, protections, abuse controls, retention), approval workflow and supplier live-cost checks.
 - Phase 6: payments, invoice matching and fulfillment only after verified TD SYNNEX access, approved reseller terms and explicit permission for order automation.
+
+## Phase 3 development: synthetic feed staging (October 12, 2026)
+
+A new **synthetic-only catalog and stock importer** now exists in `lib/equipment-catalog-stage.mjs` and `api/equipment-import.js`. The private preview page `/equipment/admin/import` loads harmless example CSV and returns read-only validation results. The import API requires the existing administrator session and same-origin request. The endpoint returns HTTP 404 in production, even when signed in. It **never persists or publishes records**, does not contact TD SYNNEX, and cannot submit orders.
+
+- Supported catalog version: `TP_SYNTHETIC_CATALOG_CSV_V1` with exact columns `sku,mfgPN,manufacturer,description,category,status,priceType,unitCost`.
+- Supported stock version: `TP_SYNTHETIC_HOURLY_STOCK_CSV_V1` with exact columns `sku,quantity,stockAt`.
+- Synthetic SKUs must begin with `SYN-`. Real distributor SKUs and unknown layouts are intentionally rejected.
+- Max 128 KiB and 250 records per feed; duplicate SKU/price type, malformed CSV quoting, invalid prices, invalid timestamps and unexpected headers fail closed.
+- Full stock snapshots must cover every staged SKU; explicitly requested delta updates can update only known SKUs. Out-of-order timestamps and conflicting replay payloads are rejected.
+- A stock refresh cannot turn a product into sale-ready stock: `authorized=false`, `checkedAt=null`, `source=SYNTHETIC_ONLY` remain enforced. Responses expose counts and checksums, not wholesale unit costs or raw rows.
+- Test fixtures live under `tests/fixtures/`, outside the public build assets. `tests/equipment-catalog-stage.test.mjs` checks all-or-nothing validation, idempotent replay, duplicate rejection, stock stale-order rules, and authentication restrictions.
+
+**Not implemented or claimed:** TD SYNNEX production v4.7 flat-file field mapping, actual catalog download access, vendor image/description license, database persistence, production inventory refresh, public SKU listings, payment or order submission. Real vendor source documents must first be reconciled against an account-specific sample and authorized data-delivery agreement. The synthetic CSV layouts above are Tri-Point test schemas, not a representation of the distributor's flat-file record structures.
+
+Before turning on real imports, design dedicated private durable storage with transactional snapshot/promote semantics, checksum/idempotency, retention and recovery, source provenance, change alerts for SKU deletion and price increases, and a strict public projection. Verify import idempotency against a customer-provisioned TD SYNNEX sample; keep all real costs and vendor credentials outside source control.
+
+### Synthetic change-control review (development only)
+
+The import dry-run now optionally accepts a **previous synthetic catalog CSV** to compare against the proposed catalog. It computes SHA-256 fingerprints and shows new/removed/modified SKUs, unit-price changes (counts only), product-status changes and the fraction of existing records affected. A default policy flags removals over 20% or changed/removal entries over 60% as hard stops. Even when no hard stop is detected, **all actual changes require manual review**; no dry run can auto-publish or authorize a supplier product. The UI's **Load synthetic example** button populates both old and proposed catalogs for a reproducible zero-change test. Editing a proposed synthetic price or removing a row demonstrates the review gates.
+
+The comparison takes place only in the current authenticated preview request. It is not an inventory-history database, not a supplier-sync task, not a persistent approval workflow and not a production mapping for the TD SYNNEX file layouts. Reports deliberately omit raw costs and confidential supplier rows. Once real catalog access is provisioned, a new versioned decoder and controlled private storage/reconciliation process will be designed and separately reviewed.

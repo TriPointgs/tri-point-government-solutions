@@ -13,6 +13,7 @@ return `
   </div>
   <div class="panel narrow">
     <p class="fine">Sign in through the <a href="/contractors/admin">Tri-Point administrator login</a> first. The existing administrator session is required.</p>
+    <p><a href="/equipment/admin/import">Test synthetic catalog and hourly stock imports</a> in the private preview workbench.</p>
     <form id="equipment-estimate-form">
       <label class="field">Quantity <input type="number" name="quantity" min="1" max="100000" value="1" step="1" required></label>
       <label class="field">Supplier unit cost (USD) <input type="text" name="unitCost" inputmode="decimal" placeholder="0.00" autocomplete="off" required></label>

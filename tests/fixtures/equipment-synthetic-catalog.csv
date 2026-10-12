@@ -1,0 +1,6 @@
+sku,mfgPN,manufacturer,description,category,status,priceType,unitCost
+SYN-1001,SYN-LAP-01,Demo Systems,SYNTHETIC 14-inch laptop,Computers and workstations,Active,REGULAR,899.50
+SYN-2002,SYN-SWI-02,Example Networking,"SYNTHETIC 24-port, managed switch",Networking and wireless,Active,REGULAR,249.99
+SYN-3003,SYN-PRI-03,Demo Imaging,SYNTHETIC printer test model,Printers and imaging,Discontinued,REGULAR,129.00
+SYN-4004,SYN-MON-04,Example Display,SYNTHETIC classroom monitor,Monitors and peripherals,Active,EDUCATION,110.00
+SYN-5005,SYN-UPS-05,Demo Power,SYNTHETIC backup power test,Power and accessories,Not authorized,REGULAR,
