@@ -73,7 +73,7 @@ test('out-of-order changes fail; exact replay is idempotent',()=>{
 });
 test('CSV parser rejects malformed quoting, huge and empty inputs',()=>{
   assert.throws(()=>stageSyntheticCatalog({format:SYNTHETIC_CATALOG_FORMAT,csv:catalogCsv+'bad,record\n',receivedAt}),/columns/);
-  assert.throws(()=>stageSyntheticCatalog({format:SYNTHETIC_CATALOG_FORMAT,csv:catalogCsv.replace('SYNTHETIC 14-inch laptop','"no close'),receivedAt}),/Unclosed/);
+  assert.throws(()=>stageSyntheticCatalog({format:SYNTHETIC_CATALOG_FORMAT,csv:catalogCsv.replace('SYNTHETIC 14-inch laptop','"no close'),receivedAt}),/Unclosed|Invalid characters after quoted CSV field/);
   assert.throws(()=>stageSyntheticCatalog({format:SYNTHETIC_CATALOG_FORMAT,csv:'x'.repeat(132000),receivedAt}),/size limit/);
 });
 test('API denies anonymous and cross-site POST before accepting any catalog data',async()=>{
