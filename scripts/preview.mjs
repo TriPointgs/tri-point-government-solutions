@@ -11,9 +11,10 @@ registerHooks({resolve(specifier,context,next){return specifier==='@vercel/blob'
 const [{default:admin},{default:intake},{default:opportunities},{saveApplication},{validateApplication}]=await Promise.all([import('../api/admin.js'),import('../api/intake.js'),import('../api/opportunities.js'),import('../lib/storage.mjs'),import('../lib/model.mjs')]);
 for(const [id,name,trade,crew]of [['11111111-1111-4111-8111-111111111111','SYNTHETIC Lake Cleaning','janitorial',20],['22222222-2222-4222-8222-222222222222','SYNTHETIC Orange Electric','electrical',3]])await saveApplication(id,validateApplication({company:name,contact:'Synthetic Contact',email:'synthetic@example.invalid',zip:'34748',state:'FL',trade,serviceCounties:['Lake'],crewSize:crew,maxProject:150000,insured:'yes',workersComp:'unknown',availability:'Confirm for each project',consent:true}));
 const {default:notifications}=await import('../api/notifications.js');
+const {default:equipmentImport}=await import('../api/equipment-import.js');
 const {default:contractorAuth}=await import('../api/contractor-auth.js');
 const {default:contractorProfile}=await import('../api/contractor-profile.js');
-const routes={'/api/contractor-auth':contractorAuth,'/api/contractor-profile':contractorProfile,'/api/notifications':notifications,'/api/admin':admin,'/api/intake':intake,'/api/opportunities':opportunities};const root=resolve('dist');
+const routes={'/api/equipment-import':equipmentImport,'/api/contractor-auth':contractorAuth,'/api/contractor-profile':contractorProfile,'/api/notifications':notifications,'/api/admin':admin,'/api/intake':intake,'/api/opportunities':opportunities};const root=resolve('dist');
 createServer(async(req,res)=>{
  const pathname=new URL(req.url,'http://localhost:3000').pathname;
  res.setHeader('Cache-Control','private, no-store');
