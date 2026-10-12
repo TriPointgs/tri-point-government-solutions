@@ -83,3 +83,24 @@ test('staff-only estimator flags output as draft and never submits an order',asy
  assert.equal(res.json.sourceVerified,false);
  assert.equal(res.json.status,'DRAFT_ESTIMATE_ONLY');
 });
+
+test('admin endpoint rejects cross-site estimate requests even with a valid session',async()=>{
+ process.env.TP_SESSION_SECRET='equipment-tests-long-and-private-synthetic-only';
+ const cookie='__Host-tp_admin='+sign({type:'admin',at:Date.now()});
+ const res={headers:{},setHeader(k,v){this.headers[k]=v;},end(s){this.json=JSON.parse(s);}};
+ await handler({method:'POST',headers:{cookie,origin:'https://evil.example','content-type':'application/json'},body:{action:'estimate',quote:{quantity:1,unitCostCents:10000}}},res);
+ assert.equal(res.statusCode,403);
+ assert.equal(res.json.estimate,undefined);
+});
+test('authenticated equipment endpoint disallows retrieval and purchase operations',async()=>{
+ process.env.TP_SESSION_SECRET='equipment-tests-long-and-private-synthetic-only';
+ const cookie='__Host-tp_admin='+sign({type:'admin',at:Date.now()});
+ const mk=()=>({headers:{},setHeader(k,v){this.headers[k]=v;},end(s){this.json=JSON.parse(s);}});
+ const get=mk();
+ await handler({method:'GET',headers:{cookie,origin:'https://tripointgs.com'}},get);
+ assert.equal(get.statusCode,405);
+ const post=mk();
+ await handler({method:'POST',headers:{cookie,origin:'https://tripointgs.com','content-type':'application/json'},body:{action:'submitPO',order:{SKU:'439866'}}},post);
+ assert.equal(post.statusCode,400);
+ assert.equal(post.json.estimate,undefined);
+});
