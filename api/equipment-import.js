@@ -1,6 +1,7 @@
 import {HttpError} from '../lib/model.mjs';
 import {requireAdmin,requireOrigin,body,send,fail} from '../lib/security.mjs';
-import {syntheticImportReport} from '../lib/equipment-catalog-stage.mjs';
+import {syntheticImportReport,stageSyntheticCatalog,SYNTHETIC_CATALOG_FORMAT} from '../lib/equipment-catalog-stage.mjs';
+import {planSyntheticCatalogUpdate} from '../lib/equipment-catalog-diff.mjs';
 
 /**
  * Preview-only dry-run endpoint for internal synthetic catalog and stock CSVs.
@@ -16,7 +17,7 @@ export default async function handler(req,res){
       throw new HttpError(405,'Method not allowed.');
     }
     requireOrigin(req);
-    const input=await body(req,275000);
+    const input=await body(req,420000);
     if(input.action!=='dryRunSynthetic'||input.confirmSynthetic!==true){
       throw new HttpError(400,'Only explicitly confirmed synthetic dry runs are supported.');
     }
@@ -27,6 +28,20 @@ export default async function handler(req,res){
       catalogCsv:input.catalogCsv,stockCsv:input.stockCsv,
       receivedAt:new Date().toISOString(),mode:input.mode??'full'
     });
+    if(input.previousCatalogCsv!==undefined){
+      if(typeof input.previousCatalogCsv!=='string'||!input.previousCatalogCsv.trim())
+        throw new HttpError(400,'Previous synthetic catalog must be non-empty CSV text.');
+      const currentAt=Date.now();
+      const previous=stageSyntheticCatalog({
+        format:SYNTHETIC_CATALOG_FORMAT,csv:input.previousCatalogCsv,
+        receivedAt:new Date(currentAt-1000).toISOString()
+      });
+      const next=stageSyntheticCatalog({
+        format:SYNTHETIC_CATALOG_FORMAT,csv:input.catalogCsv,
+        receivedAt:new Date(currentAt).toISOString()
+      });
+      result.changeControl=planSyntheticCatalogUpdate(previous,next);
+    }
     return send(res,200,result);
   }catch(error){return fail(res,error);}
 }
