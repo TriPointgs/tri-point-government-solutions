@@ -106,3 +106,42 @@ test('API refuses production simulation and unknown operations, even if authenti
   await handler({method:'POST',headers:{cookie,origin:'https://tripointgs.com','content-type':'application/json'},body:{action:'publish',confirmSynthetic:true,catalogCsv,stockCsv}},unknown);
   assert.equal(unknown.statusCode,400);
 });
+
+test('private dry-run comparison reports changed supplier pricing without exposing values',async()=>{
+ process.env.TP_SESSION_SECRET='synthetic-only-equipment-tests-not-production';
+ process.env.VERCEL_ENV='preview';
+ const cookie='__Host-tp_admin='+sign({type:'admin',at:Date.now()});
+ const changedCatalog=catalogCsv.replace('899.50','999.50');
+ const res=response();
+ await handler({
+  method:'POST',
+  headers:{cookie,origin:'https://tripointgs.com','content-type':'application/json'},
+  body:{
+   action:'dryRunSynthetic',confirmSynthetic:true,
+   catalogCsv:changedCatalog,stockCsv,mode:'full',previousCatalogCsv:catalogCsv
+  }
+ },res);
+ assert.equal(res.statusCode,200);
+ assert.equal(res.data.changeControl.counts.priceChanges,1);
+ assert.equal(res.data.changeControl.counts.removed,0);
+ assert.equal(res.data.changeControl.canAutoPublish,false);
+ assert.equal(res.data.changeControl.requiresManualReview,true);
+ assert.equal(res.data.safeForCustomerQuote,false);
+ assert.doesNotMatch(JSON.stringify(res.data),/unitCostCents|99950|89950/);
+});
+test('private dry-run comparison refuses a real or malformed previous catalog',async()=>{
+ process.env.TP_SESSION_SECRET='synthetic-only-equipment-tests-not-production';
+ process.env.VERCEL_ENV='preview';
+ const cookie='__Host-tp_admin='+sign({type:'admin',at:Date.now()});
+ const r=response();
+ await handler({
+  method:'POST',
+  headers:{cookie,origin:'https://tripointgs.com','content-type':'application/json'},
+  body:{
+   action:'dryRunSynthetic',confirmSynthetic:true,
+   catalogCsv,stockCsv,previousCatalogCsv:catalogCsv.replace('SYN-1001','439866')
+  }
+ },r);
+ assert.equal(r.statusCode,400);
+ assert.equal(r.data.changeControl,undefined);
+});
