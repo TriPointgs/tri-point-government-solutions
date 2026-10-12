@@ -44,6 +44,7 @@ export function transformPage(input,route){
  }
  html=html.replace(sourceLink,'');
  html=html.replace(/<div class="nav-links">([\s\S]*?)<\/div>/,(whole,inside)=>`<div class="nav-links">${inside.replace('<a href="/contractors">Contractor network</a>','<a href="/contractors">Subcontractor network</a><a href="/contractors#how-it-works">How it works</a><a href="/#contact">Contact</a>')}</div>`);
+ html=html.replace('<a class="button small" href="/contractors/join">Join free</a>','<a href="/login">Sign in</a><a class="button small" href="/contractors/join">Join free</a>');
  html=html.replaceAll('potential teaming and subcontracting opportunities','potential subcontracting work coordinated by Tri-Point');
  html=html.replace('Start with the contractor network, contracting resources or our agency capabilities.','Start with the subcontractor network or our agency capabilities.');
  return html;
