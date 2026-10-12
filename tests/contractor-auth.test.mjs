@@ -55,12 +55,31 @@ test('email sender only sends to the profile email using fragment claim links',a
  let seen;await sendClaimEmail(profile(),'11111111-1111-4111-8111-111111111111.'+'a'.repeat(43),{env,fetcher:async(url,init)=>{seen=JSON.parse(init.body);return {ok:true};}});
  assert.deepEqual(seen.to,['contact@example.invalid']);assert.match(seen.text,/\/login#claim=/);assert.doesNotMatch(seen.text,/\/login\?claim=/);
 });
-test('contractor APIs return no profile data before feature and identity verification',async()=>{
- let out;const res={setHeader:()=>{},end:v=>out=JSON.parse(v)};
- await contractorProfile({method:'GET',headers:{}},res);
- assert.equal(res.statusCode,503);assert.equal(out.profile,undefined);
- await contractorAuth({method:'GET',headers:{}},res);
- assert.equal(res.statusCode,200);assert.equal(out.enabled,false);assert.equal(out.signedIn,false);
+test('contractor APIs fail closed in preview irrespective of production deployment flags',async()=>{
+ const previous=process.env.VERCEL_ENV;
+ try{
+  process.env.VERCEL_ENV='preview';
+  let out;const res={setHeader:()=>{},end:v=>out=JSON.parse(v)};
+  await contractorProfile({method:'GET',headers:{}},res);
+  assert.equal(res.statusCode,503);assert.equal(out.profile,undefined);
+  await contractorAuth({method:'GET',headers:{}},res);
+  assert.equal(res.statusCode,200);assert.equal(out.enabled,false);assert.equal(out.signedIn,false);
+ }finally{
+  if(previous===undefined)delete process.env.VERCEL_ENV;
+  else process.env.VERCEL_ENV=previous;
+ }
+});
+test('enabled contractor login still rejects anonymous profile access',async()=>{
+ const names=['VERCEL_ENV','TP_CONTRACTOR_LOGIN_ENABLED','RESEND_API_KEY','TP_AUTH_EMAIL_FROM'];
+ const previous=Object.fromEntries(names.map(k=>[k,process.env[k]]));
+ try{
+  Object.assign(process.env,{VERCEL_ENV:'production',TP_CONTRACTOR_LOGIN_ENABLED:'true',RESEND_API_KEY:'synthetic-not-a-live-key',TP_AUTH_EMAIL_FROM:'accounts@send.tripointgs.com'});
+  let out;const res={setHeader:()=>{},end:v=>out=JSON.parse(v)};
+  await contractorProfile({method:'GET',headers:{}},res);
+  assert.equal(res.statusCode,401);assert.equal(out.profile,undefined);
+  await contractorAuth({method:'GET',headers:{}},res);
+  assert.equal(res.statusCode,200);assert.equal(out.enabled,true);assert.equal(out.signedIn,false);
+ }finally{for(const name of names){if(previous[name]===undefined)delete process.env[name];else process.env[name]=previous[name];}}
 });
 
 
