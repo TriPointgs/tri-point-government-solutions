@@ -43,6 +43,7 @@ export function transformPage(input,route){
   html=html.replace('does not make assurances about unrelated third-party websites linked from our guides.','does not authorize unrelated marketing or publication of company profiles.');
  }
  html=html.replace(sourceLink,'');
+ if(!html.includes('href="/equipment"'))html=html.replace('<div class="nav-links">','<div class="nav-links"><a href="/equipment">Equipment quotes</a>');
  html=html.replace(/<div class="nav-links">([\s\S]*?)<\/div>/,(whole,inside)=>`<div class="nav-links">${inside.replace('<a href="/contractors">Contractor network</a>','<a href="/contractors">Subcontractor network</a><a href="/contractors#how-it-works">How it works</a><a href="/#contact">Contact</a>')}</div>`);
  html=html.replace('<a class="button small" href="/contractors/join">Join free</a>','<a href="/login">Sign in</a><a class="button small" href="/contractors/join">Join free</a>');
  html=html.replaceAll('potential teaming and subcontracting opportunities','potential subcontracting work coordinated by Tri-Point');
@@ -56,7 +57,7 @@ export function applyBoundary(root='dist'){
  const files=fs.readdirSync(output,{recursive:true}).filter(f=>f.endsWith('.html'));
  for(const file of files){const route=file==='index.html'?'/':'/'+file.slice(0,-5);const p=path.join(output,file);fs.writeFileSync(p,transformPage(fs.readFileSync(p,'utf8'),route));}
  const origin='https://tripointgs.com';
- fs.writeFileSync(path.join(output,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+origin+'/</loc></url><url><loc>'+origin+'/contractors</loc></url></urlset>');
+ fs.writeFileSync(path.join(output,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+origin+'/</loc></url><url><loc>'+origin+'/contractors</loc></url><url><loc>'+origin+'/equipment</loc></url></urlset>');
  for(const file of files){const html=fs.readFileSync(path.join(output,file),'utf8');assert.doesNotMatch(html,PUBLIC_FORBIDDEN,`Removed navigation/source link remains: ${file}`);assert.equal((html.match(/<h1\b/g)||[]).length,1);for(const m of html.matchAll(/(?:href|src)="(\/[^"#?]*)(?:[?#][^"]*)?"/g)){const p=m[1];if(p.startsWith('/api/'))continue;const file=p==='/'?'index.html':p.slice(1);assert.ok(fs.existsSync(path.join(output,file))||fs.existsSync(path.join(output,file+'.html')),`Broken link: ${p}`);}}
  const form=fs.readFileSync(path.join(output,'contractors/join.html'),'utf8');
  assert.doesNotMatch(form,/name="(?:sam|alertsOptIn)"|value="(?:prime|guidance|teaming)"/);
