@@ -18,6 +18,13 @@ export function equipmentImportPage(){
    <label class="field">Synthetic catalog CSV
     <textarea name="catalogCsv" id="equipment-import-catalog" rows="9" maxlength="131072" required placeholder="sku,mfgPN,manufacturer,description,category,status,priceType,unitCost"></textarea>
    </label>
+   <details>
+    <summary>Compare against an earlier synthetic catalog (optional)</summary>
+    <p class="fine">Paste a prior synthetic catalog snapshot to identify changed costs, discontinued products, removed SKUs and manual-review holds. Neither file will be saved or published.</p>
+    <label class="field">Previous synthetic catalog CSV
+     <textarea name="previousCatalogCsv" id="equipment-import-previous" rows="7" maxlength="131072" placeholder="sku,mfgPN,manufacturer,description,category,status,priceType,unitCost"></textarea>
+    </label>
+   </details>
    <label class="field">Synthetic hourly stock CSV
     <textarea name="stockCsv" id="equipment-import-stock" rows="7" maxlength="131072" required placeholder="sku,quantity,stockAt"></textarea>
    </label>
