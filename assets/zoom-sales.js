@@ -39,3 +39,8 @@ $('#zoom-export').addEventListener('click',()=>run(async()=>{if(!confirm('Export
 $('#zoom-run-reminders').addEventListener('click',()=>{if(!confirm('Run today’s internal reminder check? If enabled and not already attempted, this may email the Tri-Point business inbox.'))return;run(async()=>{const data=await request('/api/zoom-sales',{action:'run-reminders',confirm:true});status('Reminder check: '+data.status+(data.alreadyAttempted?' (already attempted today)':''));});});
 addEventListener('beforeunload',event=>{if(dirty){event.preventDefault();event.returnValue='';}});
 run(async()=>{await loadList();status('Private Zoom sales workspace loaded.');});
+
+$('#zoom-test-alert').addEventListener('click',()=>{
+ if(!confirm('Send one clearly labeled TEST message to Tri-Point’s business inbox? No customer or distributor will be emailed.'))return;
+ const requestId=crypto.randomUUID();run(async()=>{const result=await request('/api/zoom-sales',{action:'test-alert',requestId,confirm:true});status('Internal test email accepted by provider. Reference: '+result.messageId+'. Check delivery before assuming inbox receipt.');});
+});
