@@ -27,6 +27,8 @@ export function createZoomSalesHandler({service=createZoomService(),configuratio
  requireOrigin(req);const b=await body(req,65536);
  if(b.action==='update')return send(res,200,{lead:await service.update(b.id,b.revision,b.changes)});
  if(b.action==='note')return send(res,200,{lead:await service.addNote(b.id,b.revision,b.note)});
+ if(b.action==='draft-distributor')return send(res,200,{draft:await service.previewDistributorRequest(b.id,b.revision,b.disclosure)});
+ if(b.action==='record-distributor')return send(res,200,{lead:await service.recordDistributorRequest(b.id,b.revision,b)});
  if(b.action==='retry-alert'&&b.confirm===true)return send(res,200,{lead:await service.retryAlert(b.id,b.revision)});
  if(b.action==='reconcile-alert'&&b.confirm===true)return send(res,200,{lead:await service.reconcileAlert(b.id,b.revision,b.accepted,b.evidence)});
  if(b.action==='test-alert'&&b.confirm===true){await rate(req,'zoom-test-alert',2);const receipt=await testMailer(b.requestId);return send(res,200,{status:'accepted',messageId:receipt.messageId});}
