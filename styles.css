@@ -241,3 +241,5 @@ footer {
 }
 
 .contact-line a { color: var(--blue); font-weight: 900; text-decoration: underline; }
+
+.business-address{font-style:normal;line-height:1.6;}
