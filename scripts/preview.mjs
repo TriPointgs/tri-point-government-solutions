@@ -13,10 +13,12 @@ for(const [id,name,trade,crew]of [['11111111-1111-4111-8111-111111111111','SYNTH
 const {default:notifications}=await import('../api/notifications.js');
 const {default:contractorAuth}=await import('../api/contractor-auth.js');
 const {default:contractorProfile}=await import('../api/contractor-profile.js');
-const routes={'/api/contractor-auth':contractorAuth,'/api/contractor-profile':contractorProfile,'/api/notifications':notifications,'/api/admin':admin,'/api/intake':intake,'/api/opportunities':opportunities};const root=resolve('dist');
+const [{default:zoomPage},{default:zoomQuotes},{default:zoomSales}]=await Promise.all([import('../api/zoom-page.js'),import('../api/zoom-quotes.js'),import('../api/zoom-sales.js')]);
+const routes={'/api/zoom-page':zoomPage,'/api/zoom-quotes':zoomQuotes,'/api/zoom-sales':zoomSales,'/api/contractor-auth':contractorAuth,'/api/contractor-profile':contractorProfile,'/api/notifications':notifications,'/api/admin':admin,'/api/intake':intake,'/api/opportunities':opportunities};const root=resolve('dist');
 createServer(async(req,res)=>{
  const pathname=new URL(req.url,'http://localhost:3000').pathname;
  res.setHeader('Cache-Control','private, no-store');
+ if(pathname==='/solutions/zoom'||pathname==='/solutions/zoom/quote'||pathname==='/contractors/admin/zoom'){const q=new URL(req.url,'http://localhost:3000').searchParams;q.set('view',pathname==='/contractors/admin/zoom'?'admin':pathname.endsWith('/quote')?'quote':'marketing');req.url='/api/zoom-page?'+q;return zoomPage(req,res);}
  if(routes[pathname])return routes[pathname](req,res);
  let filename=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname));
  if(!filename.startsWith(root+'\\')&&!filename.startsWith(root+'/')){res.statusCode=403;return res.end();}
