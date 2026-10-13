@@ -1,0 +1,13 @@
+{
+  "synthetic": true,
+  "adminLogin": true,
+  "privateReviewSubmission": true,
+  "noDefaultCustomerDisclosure": true,
+  "changingConsentInvalidatesDraft": true,
+  "explicitOrganizationDisclosure": true,
+  "manualSendRecord": true,
+  "noExternalMail": true,
+  "noJsErrors": true,
+  "mobileNoOverflow": true,
+  "errors": []
+}

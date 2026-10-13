@@ -36,3 +36,9 @@ The separate TD SYNNEX PartnerFirst UAI account was reported as awaiting a sched
 - Finish real inbox delivery acceptance for Zoom internal notifications.
 - After Zoom marketing content approval, release approved copy and the public quote form through the existing two-part publication gate.
 - Verify the PartnerFirst UAI account after provider synchronization; only then scope a separate, explicitly authorized TD SYNNEX API integration using actual provider API documentation.
+
+
+## Synthetic browser acceptance
+A real Chromium session completed a synthetic-only flow against the in-memory Node preview: existing staff login, unapproved review-only Zoom inquiry, private lead list and draft generation, default exclusion of customer details, explicit organization disclosure, invalidation after changes to disclosure choices, manual-send confirmation and audited record. No external email was sent and no real customer information was touched. Browser console reported zero JavaScript errors and the 390-pixel layout had no horizontal overflow. Run log is recorded in `docs/ZOOM-DISTRIBUTOR-ACCEPTANCE.json`.
+
+The full project build/test was run with Node 24 (179/179 tests passed). The unapproved Zoom marketing page remains gated. Both contractor signup/authentication and the internal opportunity bot synchronization routes were unchanged.
