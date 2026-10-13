@@ -1,0 +1,13 @@
+{
+  "synthetic": true,
+  "adminLogin": true,
+  "quoteIntake": true,
+  "privatePricingSaved": true,
+  "customerCopyExcludesDistributorCost": true,
+  "internalApproval": true,
+  "manualSendRecording": true,
+  "noExternalEmailSent": true,
+  "zeroPageErrors": true,
+  "layoutOverflow": false,
+  "errors": []
+}
