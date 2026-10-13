@@ -1,0 +1,36 @@
+{
+  "syntheticOnly": true,
+  "formPersistenceRoundTrip": true,
+  "adminSearchAndAssignment": true,
+  "notesEscaped": true,
+  "privateFinancials": true,
+  "documentsStored": true,
+  "followUpAndRenewalDue": true,
+  "csvExport": true,
+  "reloadPersistence": true,
+  "mobileOverflow": false,
+  "consoleErrors": [],
+  "accessibilityViolations": [],
+  "anonymousChecks": [
+    {
+      "path": "/solutions/zoom",
+      "status": 404
+    },
+    {
+      "path": "/solutions/zoom/quote",
+      "status": 404
+    },
+    {
+      "path": "/api/zoom-quotes",
+      "status": 404
+    },
+    {
+      "path": "/api/zoom-sales",
+      "status": 401
+    },
+    {
+      "path": "/api/zoom-sales",
+      "status": 401
+    }
+  ]
+}
