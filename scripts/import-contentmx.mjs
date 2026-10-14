@@ -17,12 +17,12 @@ if(!response.ok)throw Error('RSS fetch failed HTTP '+response.status);
 const type=response.headers.get('content-type')||'';
 if(type&&!/xml|rss|text\/plain/i.test(type))throw Error('Unexpected ContentMX content type');
 const body=await response.text();
-const feed=parseContentMxFeed(body,{limit:12});
+const feed=parseContentMxFeed(body,{limit:50});
 if(!feed.length){console.log('No eligible RSS items; leaving published content unchanged.');process.exit(0);}
 const dir='content/blog',filenames=(await fs.readdir(dir)).filter(x=>x.endsWith('.json'));
 const records=await Promise.all(filenames.map(async filename=>JSON.parse(await fs.readFile(path.join(dir,filename),'utf8'))));
 const existing=new Set(records.map(x=>x.slug));
-const selected=feed.filter(x=>!existing.has(x.slug));
+const selected=feed.filter(x=>!existing.has(x.slug)).slice(0,12);
 for(const post of selected) {
  // Validate every new entry and the existing set before writing anything.
  approvedPosts([...records,post]);
