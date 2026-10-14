@@ -1,0 +1,56 @@
+{
+  "status": "draft",
+  "approvedBy": "",
+  "approvedAt": null,
+  "publishedAt": null,
+  "slug": "software-license-renewal-planning",
+  "title": "How to Prepare for a Software License Renewal",
+  "summary": "A renewal-planning checklist covering license quantities, contract dates, product editions and quotation requirements.",
+  "category": "Software Licensing",
+  "body": [
+    {
+      "type": "paragraph",
+      "text": "License renewals often involve several independent decisions: what the organization uses, which products it is entitled to buy, when coverage expires and what term it wants next. Planning helps the purchasing team request accurate quotations."
+    },
+    {
+      "type": "heading",
+      "text": "Inventory your subscriptions"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Document each publisher, product, edition, subscription identifier and relevant contract or agreement.",
+        "Review current assigned licenses, actual users and anticipated changes in seat counts.",
+        "Confirm the expiration date and any required notice or renewal window."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Confirm organizational needs"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Identify schools, agencies, departments and locations that need coverage.",
+        "Separate optional feature requests from required functionality.",
+        "Ask the authorized supplier to verify eligibility, license terms, product availability and any transfer requirements."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Request comparable written prices"
+    },
+    {
+      "type": "paragraph",
+      "text": "Include the desired term, quantities, renewal date, response deadline and quote validity. Clarify whether taxes, support and provisioning are included rather than assuming a prior package continues unchanged."
+    },
+    {
+      "type": "heading",
+      "text": "Leave time for purchasing approvals"
+    },
+    {
+      "type": "paragraph",
+      "text": "Build in time for internal authorization, security or legal review and any procurement requirements. Never assume a renewal is automatic or that an account-specific price is guaranteed."
+    }
+  ]
+}
