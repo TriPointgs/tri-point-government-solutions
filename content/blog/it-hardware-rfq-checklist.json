@@ -1,0 +1,56 @@
+{
+  "status": "draft",
+  "approvedBy": "",
+  "approvedAt": null,
+  "publishedAt": null,
+  "slug": "it-hardware-rfq-checklist",
+  "title": "What to Include in an IT Hardware RFQ",
+  "summary": "A practical purchasing checklist for organizations preparing a request for quotations for computers and related devices.",
+  "category": "IT Hardware Procurement",
+  "body": [
+    {
+      "type": "paragraph",
+      "text": "A useful hardware RFQ lets potential suppliers understand what equipment is required, when it is needed, and which conditions matter to the purchasing organization. Exact requirements differ by agency and acquisition method."
+    },
+    {
+      "type": "heading",
+      "text": "Identify the equipment and configuration"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Provide quantities and an itemized list of device types or approved equivalent specifications.",
+        "List processor, memory, storage, display, operating system and peripheral requirements as applicable.",
+        "State any compatibility, warranty, security or accessibility requirements that the buyer has established."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Define delivery and pricing expectations"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Identify each delivery address, requested delivery window and whether phased shipments are allowed.",
+        "State whether pricing should include freight, handling, taxes or setup, and how alternatives should be identified.",
+        "Specify quote validity, submission format, deadline and time zone."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Make evaluation criteria clear"
+    },
+    {
+      "type": "paragraph",
+      "text": "Different buyers may value price, conformity, lead time, warranty terms and eligibility differently. Include the actual evaluation criteria and required documentation supplied by the purchasing organization."
+    },
+    {
+      "type": "heading",
+      "text": "Before distributing the RFQ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Review quantities, compatibility, potential substitutes, deadlines and funding or contract restrictions. The final solicitation and any addenda control the procurement—not a generic checklist."
+    }
+  ]
+}
