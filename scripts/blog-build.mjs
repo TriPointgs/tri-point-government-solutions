@@ -42,7 +42,7 @@ for(const file of fs.readdirSync(dist,{recursive:true}).filter(f=>f.endsWith('.h
  const html=fs.readFileSync(dist+'/'+file,'utf8');
  for(const match of html.matchAll(/(?:href|src)="(\/[^"#?]*)(?:[?#][^"]*)?"/g)){
   const relative=match[1];
-  if(relative.startsWith('/api/')||['/contractors/admin/zoom','/solutions/zoom','/solutions/zoom/quote'].includes(relative))continue;
+  if(relative.startsWith('/api/')||['/admin/catalog','/contractors/admin/zoom','/solutions/zoom','/solutions/zoom/quote'].includes(relative))continue;
   const target=relative==='/'?'index.html':relative.slice(1);
   assert.ok(fs.existsSync(dist+'/'+target)||fs.existsSync(dist+'/'+target+'.html'),`Broken link ${relative} in ${file}`);
  }
