@@ -23,7 +23,7 @@ jobs:
       - run: npm ci
       - name: Fetch and import external previews
         env:
-          CONTENTMX_RSS_URL: ${{ secrets.CONTENTMX_RSS_URL }}
+          CONTENTMX_RSS_URL: 'https://Tripointgs.lll-ll.com?rss&n=104543&content=all&max=50'
         run: node scripts/import-contentmx.mjs
       - name: Run site validation
         run: npm run build
