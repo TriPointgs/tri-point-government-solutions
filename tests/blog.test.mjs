@@ -4,9 +4,9 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {approvedPosts,validatePost,blogIndex,blogArticle,blogFeed,xmlEscape} from '../lib/blog.mjs';
 
 const records=readdirSync(new URL('../content/blog/',import.meta.url)).filter(x=>x.endsWith('.json')).map(x=>JSON.parse(readFileSync(new URL('../content/blog/'+x,import.meta.url),'utf8')));
-const manuscript=records[0];
+const manuscript=records.find(x=>x.status==='draft');
 const approved=()=>({...structuredClone(manuscript),status:'approved',approvedBy:'Tri-Point editorial reviewer',approvedAt:'2026-10-13T13:00:00Z',publishedAt:'2026-10-13T14:00:00Z'});
-test('sample articles remain unapproved',()=>{assert.equal(records.length,2);assert.equal(approvedPosts(records).length,0);});
+test('sample articles remain unapproved',()=>{assert.equal(records.filter(x=>x.status==='draft').length,2);assert.equal(approvedPosts(records).length,records.filter(x=>x.status==='syndicated').length);});
 test('articles require valid unique slugs and approved metadata',()=>{for(const override of [{slug:'../foo'},{slug:'A TEST'},{status:'published'},{approvedBy:'invented'},{body:[{type:'html',text:'<script>alert(1)</script>'}]}])assert.throws(()=>validatePost({...manuscript,...override}));});
 test('approved articles require named signoff and valid UTC dates',()=>{for(const override of [{approvedBy:''},{approvedAt:null},{publishedAt:'2026-02-30T00:00:00Z'},{approvedAt:'2026-10-15T12:00:00Z'}])assert.throws(()=>validatePost({...approved(),...override}));});
 test('approval emits one complete blog article and RSS item with public canonical URL',()=>{const post=approvedPosts([approved()]);assert.equal(post.length,1);const html=blogArticle(post[0]);assert.match(html,/BlogPosting/);assert.match(html,/1017 Cottonwood Street/);assert.match(html,/blog\/feed.xml/);const rss=blogFeed(post);assert.match(rss,/<rss version="2.0"/);assert.match(rss,/<item>/);assert.match(rss,/\/blog\/it-hardware-rfq-checklist|\/blog\/software-license-renewal-planning/);assert.match(rss,/Tue, 13 Oct 2026 14:00:00 GMT/);});
