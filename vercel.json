@@ -25,7 +25,7 @@
   "rewrites": [
     {
       "source": "/admin/catalog",
-      "destination": "/api/catalog-page"
+      "destination": "/api/catalog?view=page"
     },
     {
       "source": "/learn/:path*",
