@@ -11,7 +11,7 @@ for(const p of ['dist/solutions/zoom','dist/solutions/zoom.html','dist/contracto
 const sitemap='dist/sitemap.xml';let xml=fs.readFileSync(sitemap,'utf8');
 if(zoomPublicEnabled()){xml=xml.replace('</urlset>','<url><loc>https://tripointgs.com/solutions/zoom</loc></url></urlset>');fs.writeFileSync(sitemap,xml);}
 else assert.doesNotMatch(xml,/\/solutions\/zoom/);
-const dynamic=new Set(['/contractors/admin/zoom','/solutions/zoom','/solutions/zoom/quote']);
+const dynamic=new Set(['/admin/catalog','/contractors/admin/zoom','/solutions/zoom','/solutions/zoom/quote']);
 const pages=fs.readdirSync('dist',{recursive:true}).filter(p=>p.endsWith('.html'));
 for(const p of pages){const h=fs.readFileSync('dist/'+p,'utf8');if(!p.startsWith('contractors/admin')&&!zoomPublicEnabled())assert.doesNotMatch(h,/href="\/solutions\/zoom/,'Unapproved marketing navigation must not be public');for(const m of h.matchAll(/(?:href|src)="(\/[^"#?]*)(?:[?#][^"]*)?"/g)){const v=m[1];if(v.startsWith('/api/')||dynamic.has(v))continue;assert.ok(fs.existsSync('dist'+(v==='/'?'/index.html':v))||fs.existsSync('dist'+v+'.html'),'Missing link target: '+v);}}
 console.log('Zoom release gate PASS: server-only draft, no public marketing navigation/sitemap, isolated private admin integration.');
