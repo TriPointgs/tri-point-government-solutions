@@ -14,8 +14,12 @@ if (-not $py -and -not $python) {
     exit 1
 }
 $exe = if ($py) { $py.Source } else { $python.Source }
-$pyArgs = if ($py) { @('-3') } else { @() }
-& $exe @pyArgs --version
+# Do not splat Python arguments: some Windows Python launchers start an interactive REPL instead.
+if ($py) {
+    & $exe -3 -c 'import sys; print("Python", sys.version.split()[0])'
+} else {
+    & $exe -c 'import sys; print("Python", sys.version.split()[0])'
+}
 if ($LASTEXITCODE -ne 0) { throw 'Working Python 3 required.' }
 
 Write-Host "[2/5] Locating the existing catalog..." -ForegroundColor Cyan
@@ -43,7 +47,8 @@ if (-not (Test-Path -LiteralPath $db)) {
     }
     Copy-Item -LiteralPath $archive -Destination (Join-Path $root '822539.zip')
     Write-Host '[3/5] Building the search database. This can take several minutes...' -ForegroundColor Cyan
-    & $exe @pyArgs (Join-Path $root 'catalog_import.py')
+    if ($py) { & $exe -3 (Join-Path $root 'catalog_import.py') }
+    else { & $exe (Join-Path $root 'catalog_import.py') }
     if ($LASTEXITCODE -ne 0) { throw 'Database import failed. See preceding output.' }
 } else {
     Write-Host "[3/5] Existing catalog.sqlite found." -ForegroundColor Green
