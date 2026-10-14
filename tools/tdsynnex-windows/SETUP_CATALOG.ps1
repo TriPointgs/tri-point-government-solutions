@@ -1,7 +1,7 @@
 # Tri-Point private TD SYNNEX catalog setup; no database uploaded.
 $ErrorActionPreference = 'Stop'
 $root = 'C:\TriPointPrivateCatalog'
-$filesBase = 'https://raw.githubusercontent.com/TriPointgs/tri-point-government-solutions/25365d3a97cd8e800bc8492e1b433d74d37cc43a/tools/tdsynnex-windows'
+$filesBase = 'https://raw.githubusercontent.com/TriPointgs/tri-point-government-solutions/0989c499df14143a49f60eddd38216e7866cfe69/tools/tdsynnex-windows'
 Write-Host "[1/5] Preparing private catalog folder..." -ForegroundColor Cyan
 New-Item -ItemType Directory -Force -Path $root | Out-Null
 foreach ($file in @('catalog_gateway.py','catalog_import.py')) {
