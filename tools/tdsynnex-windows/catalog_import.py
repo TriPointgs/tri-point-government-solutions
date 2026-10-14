@@ -2,6 +2,7 @@
 """Build the private SQLite catalog from the original TD SYNNEX 822539.zip SFTP file."""
 from pathlib import Path
 from zipfile import ZipFile
+from contextlib import closing
 import json, sqlite3, os, sys, time
 ROOT=Path(__file__).resolve().parent
 source=ROOT/"822539.zip"
@@ -35,7 +36,7 @@ try:
     with ZipFile(source) as archive:
         files=[n for n in archive.namelist() if n.lower().endswith(".ap")]
         if len(files)!=1:raise ValueError("Expected one .ap catalog within ZIP")
-        with archive.open(files[0]) as records,sqlite3.connect(tmp) as db:
+        with archive.open(files[0]) as records, closing(sqlite3.connect(tmp)) as db:
             db.execute("PRAGMA synchronous=OFF")
             db.execute("PRAGMA journal_mode=OFF")
             db.executescript(CREATE)
@@ -78,5 +79,9 @@ try:
     os.replace(tmp,dest)
     print(f"SUCCESS: {count:,} products, database {dest.stat().st_size/1048576:.1f} MB",flush=True)
 except Exception as e:
-    if tmp.exists():tmp.unlink()
+    if tmp.exists():
+        try:
+            tmp.unlink()
+        except OSError:
+            pass  # Preserve the original failure; a later retry can clean stale temp files.
     sys.exit("IMPORT FAILED: "+str(e))
