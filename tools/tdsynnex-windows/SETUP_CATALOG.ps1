@@ -16,9 +16,9 @@ if (-not $py -and -not $python) {
 $exe = if ($py) { $py.Source } else { $python.Source }
 # Do not splat Python arguments: some Windows Python launchers start an interactive REPL instead.
 if ($py) {
-    & $exe -3 -c 'import sys; print("Python", sys.version.split()[0])'
+    & $exe -3 -c 'import sys; print(sys.version.split()[0])'
 } else {
-    & $exe -c 'import sys; print("Python", sys.version.split()[0])'
+    & $exe -c 'import sys; print(sys.version.split()[0])'
 }
 if ($LASTEXITCODE -ne 0) { throw 'Working Python 3 required.' }
 
