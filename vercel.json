@@ -24,6 +24,10 @@
   ],
   "rewrites": [
     {
+      "source": "/admin/catalog",
+      "destination": "/api/catalog?view=page"
+    },
+    {
       "source": "/learn/:path*",
       "destination": "/api/retired"
     },
@@ -119,6 +123,32 @@
         {
           "key": "Cache-Control",
           "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/admin/catalog",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/api/catalog",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
         }
       ]
     }
