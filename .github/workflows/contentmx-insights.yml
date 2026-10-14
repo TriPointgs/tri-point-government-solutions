@@ -1,0 +1,38 @@
+name: ContentMX Procurement Insights Import
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: contentmx-insights-import
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Fetch and import external previews
+        env:
+          CONTENTMX_RSS_URL: ${{ secrets.CONTENTMX_RSS_URL }}
+        run: node scripts/import-contentmx.mjs
+      - name: Run site validation
+        run: npm run build
+      - name: Commit only newly imported previews
+        run: |
+          git add content/blog/contentmx-*.json
+          if git diff --cached --quiet; then
+            echo "No new previews."
+            exit 0
+          fi
+          git -c user.name="Tri-Point Insights Bot" -c user.email="info@tripointgs.com" commit -m "Publish eligible ContentMX partner previews"
+          git push origin HEAD:main
