@@ -26,7 +26,10 @@ DOC = "UPPER(COALESCE(p.description,'') || ' ' || COALESCE(p.product_family,''))
 ACCESSORY_WORDS = (
     "BATTERY", "COVER", "CASE", "SLEEVE", "CABLE", "CHARGER",
     "ADAPTER", "DOCKING", "DOCK ", "REPLACEMENT", "SCREEN PROTECTOR",
-    "BRACKET", "SPARE ", "WARRANTY", "SERVICE CONTRACT",
+    "BRACKET", "SPARE ", "WARRANTY", "SERVICE CONTRACT", "BACKPACK",
+    "MOUSE", "KEYBOARD", "PEN PRO", "TRACKPOINT", "ACCKIT", "HARD DRIVE",
+    "HDD_", "CAP SET", "PROGRAM-", "MAINTENANCE", "SUPPORT PLAN",
+    "TONER", "INK CARTRIDGE",
 )
 CATEGORY_POSITIVE = {
     "laptops": ("NOTEBOOK", "LAPTOP", "ULTRABOOK", "CHROMEBOOK", "THINKPAD",
@@ -67,6 +70,16 @@ def category_where(category):
     sql = " AND " + positive
     if negative:
         sql += " AND NOT " + negative
+    # Observed in this supplied snapshot: Lenovo's TP product families identify
+    # ThinkPad notebooks, while TO/DO/SP commonly identify accessories or services.
+    # Treat this mapping as an internal heuristic, not distributor documentation.
+    if category == "laptops":
+        sql += """ AND NOT (
+          UPPER(p.manufacturer) = 'LENOVO' AND NOT (
+            p.product_family LIKE 'TPP%' OR p.product_family LIKE 'TPE%'
+            OR p.product_family LIKE 'TPTE%' OR p.product_family = 'TPG'
+          )
+        )"""
     return sql, params + excluding
 
 
