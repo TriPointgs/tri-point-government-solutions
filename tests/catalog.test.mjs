@@ -8,7 +8,7 @@ const key='synthetic-token-long-enough-for-tests-123456789';
 const env={TP_CATALOG_API_URL:'https://catalog.example.org/private/',TP_CATALOG_API_TOKEN:key};
 const res=()=>({statusCode:0,headers:{},body:'',setHeader(k,v){this.headers[k.toLowerCase()]=v;},end(v=''){this.body=v;}});
 test('queries validate input, bounded pagination, and empty search',()=>{
- assert.deepEqual(catalogQuery(new URLSearchParams('q=AP9513&maker=APC&page=2')),{q:'AP9513',maker:'APC',page:2});
+ assert.deepEqual(catalogQuery(new URLSearchParams('q=AP9513&maker=APC&page=2')),{q:'AP9513',maker:'APC',page:2,category:'all',exact:false});
  for(const x of ['q=x&page=1001','q='+ 'x'.repeat(101),'maker='+ 'x'.repeat(81)])assert.throws(()=>catalogQuery(new URLSearchParams(x)));
 });
 test('only private HTTPS backend configuration is accepted',()=>{
@@ -49,4 +49,33 @@ test('valid administrator cookie can access read-only search and page',async()=>
   assert.equal(response.statusCode,200);assert.equal(JSON.parse(response.body).items[0].mfgPart,'AP9513');
   const page=res();await createCatalogHandler()({...request,url:'/api/catalog?view=page'},page);assert.equal(page.statusCode,200);assert.match(page.body,/Private.*Catalog/);
  }finally{if(prior===undefined)delete process.env.TP_SESSION_SECRET;else process.env.TP_SESSION_SECRET=prior;}
+});
+
+test('category choices and exact SKU mode are validated server side',()=>{
+ const f=catalogQuery(new URLSearchParams('q=20YB003XUS&maker=LENOVO&page=0&category=laptops&exact=1'));
+ assert.deepEqual(f,{q:'20YB003XUS',maker:'LENOVO',page:0,category:'laptops',exact:true});
+ for(const x of ['q=x&category=admin','q=x&category=../products','category=desktops&exact=1','q=x&exact=true','q=x&exact=2'])assert.throws(()=>catalogQuery(new URLSearchParams(x)));
+});
+test('filters are forwarded securely and only accepted when Windows gateway confirms support',async()=>{
+ const input={q:'ThinkPad',maker:'LENOVO',page:0,category:'laptops',exact:false};
+ const unsupported={ok:true,headers:{get:()=>null},text:async()=>JSON.stringify({items:[{manufacturer:'BATTERY TECHNOLOGY',description:'THINKPAD BATTERY'}],hasMore:false})};
+ await assert.rejects(searchPrivateCatalog(input,{env,fetcher:async()=>unsupported}),e=>e.status===503);
+ const output=await searchPrivateCatalog(input,{env,fetcher:async(url,options)=>{
+  assert.equal(url.searchParams.get('category'),'laptops');
+  assert.equal(url.searchParams.get('exact'),'0');
+  assert.equal(options.headers.Authorization,'Bearer '+key);
+  return {ok:true,headers:{get:()=>null},text:async()=>JSON.stringify({items:[{manufacturer:'LENOVO',description:'THINKPAD LAPTOP',internalSecret:'no'}],hasMore:false,filterVersion:2,category:'laptops',exact:false})};
+ }});
+ assert.equal(output.filterVersion,2);assert.equal(output.category,'laptops');
+ assert.equal(output.items[0].internalSecret,undefined);assert.equal(output.priceVerified,false);
+});
+test('exact mode supports manufacturer and distributor identifiers',async()=>{
+ const input={q:'20YB003XUS',maker:'',page:0,category:'all',exact:true};
+ const out=await searchPrivateCatalog(input,{env,fetcher:async(url)=>{assert.equal(url.searchParams.get('exact'),'1');return {ok:true,headers:{get:()=>null},text:async()=>JSON.stringify({items:[{mfgPart:'20YB003XUS'}],filterVersion:2,category:'all',exact:true})};}});
+ assert.equal(out.exact,true);
+});
+test('UI displays keyword taxonomy as approximate and provides exact search option',()=>{
+ const html=catalogPage();assert.match(html,/id="catalog-type"/);assert.match(html,/value="laptops"/);
+ assert.match(html,/id="catalog-exact"/);assert.match(html,/keyword-based/);
+ assert.match(html,/Type Lenovo/);
 });
