@@ -23,3 +23,12 @@ Redeploy the website. Log in to Tri-Point administration and open `/admin/catalo
 - Obtain the official TD SYNNEX positional data dictionary before using raw numerical fields for profitability or bids. Recheck licensing/segment authorization, inventory, freight and contractual restrictions directly with TD SYNNEX.
 - The catalog is a point-in-time snapshot, not live distributor availability.
 - No new third-party account, paid service, public product data, or scheduled SFTP sync has been activated.
+
+## Catalog search upgrade (October 2026)
+- The private UI offers keyword search plus approximate product-type filters: Laptops, Desktop PCs, Monitors, Networking Hardware, Software/Licenses, and Accessories/Parts.
+- Exact manufacturer part, supplier SKU, and distributor ID search bypasses broad description matching. The exact box requires a search term.
+- Filtering occurs in the private Windows SQLite database **before** pagination. The website will reject requested filters when the old gateway does not report `filterVersion: 2`, instead of silently pretending they were applied.
+- On the supplied snapshot, Lenovo notebook product-family codes `TPP`, `TPE`, `TPTE`, and `TPG` are useful laptop indicators, but this is an observed heuristic and may be incomplete. Other category heuristics use descriptions; do not treat results as official product classification.
+- The Windows user must update `C:\TriPointPrivateCatalog\catalog_gateway.py` to v2 and restart **only** the local gateway process. This does not re-import or upload the SQLite database, and the existing bearer token remains valid.
+- Keep Tailscale Funnel bound to `127.0.0.1:8766`; do not expose FileZilla credentials, the SQLite file, raw supplier feed, or token.
+- Price fields 13/14 and quantities 10/11 remain unlabeled raw values; obtain official TD SYNNEX data dictionary and confirm live inventory/cost before quote generation.
