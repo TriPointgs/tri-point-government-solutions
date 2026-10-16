@@ -1,0 +1,6 @@
+# Fortinet Engage Advocate Partner — website badge integration
+User-supplied Fortinet ENGAGE ADVOCATE PARTNER artwork (two PNG variants) was provided for Tri-Point on October 16, 2026. The copies in assets are size-optimized WebP derivatives preserving the artwork's red/black/gray colors, typography and proportional layout. The standard logo variant appears on the homepage; the divider-line variant appears on /solutions/fortinet.
+
+The artwork is provided by the business owner and used to communicate Tri-Point's reported Fortinet Engage Advocate Partner level. It is not a certificate of specific product authorization, advanced/expert partner tier, managed-security provider status, implementation accreditation, public-sector contract eligibility or stock availability. Obtain Fortinet's written badge use terms and any relevant product/channel authorization evidence before using logo on third-party campaigns. Remove/update when program status or entitlement changes.
+
+The page offers a manual Fortinet procurement inquiry to info@tripointgs.com. It does not automatically price products, submit bids or communicate with buyers. Lenovo's badge remains distinct, and any separate Zoom marketing approval gates remain in force. Contractor data/admin permissions, TD SYNNEX confidential catalog, and ContentMX publishing are not changed by this release.

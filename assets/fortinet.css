@@ -1,0 +1,10 @@
+.fortinet-home-grid{display:grid;grid-template-columns:minmax(0,1.24fr) minmax(220px,.76fr);align-items:center;gap:2.75rem}
+.fortinet-home-art,.fortinet-partner-panel{background:#fff;border:1px solid rgba(11,31,51,.12);border-radius:20px;box-shadow:0 10px 28px rgba(11,31,51,.06);padding:clamp(16px,2.8vw,32px)}
+.fortinet-home-art{display:flex;align-items:center;justify-content:center;min-height:185px}
+.fortinet-advocate-badge{display:block;width:100%;height:auto;object-fit:contain}
+.fortinet-home-art .fortinet-advocate-badge{max-width:400px}
+.fortinet-partner-panel{display:flex;flex-direction:column;align-items:center;gap:18px}
+.fortinet-partner-panel .fortinet-advocate-badge{max-width:570px}
+.fortinet-partner-panel .fine{margin:0;text-align:center;font-size:.84rem;line-height:1.6}
+.fortinet-hero{align-items:center;gap:2.6rem}
+@media(max-width:760px){.fortinet-home-grid{grid-template-columns:1fr;gap:1.4rem}.fortinet-home-art{min-height:150px}.fortinet-hero{gap:1.4rem}}
