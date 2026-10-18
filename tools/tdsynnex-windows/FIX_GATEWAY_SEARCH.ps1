@@ -1,4 +1,4 @@
-# Run in Windows PowerShell 5.1. Patches only the exact-search Boolean conversion.
+# Run in Windows PowerShell 5.1. Revision 2 uses an explicit replacement backup path.
 [CmdletBinding()]
 param([string]$Root = 'C:\TriPointPrivateCatalog')
 $ErrorActionPreference = 'Stop'
@@ -8,6 +8,33 @@ $TokenFile = Join-Path $Root '.catalog-token.txt'
 $Backup = $null
 $Stage = $null
 $Changed = $false
+$ReplaceAttempted = $false
+$BackupVerified = $false
+$PreserveStage = $false
+
+function Test-GatewayReplacement {
+    # Exercise the Windows replacement API with disposable files on the same volume.
+    $probeDirectory = Join-Path $Root ('.gateway-replace-check-' + [guid]::NewGuid().ToString('N'))
+    [IO.Directory]::CreateDirectory($probeDirectory) | Out-Null
+    try {
+        $probeSource = Join-Path $probeDirectory 'original.txt'
+        $probeCandidate = Join-Path $probeDirectory 'candidate.txt'
+        $probeBackup = Join-Path $probeDirectory 'backup.txt'
+        [IO.File]::WriteAllText($probeSource, 'before')
+        [IO.File]::WriteAllText($probeCandidate, 'after')
+        [IO.File]::Replace($probeCandidate, $probeSource, $probeBackup)
+        if ([IO.File]::ReadAllText($probeSource) -cne 'after' -or
+            [IO.File]::ReadAllText($probeBackup) -cne 'before' -or
+            (Test-Path -LiteralPath $probeCandidate)) {
+            throw 'Temporary replacement check failed. Gateway source was not changed.'
+        }
+        Write-Host 'Windows file replacement preflight: PASS'
+    } finally {
+        if (Test-Path -LiteralPath $probeDirectory) {
+            Remove-Item -LiteralPath $probeDirectory -Recurse -Force
+        }
+    }
+}
 
 function Get-GatewayListener {
     $listeners = @(Get-NetTCPConnection -State Listen -ErrorAction Stop | Where-Object { $_.LocalPort -eq 8766 })
@@ -55,6 +82,7 @@ function Assert-Search($Result, [bool]$ExpectedExact, [string]$Label) {
 }
 
 try {
+    Write-Host 'Catalog search repair - revision 2 (Windows backup-path correction)'
     Write-Host '[1/5] Checking local files, source shape, and port owner...'
     foreach ($file in @($Source, $Launcher, $TokenFile)) {
         if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw ("Required file missing: {0}" -f $file) }
@@ -114,18 +142,26 @@ try {
     [IO.File]::WriteAllBytes($Stage, $newBytes)
     & $python @pythonArgs -c 'import pathlib,sys; compile(pathlib.Path(sys.argv[1]).read_bytes(), sys.argv[1], ''exec'')' $Stage 2>$null
     if ($LASTEXITCODE -ne 0) { throw 'Python syntax check failed. Original source and running process were left unchanged.' }
+    Test-GatewayReplacement
     # Detect concurrent edits before backing up or replacing anything.
     $current = [IO.File]::ReadAllBytes($Source)
     if ([Convert]::ToBase64String($current) -cne [Convert]::ToBase64String($bytes)) {
         throw 'Source changed during preparation. No changes made; rerun after editing finishes.'
     }
     if (-not $alreadyFixed) {
-        $Backup = $Source + '.bak-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff')
-        [IO.File]::Copy($Source, $Backup, $false)
-        [IO.File]::Replace($Stage, $Source, $null)
+        $Backup = $Source + '.bak-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '-' + [guid]::NewGuid().ToString('N')
+        # PowerShell must pass a real string path, not $null, as the backup argument.
+        $ReplaceAttempted = $true
+        [IO.File]::Replace($Stage, $Source, $Backup)
         $Changed = $true
         $Stage = $null
+        $BackupVerified = [Convert]::ToBase64String([IO.File]::ReadAllBytes($Backup)) -ceq [Convert]::ToBase64String($bytes)
+        if (-not $BackupVerified) { throw 'The backup does not match the original source; restart was not attempted.' }
+        if ([Convert]::ToBase64String([IO.File]::ReadAllBytes($Source)) -cne [Convert]::ToBase64String($newBytes)) {
+            throw 'Installed source does not match the checked candidate; restart was not attempted.'
+        }
         Write-Host ("One-line repair saved. Backup: {0}" -f $Backup)
+        Write-Host 'Installed source and original backup bytes: VERIFIED'
     }
 
     Write-Host '[3/5] Restarting only the verified gateway through its existing launcher...'
@@ -178,14 +214,33 @@ try {
     if ($Backup) { Write-Host ("Rollback backup retained: {0}" -f $Backup) }
 } catch {
     Write-Host ('REPAIR NOT VERIFIED: ' + $_.Exception.Message) -ForegroundColor Red
-    if ($Changed) {
-        Write-Host ("Backup: {0}" -f $Backup)
-        Write-Host 'To roll back: stop only the gateway using its launcher window, then run:'
-        Write-Host ("Copy-Item -LiteralPath '{0}' -Destination '{1}' -Force" -f $Backup.Replace("'", "''"), $Source.Replace("'", "''"))
-        Write-Host 'Then start START_GATEWAY.ps1 again. Database and token were not modified.'
+    if ($ReplaceAttempted) {
+        # A Windows replacement error can occur after the original moved to its backup.
+        # Verify the recovery file and preserve any surviving candidate before cleanup.
+        $PreserveStage = $Stage -and (Test-Path -LiteralPath $Stage -PathType Leaf)
+        $BackupVerified = $false
+        try {
+            if (Test-Path -LiteralPath $Backup -PathType Leaf) {
+                $BackupVerified = [Convert]::ToBase64String([IO.File]::ReadAllBytes($Backup)) -ceq [Convert]::ToBase64String($bytes)
+            }
+        } catch { }
+        if ($BackupVerified) {
+            Write-Host ("Verified original backup: {0}" -f $Backup)
+            Write-Host 'To roll back: stop only the gateway using its launcher window, then run:'
+            Write-Host ("Copy-Item -LiteralPath '{0}' -Destination '{1}' -Force" -f $Backup.Replace("'", "''"), $Source.Replace("'", "''"))
+            Write-Host 'Then start START_GATEWAY.ps1 again.'
+        } else {
+            Write-Host ("Backup was not verified. Retain this path for inspection: {0}" -f $Backup)
+        }
+        if (-not (Test-Path -LiteralPath $Source -PathType Leaf)) {
+            Write-Host 'Gateway source is missing; restore a verified original before starting the launcher.'
+        }
+        if ($PreserveStage) { Write-Host ("Candidate retained for recovery: {0}" -f $Stage) }
     }
     exit 1
 } finally {
-    if ($Stage -and (Test-Path -LiteralPath $Stage)) { Remove-Item -LiteralPath $Stage -Force }
+    if ($Stage -and -not $PreserveStage -and (Test-Path -LiteralPath $Stage)) {
+        Remove-Item -LiteralPath $Stage -Force
+    }
     $Token = $null
 }
