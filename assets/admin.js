@@ -7,7 +7,7 @@ async function loadNotifications(){
   if(!res.ok)return;
   const data=await res.json();const count=Number(data.newCount||0);
   const el=document.querySelector('#new-signups-count');
-  if(el)el.textContent=(count===0?'No unreviewed subcontractor applications':count+' new subcontractor application'+(count===1?'':'s')+' awaiting review')+(data.emailEnabled?' · Email alerts enabled':' · Email alerts not configured');
+  if(el)el.textContent=(count===0?'No unreviewed subcontractor applications':count+' new subcontractor application'+(count===1?'':'s')+' awaiting review')+(data.preview?' · Preview: email alerts intentionally disabled':data.emailEnabled?' · Email alerts enabled':' · Email alerts not configured');
  }catch{console.warn('Notification count could not load.');}
 }
 

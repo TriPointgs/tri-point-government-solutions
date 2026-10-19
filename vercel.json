@@ -28,6 +28,14 @@
       "destination": "/api/catalog?view=page"
     },
     {
+      "source": "/admin/orders",
+      "destination": "/api/commerce?view=page"
+    },
+    {
+      "source": "/admin/inquiries",
+      "destination": "/api/contact?view=admin-page"
+    },
+    {
       "source": "/learn/:path*",
       "destination": "/api/retired"
     },

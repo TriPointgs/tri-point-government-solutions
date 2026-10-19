@@ -1,3 +1,4 @@
+import {applySiteExperience} from '../lib/site-experience.mjs';
 import {HttpError} from '../lib/model.mjs';
 import {requireAdmin,send,fail} from '../lib/security.mjs';
 import {catalogQuery,searchPrivateCatalog} from '../lib/catalog-remote.mjs';
@@ -13,7 +14,7 @@ export function createCatalogHandler({search=searchPrivateCatalog,render=catalog
    requireAdmin(req); // Contractor-only sessions cannot access either view.
    if(page){
     if(!['GET','HEAD'].includes(req.method)){res.setHeader('Allow','GET, HEAD');throw new HttpError(405,'Method not allowed.');}
-    res.setHeader('Content-Type','text/html; charset=utf-8');res.statusCode=200;return res.end(req.method==='HEAD'?'':render());
+    res.setHeader('Content-Type','text/html; charset=utf-8');res.statusCode=200;return res.end(req.method==='HEAD'?'':applySiteExperience(render(),{route:'/admin/catalog'}));
    }
    if(req.method!=='GET'){res.setHeader('Allow','GET');throw new HttpError(405,'Method not allowed.');}
    const input=catalogQuery(query);
