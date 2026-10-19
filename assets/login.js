@@ -26,6 +26,7 @@ async function initialize(){
    const data=await response.json();
    contractor.querySelector('button').disabled=!data.enabled;
    if(!data.enabled)document.querySelector('#contractor-availability').textContent='Contractor email sign-in will be enabled after Tri-Point verifies its sending domain. For profile changes, email info@tripointgs.com from your application contact address.';
+   if(data.enabled&&!data.signedIn)document.querySelector('#contractor-availability').textContent='Enter your application email to receive a private, single-use sign-in link.';
    if(data.enabled&&data.signedIn&&!claim)document.querySelector('#contractor-availability').textContent='You already have a profile session. Open your company profile below.';
   }
  }catch{status('Unable to check contractor sign-in availability. Administrator sign-in remains available.',true);}
