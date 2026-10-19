@@ -21,13 +21,15 @@ const syntheticProducts=Array.from({length:55},(_,i)=>({manufacturer:'SYNTHETIC 
 const catalog=createCatalogHandler({search:async(q)=>{let products=syntheticProducts.filter(p=>(!q.maker||p.manufacturer.toLowerCase().includes(q.maker.toLowerCase()))&&(!q.q||(q.exact?[p.mfgPart,p.supplierSku,p.distributorId].includes(q.q.toUpperCase()):[p.description,p.mfgPart].join(' ').toLowerCase().includes(q.q.toLowerCase())))&&['all','laptops'].includes(q.category));return {items:products.slice(q.page*50,q.page*50+50),hasMore:products.length>q.page*50+50,priceVerified:false,stockVerified:false,filterVersion:2,category:q.category,exact:q.exact,totalRecords:55};}});
 const commerce=createCommerceHandler({env:{VERCEL_ENV:'preview'},service:createOrderLabService({repository:createMemoryOrderRepository()})});
 const {default:contact}=await import('../api/contact.js');
-const routes={'/api/contact':contact,'/api/catalog':catalog,'/api/commerce':commerce,'/api/zoom-page':zoomPage,'/api/zoom-quotes':zoomQuotes,'/api/zoom-sales':zoomSales,'/api/contractor-auth':contractorAuth,'/api/contractor-profile':contractorProfile,'/api/notifications':notifications,'/api/admin':admin,'/api/intake':intake,'/api/opportunities':opportunities};const root=resolve('dist');
+const {previewProductControls}=await import('./preview-products.mjs');
+const routes={'/api/product-controls':previewProductControls,'/api/contact':contact,'/api/catalog':catalog,'/api/commerce':commerce,'/api/zoom-page':zoomPage,'/api/zoom-quotes':zoomQuotes,'/api/zoom-sales':zoomSales,'/api/contractor-auth':contractorAuth,'/api/contractor-profile':contractorProfile,'/api/notifications':notifications,'/api/admin':admin,'/api/intake':intake,'/api/opportunities':opportunities};const root=resolve('dist');
 createServer(async(req,res)=>{
  const pathname=new URL(req.url,'http://localhost:3000').pathname;
  res.setHeader('Cache-Control','private, no-store');
  if(pathname==='/solutions/zoom'||pathname==='/solutions/zoom/quote'||pathname==='/contractors/admin/zoom'){const q=new URL(req.url,'http://localhost:3000').searchParams;q.set('view',pathname==='/contractors/admin/zoom'?'admin':pathname.endsWith('/quote')?'quote':'marketing');req.url='/api/zoom-page?'+q;return zoomPage(req,res);}
  if(pathname==='/admin/catalog'){req.url='/api/catalog?view=page';return catalog(req,res);}
  if(pathname==='/admin/inquiries'){req.url='/api/contact?view=admin-page';return contact(req,res);}
+ if(pathname==='/admin/products'){req.url='/api/product-controls?view=page';return previewProductControls(req,res);}
  if(pathname==='/admin/orders'){req.url='/api/commerce?view=page';return commerce(req,res);}
  if(pathname==='/learn'||pathname.startsWith('/learn/')||pathname==='/government-contracts'||pathname.startsWith('/government-contracts/')){res.statusCode=410;return res.end('Resource retired.');}
  if(routes[pathname])return routes[pathname](req,res);

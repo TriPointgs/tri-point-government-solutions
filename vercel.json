@@ -36,6 +36,10 @@
       "destination": "/api/contact?view=admin-page"
     },
     {
+      "source": "/admin/products",
+      "destination": "/api/product-controls?view=page"
+    },
+    {
       "source": "/learn/:path*",
       "destination": "/api/retired"
     },
