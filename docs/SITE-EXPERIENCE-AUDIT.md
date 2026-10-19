@@ -35,3 +35,7 @@ No live forms were submitted, real records changed, email sent, payment made, or
 ## Remaining release checks
 
 Owner visual review of the preview; authenticated production-only feature checks; actual hosting/deployment verification; all real commerce adapter, payment, email, tax, shipping, storage, supplier-order and tracking gates. Do not merge or enable real transactions solely because the local simulation and build pass.
+
+## Follow-up feedback correction
+
+The later contact-button and logo changes are documented in `FEEDBACK-FIXES-2026-10-19.md`. The sourcing list no longer opens a mail application; it continues to the on-site request form. The original mailto behavior above describes the earlier baseline, not the updated preview.

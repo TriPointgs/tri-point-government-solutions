@@ -11,7 +11,7 @@ async function summary(){
   if(total>5000||++iterations>250)throw new HttpError(503,'Directory exceeds notification scan limit.');
   cursor=page.hasMore?page.cursor:null;
  }while(cursor);
- return {newCount:count,totalCount:total,emailEnabled:notificationConfiguration().enabled};
+ return {newCount:count,totalCount:total,emailEnabled:notificationConfiguration().enabled,preview:notificationConfiguration().preview};
 }
 export default async function handler(req,res){
  try{
