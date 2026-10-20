@@ -1,6 +1,6 @@
 import {HttpError} from '../lib/model.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
-import {createShoppingCollector,normalizeShopping,ShoppingResearchError} from '../lib/serpapi-shopping.mjs';
+import {createShoppingCollector,normalizeShopping,normalizeExactWebListings,ShoppingResearchError} from '../lib/serpapi-shopping.mjs';
 import {createProductControlsHandler} from '../api/product-controls.js';
 import {sign} from '../lib/security.mjs';
 const product={id:'TD-14790211',manufacturer:'LENOVO',mfgPart:'21KCS4S600',description:'ThinkPad X1 Carbon Gen 12'};
@@ -17,7 +17,7 @@ test('duplicate store labels do not inflate the provisional source count',()=>{c
 test('provider errors cannot echo customer input or secret information',()=>{for(const d of [{error:'SECRET_API_KEY'},{search_metadata:{status:'Error'},shopping_results:[]}])assert.throws(()=>norm(d),e=>e.code==='provider_error'&&!e.message.includes('SECRET'));});
 test('unusable or non-google product URLs cannot be opened through the research result',()=>{const r=norm({shopping_results:[row({product_link:'https://evil.invalid/visit?api_key=SENSITIVE'}),row({product_link:'http://www.google.com/shopping/product/123'})]});assert.equal(r.candidates[0].googleProductLink,null);assert.equal(r.candidates[1].googleProductLink,null);});
 test('missing results on reported success is empty, otherwise an error',()=>{assert.equal(norm({search_metadata:{status:'Success'}}).candidates.length,0);assert.throws(()=>norm({}),e=>e.code==='missing_results');});
-test('server collector uses only saved exact part and one fixed SerpApi endpoint',async()=>{let calls=[];const c=createShoppingCollector({env:config,clock:()=>now,fetcher:async(url,opts)=>{calls.push({url,opts});return response({shopping_results:[row()]});}});const r=await c.search(product);assert.equal(calls.length,1);const u=new URL(calls[0].url);assert.equal(u.origin,'https://serpapi.com');assert.equal(u.pathname,'/search.json');assert.equal(u.searchParams.get('engine'),'google_shopping');assert.equal(u.searchParams.get('q'),'LENOVO 21KCS4S600');assert.equal(u.searchParams.get('gl'),'us');assert.equal(u.searchParams.get('api_key'),config.TP_SERPAPI_KEY);assert.equal(calls[0].opts.method,'GET');assert.equal(calls[0].opts.redirect,'error');assert.doesNotMatch(JSON.stringify(r),/synthetic-super-secret/);});
+test('server collector uses only saved exact part and one fixed SerpApi endpoint',async()=>{let calls=[];const c=createShoppingCollector({env:config,clock:()=>now,fetcher:async(url,opts)=>{calls.push({url,opts});return response({shopping_results:[row()]});}});const r=await c.search(product);assert.equal(calls.length,1);const u=new URL(calls[0].url);assert.equal(u.origin,'https://serpapi.com');assert.equal(u.pathname,'/search.json');assert.equal(u.searchParams.get('engine'),'google_shopping');assert.equal(u.searchParams.get('q'),'"21KCS4S600" LENOVO');assert.equal(u.searchParams.get('gl'),'us');assert.equal(u.searchParams.get('api_key'),config.TP_SERPAPI_KEY);assert.equal(calls[0].opts.method,'GET');assert.equal(calls[0].opts.redirect,'error');assert.doesNotMatch(JSON.stringify(r),/synthetic-super-secret/);});
 test('configured status reveals no key or credential fragment',()=>{const s=createShoppingCollector({env:config}).status();assert.equal(s.configured,true);assert.equal(s.queriesPerTrigger,1);assert.doesNotMatch(JSON.stringify(s),/synthetic-super-secret/);});
 test('production gate and missing key do not consume provider requests',async()=>{let calls=0;for(const env of [{VERCEL_ENV:'production',TP_SERPAPI_KEY:'synthetic-super-secret-serpapi-key'},{VERCEL_ENV:'preview'}]){const c=createShoppingCollector({env,fetcher:async()=>{calls++;}});await assert.rejects(c.search(product),e=>e.status===503);}assert.equal(calls,0);});
 test('invalid saved ID or unqueryable part fails before provider contact',async()=>{let calls=0;const c=createShoppingCollector({env:config,fetcher:async()=>{calls++;}});await assert.rejects(c.search({...product,id:'other'}),e=>e.status===400);await assert.rejects(c.search({...product,mfgPart:'<script>'}),e=>e.status===400);assert.equal(calls,0);});
@@ -32,3 +32,27 @@ test('shopping status cannot leak secret configuration or call provider',async()
 test('rate limiting happens before provider usage',async()=>{const r=await route({token:admin(),rate:async()=>{throw new HttpError(429,'Wait');}});assert.equal(r.status,429);assert.equal(r.called,0);});
 
 test('foreign and undisclosed currencies are never included in provisional US dollar calculation',()=>{const r=norm({shopping_results:[row({source:'Newegg',price:'£1,599.99'}),row({source:'Walmart',price:'CA$1,499.99'})]});assert.equal(r.preliminaryAverageCents,null);assert.equal(r.preliminarySourceCount,0);});
+
+test('exact-part organic search returns recognized retailer pages but no price benchmark',()=>{
+ const rows=[{title:'ThinkPad X1 Carbon (21KCS4S600)',link:'https://www.staples.com/product_24691889?utm_source=ad',snippet:'Lenovo 21KCS4S600 at Staples'},{title:'Lenovo X1 Carbon 21KCS4S600',link:'https://www.newegg.com/lenovo-laptop/p/1TS-000E-1E2Y4',snippet:'Manufacturer 21KCS4S600'},{title:'Other ThinkPad',link:'https://example.org/product',snippet:'not the requested model'}];
+ const r=normalizeExactWebListings({organic_results:rows},product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(r.mode,'exact_web');assert.equal(r.exactTitleMatches,2);assert.equal(r.preliminaryAverageCents,null);
+ assert.equal(r.candidates[0].vendorLink,'https://www.staples.com/product_24691889');
+ assert.equal(r.candidates[1].vendorLink,'https://www.newegg.com/lenovo-laptop/p/1TS-000E-1E2Y4');
+ assert.equal(r.candidates[2].vendorLink,null);
+});
+test('exact web search uses Google organic engine only once and returns no key',async()=>{
+ let calls=0;const c=createShoppingCollector({env:config,clock:()=>now,fetcher:async url=>{calls++;const u=new URL(url);assert.equal(u.searchParams.get('engine'),'google');assert.equal(u.searchParams.get('q'),'"21KCS4S600" LENOVO');return response({organic_results:[{title:'21KCS4S600 laptop',link:'https://www.staples.com/product_24691889',snippet:'Part 21KCS4S600'}]});}});
+ const r=await c.search(product,{mode:'exact_web'});assert.equal(calls,1);assert.equal(r.mode,'exact_web');assert.doesNotMatch(JSON.stringify(r),/synthetic-super-secret/);
+});
+test('unsupported search modes never spend a credit',async()=>{let n=0;const c=createShoppingCollector({env:config,fetcher:async()=>{n++}});await assert.rejects(c.search(product,{mode:'unrestricted_web'}),e=>e.status===400);assert.equal(n,0)});
+test('Google product IDs provide safe research link when product_link missing',()=>{
+ const r=norm({shopping_results:[row({product_link:undefined,product_id:'123456789012345'})]});
+ assert.match(r.candidates[0].googleProductLink,/^https:\/\/www\.google\.com\/search\?udm=28/);
+ assert.doesNotMatch(r.candidates[0].googleProductLink,/api_key/);
+ assert.equal(norm({shopping_results:[row({product_link:undefined,product_id:'foo'})]}).candidates[0].googleProductLink,null);
+});
+test('web search does not infer item prices from snippets',()=>{
+ const r=normalizeExactWebListings({organic_results:[{title:'21KCS4S600',snippet:'Price $1,849.99',link:'https://www.staples.com/product_24691889'}]},product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(r.candidates[0].priceCents,null);assert.equal(r.preliminaryAverageCents,null);assert.equal(r.candidates[0].eligibleForVerifiedAverage,false);
+});

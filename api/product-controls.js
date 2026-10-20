@@ -25,7 +25,7 @@ export function createProductControlsHandler({env=process.env,service=createProd
       }
       if(req.method!=='POST'){res.setHeader('Allow','GET, HEAD, POST');throw new HttpError(405,'Method not allowed.');}
       requireOrigin(req);const input=await body(req,32000);
-      const fields={import:['query','selections','revision'],rules:['policy','pricingPolicy','revision'],review:['id','patch','revision'],refresh:['productIds','revision'],marketSave:['id','revision','offer','destinationZip'],marketRemove:['id','revision','retailer','destinationZip'],marketSearch:['id']};
+      const fields={import:['query','selections','revision'],rules:['policy','pricingPolicy','revision'],review:['id','patch','revision'],refresh:['productIds','revision'],marketSave:['id','revision','offer','destinationZip'],marketRemove:['id','revision','retailer','destinationZip'],marketSearch:['id','mode']};
       if(!Object.hasOwn(fields,input.action)||Object.keys(input).some(k=>k!=='action'&&!fields[input.action].includes(k)))throw new HttpError(400,'Unsupported product action.');
       if(input.action==='marketSearch')await rate(req,'serpapi-google-shopping',3);
       if(input.action==='marketSave'||input.action==='marketRemove')await rate(req,'retail-market-write',30);

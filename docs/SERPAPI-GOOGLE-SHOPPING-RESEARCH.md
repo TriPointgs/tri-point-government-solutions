@@ -35,3 +35,11 @@ Shopping results provide `title`, `source`, `price`, `extracted_price`, `product
 - Vercel preview build must be verified against the exact new commit. A successful build does not prove SerpApi credentials, product coverage, quota or hosted response format.
 - Owner must press **Fetch candidates · 1 search** once on the saved Lenovo item. Capture status, result count and candidate list without exposing secrets. If no exact part match, do not fabricate an average; investigate search query or a controlled `google_product` follow-up based on actual response.
 - Determine a permitted, budgeted, reliable automatic collector with product-offer detail, independent seller identity and validation before proposing scheduled refreshes. HP MAP checks remain separate from retail averages.
+
+## Matching repair after first actual Google Shopping test
+
+The user-provided live result list contained approximately 40 broad Lenovo products, many from other laptop families and several non-laptops, with zero visible exact manufacturer-part matches. For part 21KCS4S600, do not calculate a mean from those results. The search provider returned data but not sufficiently relevant products.
+
+This revision offers two separate, manually triggered, one-credit searches: Shopping uses the quoted complete MPN plus manufacturer, and Exact-part web listings uses Google's organic search engine with the same quoted MPN. The web mode returns recognized HTTPS retailer product-page links based on title/snippet/URL exact-part signals but never converts prices in snippets into confirmed offers.
+
+For Shopping records with a numeric product_id and no product_link, a safe Google-owned product-reference link is generated. Provider URLs, tracking data and credentials are not returned. Exact-part candidates display first. Unrelated or missing-MPN results are hidden until specifically requested. No candidate changes a reviewed comparison or customer selling price. Each mode consumes only one SerpApi request when clicked, with no automatic fallback or scheduled search.
