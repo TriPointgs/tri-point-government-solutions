@@ -4,8 +4,9 @@ let cart={revision:0,items:[],itemCount:0},page=0,query={q:'',category:'all'},ha
 // Preview: only enrich specifically searched/filtered visible products, never 50+ arbitrary
 // first-page catalog records or all 1.2M supplier items. No automatic provider polling.
 const icecatCache=new Map(),artIdentity=new WeakMap();
-const MAX_AUTO_PER_SEARCH=2,MAX_AUTO_PER_TAB=4;
-let autoUsed=0,mediaObserver=null,searchGeneration=0;
+// Per-search pilot budget; the old lifetime tab cap could silently disable images after browsing four products.
+const MAX_AUTO_PER_SEARCH=2;
+let mediaObserver=null,searchGeneration=0;
 function exactMedia(data,p){
  return !!(data?.status==='matched'&&data?.identityVerified===true&&data?.product&&
  data.product.brand?.trim().toUpperCase()===p.manufacturer.trim().toUpperCase()&&
@@ -30,30 +31,43 @@ function showCardPhoto(art,p,d){
 }
 function autoMedia(p,art){
  art.dataset.photo='loading';art.replaceChildren(el('span','Loading photo…','image-loading'));
- getIcecat(p).then(d=>showCardPhoto(art,p,d)).catch(()=>{
+ getIcecat(p).then(d=>showCardPhoto(art,p,d)).catch(e=>{
   if(!art.isConnected||artIdentity.get(art)!==p.sku)return;
-  art.replaceChildren(el('span','Image unavailable','image-unavailable'));art.dataset.photo='unavailable';
+  const limited=e?.status===429;
+  art.replaceChildren(el('span',limited?'Photo lookup paused':'Image unavailable','image-unavailable'));
+  art.dataset.photo=limited?'paused':'unavailable';
  });
 }
 function scheduleVisibleImages(cards,explicitQuery){
  if(mediaObserver)mediaObserver.disconnect();
- if(!explicitQuery||autoUsed>=MAX_AUTO_PER_TAB||!cards.length)return;
+ if(!explicitQuery||!cards.length)return;
  const generation=++searchGeneration;
  let perSearch=0;
- if(typeof IntersectionObserver!=='function')return; // details button remains available
+ const searchPart=String(query.q||'').trim().toUpperCase();
+ // Exact manufacturer-part / TD SKU searches should not depend on IntersectionObserver
+ // firing or on a budget already consumed by earlier, unrelated browsing.
+ const exact=searchPart?cards.filter(c=>String(c.p.partNumber||'').toUpperCase()===searchPart||String(c.p.sku||'')===searchPart):[];
+ const priority=exact.length?exact.slice(0,MAX_AUTO_PER_SEARCH):(cards.length===1&&searchPart?[cards[0]]:[]);
+ for(const card of priority){
+  perSearch++;
+  autoMedia(card.p,card.art);
+ }
+ // When the exact part was found, don't spend a second provider request on prefix matches.
+ if(exact.length||perSearch>=MAX_AUTO_PER_SEARCH||typeof IntersectionObserver!=='function')return;
  mediaObserver=new IntersectionObserver(entries=>{
   if(generation!==searchGeneration)return;
   for(const entry of entries){
    if(!entry.isIntersecting)continue;
    mediaObserver.unobserve(entry.target);
-   if(autoUsed>=MAX_AUTO_PER_TAB||perSearch>=MAX_AUTO_PER_SEARCH)continue;
-   const original=artIdentity.get(entry.target),card=cards.find(c=>c.p.sku===original&&c.art===entry.target);
+   if(perSearch>=MAX_AUTO_PER_SEARCH)continue;
+   const original=artIdentity.get(entry.target);
+   const card=cards.find(c=>c.p.sku===original&&c.art===entry.target);
    if(!card||!entry.target.isConnected)continue;
-   autoUsed++;perSearch++;
+   perSearch++;
    autoMedia(card.p,card.art);
   }
  },{rootMargin:'80px'});
- for(const c of cards)mediaObserver.observe(c.art);
+ for(const card of cards)if(!priority.includes(card))mediaObserver.observe(card.art);
 }
 
 function status(message,error=false){$('shop-status').textContent=message;$('shop-status').classList.toggle('error',error);}
