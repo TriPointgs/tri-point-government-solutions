@@ -52,3 +52,14 @@ A user-provided exact-part Google organic test surfaced SHI (21KCS4S600, reporte
 Organic result price snippets previously showed Unavailable because they were not extracted as verified prices. The panel now presents unambiguous text or supported rich-result currency fields as an explicitly unverified price hint. Mixed prices, negative savings, multiple different dollar amounts, and installment text do not produce a hint. Such amounts are NEVER saved as checked retailer offers and NEVER enter verified averages; organic priceCents remains null.
 
 Unrecognized vendor product domains now display a Google research link for the exact MPN and listing title, not a fabricated direct seller URL. SHI and Staples are available as separate manual comparison sources after staff verifies an exact, current offer; no supplier is automatically marked in stock or authorized. There is no automatic refresh, no markup/HP MAP change, no order submission, and no public competitor claim.
+
+
+## Supplier availability classifications after the second live search
+
+The owner's second live exact-part query showed two price-hint leads:
+- SHI, MPN 21KCS4S600, $1,551.00. External web verification of SHI's separate listing indicated Backorder, Stock 0. The SerpApi user screenshot itself did not include that field, so the collector cannot infer it without a separate retailer-page source.
+- PetroCore Supply Solutions, MPN 21KCS4S600, $1,550.99, explicitly says Available to order / Supplied to order, which does not establish physical inventory. A direct reviewed product URL and US seller/currency scope were not confirmed.
+
+Other exact manufacturer-part candidates are sold by third-party merchants at Newegg or listed as manufacturer dropship at CompSource. Neither an Add to Cart control nor dropship language proves physical stock.
+
+This update adds a conservative transparent organic search availability signal: backorder_or_zero, out_of_stock, supplier_order, in_stock_claim, or unknown. A positive in_stock_claim is itself not verified stock. SHI and PetroCore search price hints still never enter a multi-source verified mean automatically. The UI counts hints and reports inventory uncertainty before individual results. Tri-Point pricing, public listings, supplier orders and HP MAP remain unchanged. Keep external research separate from SerpApi-returned fields.

@@ -1,7 +1,7 @@
 import {retailerUrl} from '../lib/market-price.mjs';
 import {HttpError} from '../lib/model.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
-import {createShoppingCollector,normalizeShopping,normalizeExactWebListings,ShoppingResearchError} from '../lib/serpapi-shopping.mjs';
+import {createShoppingCollector,normalizeShopping,normalizeExactWebListings,researchAvailabilitySignal,ShoppingResearchError} from '../lib/serpapi-shopping.mjs';
 import {createProductControlsHandler} from '../api/product-controls.js';
 import {sign} from '../lib/security.mjs';
 const product={id:'TD-14790211',manufacturer:'LENOVO',mfgPart:'21KCS4S600',description:'ThinkPad X1 Carbon Gen 12'};
@@ -92,4 +92,36 @@ test('SHI and Staples product pages allowed for manual review, not search or unt
  assert.equal(retailerUrl('staples','https://www.staples.com/product_24691889'),'https://www.staples.com/product_24691889');
  assert.throws(()=>retailerUrl('shi','https://www.shi.com/search?q=MPN'),e=>e.status===400);
  assert.throws(()=>retailerUrl('staples','https://www.staples.com.evil.invalid/product_123'),e=>e.status===400);
+});
+
+test('search evidence distinguishes backorders, unavailable, and supplier-order language',()=>{
+ const examples=[
+ ['Lenovo 21KCS4S600','SHI - $1,551.00 Backorder Stock: 0','backorder_or_zero'],
+ ['Lenovo 21KCS4S600','In stock 0 remaining, backordered','backorder_or_zero'],
+ ['Lenovo 21KCS4S600','New. Out of Stock. Notify when available.','out_of_stock'],
+ ['Lenovo 21KCS4S600','Price: $1,550.99. Available to order. Supplied to order.','supplier_order'],
+ ['Lenovo 21KCS4S600','Manufacturer Drop Ship.','supplier_order'],
+ ['Lenovo 21KCS4S600','New factory sealed. 656 in stock.','in_stock_claim'],
+ ['Lenovo 21KCS4S600','Price $1,749.99. Add to cart.','unknown'],
+ ];
+ for(const [title,snippet,wanted] of examples)assert.equal(researchAvailabilitySignal(title,snippet).status,wanted,snippet);
+});
+test('exact web research exposes stock signals without approving snippet price as sellable',()=>{
+ const data={organic_results:[
+ {title:'THINKPAD X1 CARBON GEN 12 | Overview Specs',snippet:'Mfr Part #: 21KCS4S600 Price: $1,551.00 Backorder Stock: 0',link:'https://www.shi.com/product/51037510/THINKPAD-X1-CARBON-GEN-12'},
+ {title:'THINKPAD X1 CARBON GEN 12 | 21KCS4S600',snippet:'$1,550.99. Available to order. Supplied to order',link:'https://example.invalid/abc'}
+ ]};
+ const r=normalizeExactWebListings(data,product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(r.priceHintCount,2);
+ assert.equal(r.candidates[0].availabilitySignal.status,'backorder_or_zero');
+ assert.equal(r.candidates[1].availabilitySignal.status,'supplier_order');
+ assert.equal(r.candidates[0].priceHintCents,155100);
+ assert.equal(r.candidates[1].priceHintCents,155099);
+ assert.equal(r.preliminaryAverageCents,null);
+ assert.ok(r.candidates.every(x=>x.eligibleForVerifiedAverage===false&&x.reviewed===false));
+});
+test('unknown stock never becomes an in-stock claim from an add-to-cart button',()=>{
+ const result=normalizeExactWebListings({organic_results:[{title:'21KCS4S600',snippet:'Add to Cart. Price $1,749.99',link:'https://www.newegg.com/lenovo/p/123'}]},product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(result.candidates[0].availabilitySignal.status,'unknown');
+ assert.equal(result.candidates[0].priceCents,null);
 });
