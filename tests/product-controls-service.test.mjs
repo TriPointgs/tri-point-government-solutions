@@ -1,3 +1,4 @@
+import {memoryResearchStore} from '../lib/research-report-store.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {BlobNotFoundError} from '@vercel/blob';
 import {createProductControls} from '../lib/product-controls-service.mjs';
@@ -7,7 +8,7 @@ import {TdReadError} from '../lib/tdsynnex-readonly.mjs';
 const at='2026-10-19T15:00:00.000Z',clock=()=>Date.parse(at),query={q:'notebook',maker:'LENOVO',category:'laptops',page:0,exact:'0'};
 const row=(n=0,over={})=>({distributorId:String(12345+n),mfgPart:'PART-'+n,manufacturer:'LENOVO',description:'Example notebook '+n,productFamily:'TPP',rawField13:999999,rawField10:999999,...over});
 const observation=(n=0,over={})=>({sku:String(12345+n),mfgPart:'PART-'+n,identityMatched:true,source:'tdsynnex-priceavailability',environment:'production',checkedAt:at,status:'Active',issues:[],currency:'USD',costCents:10000,stockQuantity:4,endUserRequired:false,parcelShippable:true,...over});
-function setup({catalog,td,store}={}){store=store||memoryProductStore();const s=createProductControls({env:{VERCEL_ENV:'preview'},store,catalog:catalog||(async()=>({items:[row(),row(1)],hasMore:false})),td:td||{configuration:()=>({enabled:true,environment:'production'}),lookup:async ids=>ids.map(s=>observation(Number(s.sku)-12345))},clock});return {s,store};}
+function setup({catalog,td,store}={}){store=store||memoryProductStore();const s=createProductControls({env:{VERCEL_ENV:'preview'},store,researchStore:memoryResearchStore(),catalog:catalog||(async()=>({items:[row(),row(1)],hasMore:false})),td:td||{configuration:()=>({enabled:true,environment:'production'}),lookup:async ids=>ids.map(s=>observation(Number(s.sku)-12345))},clock});return {s,store};}
 const importInput=(revision=0)=>({query,selections:[{sku:'12345',mfgPart:'PART-0'}],revision});
 
 test('catalog search returns identities only, scoped to one source page',async()=>{const {s}=setup();const r=await s.source(query);assert.equal(r.items.length,2);assert.equal(r.scope,'one-distributor-search-page');assert.equal(r.categoryApproximate,true);assert.doesNotMatch(JSON.stringify(r),/rawField|999999|costCents/);});

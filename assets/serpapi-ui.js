@@ -13,14 +13,15 @@ export async function fetchShoppingCandidates(mode='shopping'){
  if(inFlight||!activeId)return;
  const id=activeId,requested=++seq,button=$('serpapi-fetch'),other=$('serpapi-exact-web');
  inFlight=true;button.disabled=true;other.disabled=true;
- $('serpapi-status').textContent='Checking '+(mode==='exact_web'?'exact-part retail web listings':'Google Shopping')+'… one server-side request. No prices are being saved.';
+ $('serpapi-status').textContent='Checking '+(mode==='exact_web'?'exact-part retail web listings':'Google Shopping')+'… one server-side request. Results will be saved as unverified research, not approved retail offers.';
  try{
   const r=await fetch('/api/product-controls',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'marketSearch',id,mode}),credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(25000)});
   let data;try{data=await r.json();}catch{throw Error('Search response was not readable.');}
   if(r.status===401){$('market-price-dialog').close();location.assign('/login');return;}
   if(!r.ok)throw Error(data.error||'Shopping research failed.');
   if(id!==activeId||requested!==seq)return;
-  $('serpapi-status').textContent='Search completed '+new Date(data.checkedAt).toLocaleString()+' · '+data.totalReturned+' '+(data.mode==='exact_web'?'web results':'shopping results')+' · '+data.exactTitleMatches+' show the complete part number in searchable fields. Results remain unverified.';
+  if(data.researchSummary)document.dispatchEvent(new CustomEvent('research-report-updated',{detail:{id,summary:data.researchSummary,saved:data.researchSummarySaved??data.researchSaved}}));
+  $('serpapi-status').textContent='Search completed '+new Date(data.checkedAt).toLocaleString()+' · '+data.totalReturned+' '+(data.mode==='exact_web'?'web results':'shopping results')+' · '+data.exactTitleMatches+' show the complete part number in searchable fields. Results remain unverified. '+(data.researchSaved===true?'Research summary saved.':data.saveWarning||'');
   $('serpapi-indicative').textContent=data.mode==='exact_web'?'Web results are product-page leads, not confirmed prices. Open the retailer listing to check actual price and stock.':
    data.preliminaryAverageCents===null?'No preliminary multi-source average from strict title matches. This is not an error.':
    'Unverified title-match indicator: '+dollars(data.preliminaryAverageCents)+' from '+data.preliminarySourceCount+' distinct store labels. Not an approved or published retail average.';
@@ -31,7 +32,7 @@ export async function fetchShoppingCandidates(mode='shopping'){
    const hints=matches.filter(c=>c.priceHintCents!==null&&c.priceHintCents!==undefined);
    const excluded=hints.filter(c=>['backorder_or_zero','out_of_stock'].includes(c.availabilitySignal?.status)).length;
    const held=hints.filter(c=>['supplier_order','unknown'].includes(c.availabilitySignal?.status)).length;
-   $('serpapi-indicative').textContent=hints.length+' exact-part search price hints; '+excluded+' indicate backorder/out of stock, '+held+' require stock confirmation. No verified average calculated.';
+   $('serpapi-indicative').textContent=hints.length+' exact-part search price hints; '+excluded+' indicate backorder/out of stock, '+held+' require stock confirmation. The saved research average includes non-stocked offers; it is not a verified in-stock price.';
   }
   const body=$('serpapi-candidates');body.replaceChildren();
   for(const c of [...matches,...others]){
