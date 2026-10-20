@@ -7,6 +7,9 @@
   "functions": {
     "api/*.js": {
       "maxDuration": 30
+    },
+    "api/shop.js": {
+      "maxDuration": 60
     }
   },
   "redirects": [
@@ -23,6 +26,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/shop-preview",
+      "destination": "/api/shop?view=page"
+    },
     {
       "source": "/admin/catalog",
       "destination": "/api/catalog?view=page"
