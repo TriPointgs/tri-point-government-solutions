@@ -16,6 +16,7 @@ export function createProductControlsHandler({env=process.env,service=createProd
         if(view==='page'){res.statusCode=200;res.setHeader('Content-Type','text/html; charset=utf-8');return res.end(req.method==='HEAD'?'':productControlsPage());}
         if(req.method==='HEAD')throw new HttpError(405,'Use GET for workspace data.');
         if(view==='market'){await rate(req,'retail-market-read',60);return send(res,200,await service.marketRead(params.get('id'),params.get('zip')||''));}
+        if(view==='shopping-status')return send(res,200,service.shoppingStatus());
         if(view==='configuration')return send(res,200,service.configuration());
         if(view==='selection'){const filters=Object.fromEntries(params);delete filters.view;return send(res,200,await service.list(filters));}
         if(view==='source'){await rate(req,'product-source-read',30);const query=Object.fromEntries(params);delete query.view;return send(res,200,await service.source(query));}
@@ -24,8 +25,9 @@ export function createProductControlsHandler({env=process.env,service=createProd
       }
       if(req.method!=='POST'){res.setHeader('Allow','GET, HEAD, POST');throw new HttpError(405,'Method not allowed.');}
       requireOrigin(req);const input=await body(req,32000);
-      const fields={import:['query','selections','revision'],rules:['policy','pricingPolicy','revision'],review:['id','patch','revision'],refresh:['productIds','revision'],marketSave:['id','revision','offer','destinationZip'],marketRemove:['id','revision','retailer','destinationZip']};
+      const fields={import:['query','selections','revision'],rules:['policy','pricingPolicy','revision'],review:['id','patch','revision'],refresh:['productIds','revision'],marketSave:['id','revision','offer','destinationZip'],marketRemove:['id','revision','retailer','destinationZip'],marketSearch:['id']};
       if(!Object.hasOwn(fields,input.action)||Object.keys(input).some(k=>k!=='action'&&!fields[input.action].includes(k)))throw new HttpError(400,'Unsupported product action.');
+      if(input.action==='marketSearch')await rate(req,'serpapi-google-shopping',3);
       if(input.action==='marketSave'||input.action==='marketRemove')await rate(req,'retail-market-write',30);
       if(input.action==='refresh')await rate(req,'td-product-check',10);
       if(input.action==='import')await rate(req,'td-product-import',15);

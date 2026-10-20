@@ -1,3 +1,4 @@
+import {normalizeShopping} from '../lib/serpapi-shopping.mjs';
 import {memoryMarketPriceStore} from '../lib/market-price-store.mjs';
 // Loopback-only fixtures. Do not import this module from a deployed route.
 import {catalogQuery,sanitizeCatalog} from '../lib/catalog-remote.mjs';
@@ -19,5 +20,5 @@ const td={configuration:()=>({enabled:true,environment:'production',currencyConf
  const i=raw.find(x=>x.distributorId===s.sku),n=Number(s.sku)-90000000,status=n%13===0?'Not authorized':n%17===0?'Discontinued':'Active',quantity=n%7===0?0:10+n;
  return {lineNumber:index+1,synnexSKU:Number(s.sku),mfgPN:i.mfgPart,status,GlobalProductStatusCode:status,price:n%11===0?null:String(100+10*n)+'.00',priceType:'REGULAR',totalQuantity:quantity,EURequired:'N',parcelShippable:'Y',AvailabilityByWarehouse:[{warehouseInfo:{number:3,city:'SYNTHETIC'},qty:quantity}]};})},selectors,{environment:'production',checkedAt:new Date().toISOString(),currencyConfirmed:true})};
 const env={VERCEL_ENV:'preview',TP_CATALOG_API_URL:'https://synthetic.invalid',TP_CATALOG_API_TOKEN:'synthetic-token-not-a-live-credential-0000'};
-const store=memoryProductStore();const service=createProductControls({env,store,catalog,td,marketStore:memoryMarketPriceStore(),sourceLabel:'synthetic-local-fixture'});
+const store=memoryProductStore();const service=createProductControls({env,store,catalog,td,marketStore:memoryMarketPriceStore(),shopping:{status:()=>({configured:true,previewOnly:true,manualTriggerOnly:true,queriesPerTrigger:1}),search:async product=>normalizeShopping({shopping_results:[{title:product.description+' '+product.mfgPart,source:'Synthetic Newegg',price:'$129.00',extracted_price:129,product_link:'https://www.google.com/shopping/product/111'},{title:product.description+' '+product.mfgPart,source:'Synthetic Walmart',price:'$139.00',extracted_price:139,product_link:'https://www.google.com/shopping/product/222'},{title:'Other configuration',source:'Synthetic Example',price:'$119.00',extracted_price:119,product_link:'https://www.google.com/shopping/product/333'}]},product,{checkedAt:new Date().toISOString()})},sourceLabel:'synthetic-local-fixture'});
 export const previewProductControls=createProductControlsHandler({env,service,rate:async()=>{}});
