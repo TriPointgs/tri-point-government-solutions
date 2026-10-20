@@ -62,3 +62,8 @@ The new live TD freight response has not yet been exercised through the user's a
 ## Next action
 
 Use the shopping preview, not Product Control Center, to search a product and add it to the cart. The normal quantity and delivery ZIP are the only order-estimation inputs. Validate the actual TD-backed cart read and freight estimate, then complete behind-the-scenes checkout infrastructure without reintroducing pricing worksheets into the customer journey.
+
+
+## Deployment configuration correction
+
+The first preview deployment rejected an overlapping function configuration: the broad api/*.js rule preceded the new api/shop.js override. The specific shop function rule is now first, matching Vercel's documented configuration structure; all other API timeouts remain unchanged. This correction does not change runtime shopping behavior or production deployment. Final deployment readiness is verified separately before release reporting.
