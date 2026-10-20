@@ -1,3 +1,4 @@
+import {memoryMarketPriceStore} from '../lib/market-price-store.mjs';
 // Loopback-only fixtures. Do not import this module from a deployed route.
 import {catalogQuery,sanitizeCatalog} from '../lib/catalog-remote.mjs';
 import {createProductControls} from '../lib/product-controls-service.mjs';
@@ -18,5 +19,5 @@ const td={configuration:()=>({enabled:true,environment:'production',currencyConf
  const i=raw.find(x=>x.distributorId===s.sku),n=Number(s.sku)-90000000,status=n%13===0?'Not authorized':n%17===0?'Discontinued':'Active',quantity=n%7===0?0:10+n;
  return {lineNumber:index+1,synnexSKU:Number(s.sku),mfgPN:i.mfgPart,status,GlobalProductStatusCode:status,price:n%11===0?null:String(100+10*n)+'.00',priceType:'REGULAR',totalQuantity:quantity,EURequired:'N',parcelShippable:'Y',AvailabilityByWarehouse:[{warehouseInfo:{number:3,city:'SYNTHETIC'},qty:quantity}]};})},selectors,{environment:'production',checkedAt:new Date().toISOString(),currencyConfirmed:true})};
 const env={VERCEL_ENV:'preview',TP_CATALOG_API_URL:'https://synthetic.invalid',TP_CATALOG_API_TOKEN:'synthetic-token-not-a-live-credential-0000'};
-const store=memoryProductStore();const service=createProductControls({env,store,catalog,td,sourceLabel:'synthetic-local-fixture'});
+const store=memoryProductStore();const service=createProductControls({env,store,catalog,td,marketStore:memoryMarketPriceStore(),sourceLabel:'synthetic-local-fixture'});
 export const previewProductControls=createProductControlsHandler({env,service,rate:async()=>{}});
