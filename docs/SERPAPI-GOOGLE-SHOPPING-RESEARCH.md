@@ -43,3 +43,12 @@ The user-provided live result list contained approximately 40 broad Lenovo produ
 This revision offers two separate, manually triggered, one-credit searches: Shopping uses the quoted complete MPN plus manufacturer, and Exact-part web listings uses Google's organic search engine with the same quoted MPN. The web mode returns recognized HTTPS retailer product-page links based on title/snippet/URL exact-part signals but never converts prices in snippets into confirmed offers.
 
 For Shopping records with a numeric product_id and no product_link, a safe Google-owned product-reference link is generated. Provider URLs, tracking data and credentials are not returned. Exact-part candidates display first. Unrelated or missing-MPN results are hidden until specifically requested. No candidate changes a reviewed comparison or customer selling price. Each mode consumes only one SerpApi request when clicked, with no automatic fallback or scheduled search.
+
+
+## Search-snippet evidence refinements after the first real exact-part results
+
+A user-provided exact-part Google organic test surfaced SHI (21KCS4S600, reported $1,551.00) with a recognized SHI product link, and PetroCore Supply Solutions (21KCS4S600, reported $1,550.99) with an unapproved link and supplied-to-order status. These are research leads, NOT two confirmed comparable retail offers. Other results were foreign, marked out of stock, or had ambiguous prices.
+
+Organic result price snippets previously showed Unavailable because they were not extracted as verified prices. The panel now presents unambiguous text or supported rich-result currency fields as an explicitly unverified price hint. Mixed prices, negative savings, multiple different dollar amounts, and installment text do not produce a hint. Such amounts are NEVER saved as checked retailer offers and NEVER enter verified averages; organic priceCents remains null.
+
+Unrecognized vendor product domains now display a Google research link for the exact MPN and listing title, not a fabricated direct seller URL. SHI and Staples are available as separate manual comparison sources after staff verifies an exact, current offer; no supplier is automatically marked in stock or authorized. There is no automatic refresh, no markup/HP MAP change, no order submission, and no public competitor claim.

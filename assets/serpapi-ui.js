@@ -31,10 +31,13 @@ export async function fetchShoppingCandidates(mode='shopping'){
   for(const c of [...matches,...others]){
    if(!c.exactPartVisible&&body.querySelector('.serpapi-offtarget')===null){const tr=el('tr'),td=el('td','Off-target or missing complete part number — excluded from any price benchmark.','serpapi-offtarget');td.colSpan=4;tr.hidden=true;tr.className='serpapi-irrelevant';tr.append(td);body.append(tr);}
    const row=el('tr'),info=el('td');info.append(el('strong',c.title),el('small',c.source||'Unidentified store'));if(c.snippet)info.append(el('small',c.snippet));
-   const price=el('td',dollars(c.priceCents)),assessment=el('td');
+   const price=el('td'),assessment=el('td');
+   if(c.priceCents!==null&&c.priceCents!==undefined)price.append(el('strong',dollars(c.priceCents)),el('small','Unverified Google Shopping item price'));
+   else if(c.priceHintCents!==null&&c.priceHintCents!==undefined)price.append(el('strong',dollars(c.priceHintCents)),el('small','Search-snippet hint only — requires retailer verification'));
+   else price.textContent='Unavailable';
    assessment.append(el('span',c.exactPartVisible?'Part number visible':'Part number not visible'),el('small',c.issues.join('; ')));
-   const source=el('td'),url=c.vendorLink||c.googleProductLink;
-   if(url){const a=el('a',c.vendorLink?'Inspect retailer listing':'Inspect Google product');a.href=url;a.rel='noopener noreferrer';a.target='_blank';source.append(a);}else source.textContent='No usable product link';
+   const source=el('td'),url=c.vendorLink||c.googleProductLink||c.researchLink;
+   if(url){const a=el('a',c.vendorLink?'Inspect retailer listing':c.googleProductLink?'Inspect Google product':'Find retailer page via Google');a.href=url;a.rel='noopener noreferrer';a.target='_blank';source.append(a);}else source.textContent='No usable product link';
    if(!c.exactPartVisible){row.className='serpapi-irrelevant';row.hidden=true;}row.append(info,price,assessment,source);body.append(row);
   }
   if(!data.candidates.length){const tr=el('tr'),td=el('td','No candidate results. This does not imply a zero-dollar market price.');td.colSpan=4;tr.append(td);body.append(tr);}

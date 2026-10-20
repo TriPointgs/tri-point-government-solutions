@@ -1,3 +1,4 @@
+import {retailerUrl} from '../lib/market-price.mjs';
 import {HttpError} from '../lib/model.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {createShoppingCollector,normalizeShopping,normalizeExactWebListings,ShoppingResearchError} from '../lib/serpapi-shopping.mjs';
@@ -55,4 +56,40 @@ test('Google product IDs provide safe research link when product_link missing',(
 test('web search does not infer item prices from snippets',()=>{
  const r=normalizeExactWebListings({organic_results:[{title:'21KCS4S600',snippet:'Price $1,849.99',link:'https://www.staples.com/product_24691889'}]},product,{checkedAt:new Date(now).toISOString()});
  assert.equal(r.candidates[0].priceCents,null);assert.equal(r.preliminaryAverageCents,null);assert.equal(r.candidates[0].eligibleForVerifiedAverage,false);
+});
+
+test('a unique US-dollar search snippet becomes a price hint, never a verified offer',()=>{
+ const listings=[{title:'THINKPAD X1 CARBON GEN 12 (21KCS4S600)',link:'https://www.shi.com/product/51037510/THINKPAD-X1-CARBON-GEN-12',snippet:'Mfr Part #: 21KCS4S600 ; Price: $1,551.00 ; Product Type Other.'},
+  {title:'THINKPAD X1 CARBON GEN 12 21KCS4S600',link:'https://petrocore.invalid/product',snippet:'21KCS4S600 $1,550.99. Excludes tax. Available to order, supplied to order.'}];
+ const d=normalizeExactWebListings({organic_results:listings},product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(d.preliminaryAverageCents,null);
+ assert.equal(d.candidates[0].priceHintCents,155100);
+ assert.equal(d.candidates[1].priceHintCents,155099);
+ assert.equal(d.candidates[0].priceCents,null);
+ assert.equal(d.candidates[1].priceCents,null);
+ assert.equal(d.candidates[0].vendorLink,'https://www.shi.com/product/51037510/THINKPAD-X1-CARBON-GEN-12');
+ assert.equal(d.candidates[1].vendorLink,null);
+ assert.match(d.candidates[1].researchLink,/^https:\/\/www\.google\.com\/search\?q=/);
+ assert.ok(d.candidates.every(x=>x.reviewed===false&&x.eligibleForVerifiedAverage===false));
+});
+test('ambiguous promotional or multiple dollar prices are never guessed as a price hint',()=>{
+ const rows=[{title:'Lenovo 21KCS4S600',snippet:'Save $-1,634.34 on price',link:'https://example.org/one'},
+ {title:'21KCS4S600',snippet:'$10,841.60 $10,841.60 $12,149.92',link:'https://example.org/two'},
+ {title:'21KCS4S600',snippet:'Monthly installment $89.99 per month',link:'https://example.org/three'},
+ {title:'21KCS4S600',snippet:'New model $1,551.00 or open box $1,099.00',link:'https://example.org/four'}];
+ const d=normalizeExactWebListings({organic_results:rows},product,{checkedAt:new Date(now).toISOString()});
+ assert.ok(d.candidates.every(x=>x.priceHintCents===null));
+});
+test('only supported USD rich extensions become a snippet price hint, not a verified offer',()=>{
+ const rows=[{title:'21KCS4S600',snippet:'Exact MPN',rich_snippet:{bottom:{detected_extensions:{price:1551,currency:'$'}}}},
+ {title:'21KCS4S600',snippet:'Exact MPN',rich_snippet:{bottom:{detected_extensions:{price:1551,currency:'GBP'}}}}];
+ const d=normalizeExactWebListings({organic_results:rows},product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(d.candidates[0].priceHintCents,155100);
+ assert.equal(d.candidates[1].priceHintCents,null);
+});
+test('SHI and Staples product pages allowed for manual review, not search or untrusted domains',()=>{
+ assert.equal(retailerUrl('shi','https://www.shi.com/product/51037510/THINKPAD-X1-CARBON-GEN-12?utm_campaign=ad'),'https://www.shi.com/product/51037510/THINKPAD-X1-CARBON-GEN-12');
+ assert.equal(retailerUrl('staples','https://www.staples.com/product_24691889'),'https://www.staples.com/product_24691889');
+ assert.throws(()=>retailerUrl('shi','https://www.shi.com/search?q=MPN'),e=>e.status===400);
+ assert.throws(()=>retailerUrl('staples','https://www.staples.com.evil.invalid/product_123'),e=>e.status===400);
 });
