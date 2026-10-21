@@ -1,86 +1,58 @@
+import {createProductImageQueue,imageFailureLabel,imageResultLabel} from './product-image-queue.mjs';
 import {productRoute,routeProduct,routeCategory,categoryRoute} from './shop-routes.mjs';
 import {setupCheckoutReview} from './checkout-review.js';
 import {createRetailProductView} from './retail-product-view.js';
 const $=id=>document.getElementById(id),el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;};
 const money=n=>n===null||n===undefined?'Pending':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n/100);
 let cart={revision:0,items:[],itemCount:0},page=0,query={q:'',category:'all'},hasMore=false,nextCursor=null,cursors=[''],browseMode=null,busy=false,searchBusy=false,requestNo=0;
-// Preview: only enrich specifically searched/filtered visible products, never 50+ arbitrary
-// first-page catalog records or all 1.2M supplier items. No automatic provider polling.
+// Viewport-based, bounded image loading. No per-page two-photo cap and no catalogue-wide crawl.
 const icecatCache=new Map(),artIdentity=new WeakMap();
-// Per-search pilot budget; the old lifetime tab cap could silently disable images after browsing four products.
-const MAX_AUTO_PER_SEARCH=2;
-let mediaObserver=null,searchGeneration=0;
-function exactMedia(data,p){
- return !!(data?.status==='matched'&&data?.identityVerified===true&&data?.product&&
- data.product.brand?.trim().toUpperCase()===p.manufacturer.trim().toUpperCase()&&
- data.product.partNumber?.trim().toUpperCase()===p.partNumber.trim().toUpperCase());
+let mediaObserver=null,visibleCards=[];
+function exactMedia(data,p){return !!(data?.status==='matched'&&data.identityVerified===true&&data.product&&data.product.brand?.trim().toUpperCase()===p.manufacturer.trim().toUpperCase()&&data.product.partNumber?.trim().toUpperCase()===p.partNumber.trim().toUpperCase());}
+const imageKey=p=>[p.sku,p.manufacturer.trim().toUpperCase(),p.partNumber.trim().toUpperCase()].join(':');
+function getIcecat(p,media='cover'){
+ const key=imageKey(p)+':'+media,entry=icecatCache.get(key);
+ if(entry&&entry.until>Date.now())return entry.promise;
+ if(entry)icecatCache.delete(key);
+ const pending={until:Date.now()+120000,promise:null};
+ pending.promise=api({view:'content',sku:p.sku,media}).then(d=>{
+  if(!exactMedia(d,p))d={status:d.status||'not-found',message:d.message||'No exact product photo returned.',product:null,imageData:null,imageStatus:d.imageStatus};
+  if(d.imageStatus==='download-failed'){icecatCache.delete(key);return d;}
+  pending.until=Date.now()+(d.imageData?300000:120000);if(media==='gallery'&&d.imageData&&exactMedia(d,p))icecatCache.set(imageKey(p)+':cover',{until:pending.until,promise:Promise.resolve({...d,images:[d.imageData],galleryCount:1})});return d;
+ }).catch(e=>{icecatCache.delete(key);throw e;});
+ if(icecatCache.size>=48)icecatCache.delete(icecatCache.keys().next().value);icecatCache.set(key,pending);return pending.promise;
 }
-function getIcecat(p,media="cover"){
- const cacheKey=[p.sku,p.manufacturer.trim().toUpperCase(),p.partNumber.trim().toUpperCase(),media].join(':');
- let pending=icecatCache.get(cacheKey);
- if(pending)return pending;
- pending=api({view:'content',sku:p.sku,media}).then(d=>{
-  if(!exactMedia(d,p))return {status:d.status||'not-found',message:d.message||'No exact product photo returned.',product:null,imageData:null};
-  return d;
- }).catch(e=>{icecatCache.delete(cacheKey);throw e;});
- // Small per-tab cache; no secret URL or raw supplier cost is stored in this browser.
- if(icecatCache.size>=24)icecatCache.delete(icecatCache.keys().next().value);
- icecatCache.set(cacheKey,pending);return pending;
+function photoState(art,p,label,state,{retry=false,detail=''}={}){
+ if(!art?.isConnected||artIdentity.get(art)!==imageKey(p))return;
+ const text=el('span',label,state==='loading'?'image-loading':'image-unavailable');if(detail)text.title=detail;art.replaceChildren(text);art.dataset.photo=state;
+ if(retry){const button=el('button','Retry photo','image-retry');button.type='button';button.setAttribute('aria-label','Retry photo for '+p.partNumber);button.addEventListener('click',()=>{icecatCache.delete(imageKey(p)+':cover');photoQueue.retry(imageKey(p));});art.append(button);}
 }
 function showCardPhoto(art,p,d){
- if(!art?.isConnected||artIdentity.get(art)!==p.sku)return;
+ if(!art?.isConnected||artIdentity.get(art)!==imageKey(p))return;
  if(exactMedia(d,p)&&/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(d.imageData||'')){
-  const img=el('img');img.src=d.imageData;img.alt='';img.loading='lazy';art.replaceChildren(img);art.dataset.photo='loaded';
- }else{art.replaceChildren(el('span','Image unavailable','image-unavailable'));art.dataset.photo='unavailable';}
+  const img=el('img');img.src=d.imageData;img.alt=p.manufacturer+' '+p.partNumber;img.decoding='async';img.addEventListener('error',()=>photoState(art,p,'Photo temporarily unavailable','failed',{retry:true}),{once:true});art.replaceChildren(img);art.dataset.photo='loaded';
+ }else photoState(art,p,imageResultLabel(d),d.imageStatus==='download-failed'?'failed':'unavailable',{retry:d.imageStatus==='download-failed',detail:d.message||''});
 }
-function autoMedia(p,art){
- art.dataset.photo='loading';art.replaceChildren(el('span','Loading photo…','image-loading'));
- getIcecat(p).then(d=>showCardPhoto(art,p,d)).catch(e=>{
-  if(!art.isConnected||artIdentity.get(art)!==p.sku)return;
-  const limited=e?.status===429;
-  art.replaceChildren(el('span',limited?'Photo lookup paused':'Image unavailable','image-unavailable'));
-  art.dataset.photo=limited?'paused':'unavailable';
- });
+const photoQueue=createProductImageQueue({concurrency:2,load:card=>getIcecat(card.p),onStart:card=>photoState(card.art,card.p,'Loading photo…','loading'),render:(card,data)=>showCardPhoto(card.art,card.p,data),onError:(card,error)=>photoState(card.art,card.p,imageFailureLabel(error),error?.status===429?'paused':'failed',{retry:true,detail:error?.message||''})});
+function stopImages(){if(mediaObserver)mediaObserver.disconnect();photoQueue.clear();visibleCards=[];}
+function scheduleVisibleImages(cards){
+ stopImages();visibleCards=cards.map(card=>({...card,key:imageKey(card.p)}));photoQueue.set(visibleCards);
+ if(!visibleCards.length)return;
+ if(typeof IntersectionObserver==='function'){
+  mediaObserver=new IntersectionObserver(entries=>{for(const entry of entries){const key=artIdentity.get(entry.target);if(key)photoQueue.visible(key,entry.isIntersecting,query.q&&visibleCards.find(c=>c.key===key)?.p.partNumber.toUpperCase()===query.q.toUpperCase()?5:0);}},{rootMargin:'0px',threshold:.01});
+  for(const card of visibleCards)mediaObserver.observe(card.art);
+ }else fallbackVisibility();
 }
-function scheduleVisibleImages(cards,explicitQuery){
- if(mediaObserver)mediaObserver.disconnect();
- if(!explicitQuery||!cards.length)return;
- const generation=++searchGeneration;
- let perSearch=0;
- const searchPart=String(query.q||'').trim().toUpperCase();
- // Exact manufacturer-part / TD SKU searches should not depend on IntersectionObserver
- // firing or on a budget already consumed by earlier, unrelated browsing.
- const exact=searchPart?cards.filter(c=>String(c.p.partNumber||'').toUpperCase()===searchPart||String(c.p.sku||'')===searchPart):[];
- const priority=exact.length?exact.slice(0,MAX_AUTO_PER_SEARCH):(cards.length===1&&searchPart?[cards[0]]:[]);
- for(const card of priority){
-  perSearch++;
-  autoMedia(card.p,card.art);
- }
- // When the exact part was found, don't spend a second provider request on prefix matches.
- if(exact.length||perSearch>=MAX_AUTO_PER_SEARCH||typeof IntersectionObserver!=='function')return;
- mediaObserver=new IntersectionObserver(entries=>{
-  if(generation!==searchGeneration)return;
-  for(const entry of entries){
-   if(!entry.isIntersecting)continue;
-   mediaObserver.unobserve(entry.target);
-   if(perSearch>=MAX_AUTO_PER_SEARCH)continue;
-   const original=artIdentity.get(entry.target);
-   const card=cards.find(c=>c.p.sku===original&&c.art===entry.target);
-   if(!card||!entry.target.isConnected)continue;
-   perSearch++;
-   autoMedia(card.p,card.art);
-  }
- },{rootMargin:'80px'});
- for(const card of cards)if(!priority.includes(card))mediaObserver.observe(card.art);
-}
+function fallbackVisibility(){if(typeof IntersectionObserver==='function')return;for(const card of visibleCards){const r=card.art.getBoundingClientRect();photoQueue.visible(card.key,r.width>0&&r.height>0&&r.bottom>0&&r.top<innerHeight);}}
+window.addEventListener('scroll',fallbackVisibility,{passive:true});window.addEventListener('resize',fallbackVisibility,{passive:true});
 
 function status(message,error=false){$('shop-status').textContent=message;$('shop-status').classList.toggle('error',error);}
-async function api(params,body){const response=await fetch('/api/shop?'+new URLSearchParams(params||{}),{credentials:'same-origin',cache:'no-store',...(body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{})});let data;try{data=await response.json();}catch{throw Error('The shop did not respond. Your order has not been placed.');}if(response.status===401){$('product-grid').replaceChildren();$('cart-items').replaceChildren();location.assign('/login?next=%2Fshop-preview');throw Error('Sign in to view the private shopping preview.');}if(!response.ok){const e=Error(data.error||'The cart could not be updated.');e.status=response.status;throw e;}return data;}
+async function api(params,body){const response=await fetch('/api/shop?'+new URLSearchParams(params||{}),{credentials:'same-origin',cache:'no-store',...(body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{})});let data;try{data=await response.json();}catch{throw Error('The shop did not respond. Your order has not been placed.');}if(response.status===401){$('product-grid').replaceChildren();$('cart-items').replaceChildren();location.assign('/login?next=%2Fshop-preview');throw Error('Sign in to view the private shopping preview.');}if(!response.ok){const e=Error(data.error||'The cart could not be updated.');e.status=response.status;e.code=data.code||null;e.retryAfter=Number(response.headers.get('retry-after')||data.retryAfter||0);throw e;}return data;}
 function controls(){for(const b of document.querySelectorAll('.add-button,.cart-remove,#delivery-form button,#cart-clear'))b.disabled=busy;for(const n of document.querySelectorAll('.cart-quantity'))n.disabled=busy;$('products-back').disabled=searchBusy||page===0;$('products-next').disabled=searchBusy||!hasMore;$('cart-state').textContent=busy?'Updating…':cart.itemCount?cart.itemCount+' item'+(cart.itemCount===1?'':'s'):'Empty';$('shopping-cart').setAttribute('aria-busy',String(busy));}
-function productCard(p){const a=el('article',undefined,'product-card');const art=el('div',undefined,'product-visual');artIdentity.set(art,p.sku);a.dataset.sku=p.sku;art.innerHTML='<svg viewBox="0 0 160 100" aria-hidden="true"><rect x="28" y="15" width="104" height="62" rx="6"></rect><path d="M18 80h124l-8 8H26z"></path><path class="screen-mark" d="M68 46h24M80 34v24"></path></svg>';a.append(art,el('p',p.manufacturer,'product-maker'),el('h3',p.title),el('p',p.partNumber,'product-part'),el('p','Live price checked in cart','live-price'));const row=el('div',undefined,'card-action'),label=el('label','Qty'),input=el('input');input.type='number';input.min='1';input.max='9999';input.step='1';input.value='1';input.setAttribute('aria-label','Quantity for '+p.partNumber);label.append(input);const add=el('button','Add to cart','add-button');add.type='button';add.addEventListener('click',()=>{const quantity=Number(input.value);if(!Number.isSafeInteger(quantity)||quantity<1||quantity>9999){status('Enter a whole quantity from 1 to 9999.',true);return;}change({action:'add',sku:p.sku,quantity});});const details=el('a','Photos & specs','details-button');details.href=productRoute(p);details.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();showDetails(p,art);});row.append(label,add,details);a.append(row);return a;}
+function productCard(p){const a=el('article',undefined,'product-card');const art=el('div',undefined,'product-visual');artIdentity.set(art,imageKey(p));a.dataset.sku=p.sku;a._productIdentity=p;art.append(el('span','Photo loads when visible','image-loading'));a.append(art,el('p',p.manufacturer,'product-maker'),el('h3',p.title),el('p',p.partNumber,'product-part'),el('p','Live price checked in cart','live-price'));const row=el('div',undefined,'card-action'),label=el('label','Qty'),input=el('input');input.type='number';input.min='1';input.max='9999';input.step='1';input.value='1';input.setAttribute('aria-label','Quantity for '+p.partNumber);label.append(input);const add=el('button','Add to cart','add-button');add.type='button';add.addEventListener('click',()=>{const quantity=Number(input.value);if(!Number.isSafeInteger(quantity)||quantity<1||quantity>9999){status('Enter a whole quantity from 1 to 9999.',true);return;}change({action:'add',sku:p.sku,quantity});});const details=el('a','Photos & specs','details-button');details.href=productRoute(p);details.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();showDetails(p,art);});row.append(label,add,details);a.append(row);return a;}
 const productView=createRetailProductView({content:getIcecat,offer:params=>api({view:'product-offer',...params}),add:input=>change({action:'add',...input}),getCart:()=>cart,showCardPhoto});
-function showDetails(p,art){const input=art?.closest('.product-card')?.querySelector('input');const q=Number(input?.value||1);productView.open(p,{art,quantity:Number.isSafeInteger(q)&&q>=1&&q<=9999?q:1});}
-async function search(){const sequence=++requestNo;searchGeneration++;if(mediaObserver)mediaObserver.disconnect();searchBusy=true;controls();status('Finding products…');try{const result=await api({view:'products',...query,page,...(cursors[page]?{cursor:cursors[page]}:{})});if(sequence!==requestNo)return;hasMore=result.hasMore;nextCursor=result.nextCursor||null;browseMode=result.catalog?.mode||null;const cards=result.items.map(p=>({p,node:productCard(p)}));$('product-grid').replaceChildren(...cards.map(c=>c.node));scheduleVisibleImages(cards.map(c=>({p:c.p,art:c.node.querySelector('.product-visual')})),!!query.q||query.category!=='all');$('product-count').textContent=result.items.length+' shown'+(Number.isSafeInteger(result.catalog?.totalRecords)?' · '+result.catalog.totalRecords.toLocaleString()+' source records':'');$('catalog-scope').textContent=result.catalog?.mode==='connector-update-required'?'Keyword search covers the supplier index. Full browsing awaits the connector update.':'Browsing the full imported supplier catalog—not just your saved selection. Prices and stock are checked in cart.';if(!result.items.length)$('product-grid').append(el('p',result.notice||'No matching products. Try another search.','empty-state'));status(result.items.length?'Choose a quantity and add a product to your cart.':result.notice||'No products found. Try another search.');}catch(e){status(e.message,true);}finally{if(sequence===requestNo){searchBusy=false;controls();}}}
+function showDetails(p,art){stopImages();const input=art?.closest('.product-card')?.querySelector('input');const q=Number(input?.value||1);productView.open(p,{art,quantity:Number.isSafeInteger(q)&&q>=1&&q<=9999?q:1});}
+async function search(){const sequence=++requestNo;stopImages();searchBusy=true;controls();status('Finding products…');try{const result=await api({view:'products',...query,page,...(cursors[page]?{cursor:cursors[page]}:{})});if(sequence!==requestNo)return;hasMore=result.hasMore;nextCursor=result.nextCursor||null;browseMode=result.catalog?.mode||null;const cards=result.items.map(p=>({p,node:productCard(p)}));$('product-grid').replaceChildren(...cards.map(c=>c.node));scheduleVisibleImages(cards.map(c=>({p:c.p,art:c.node.querySelector('.product-visual')})));$('product-count').textContent=result.items.length+' shown'+(Number.isSafeInteger(result.catalog?.totalRecords)?' · '+result.catalog.totalRecords.toLocaleString()+' source records':'');$('catalog-scope').textContent=result.catalog?.mode==='connector-update-required'?'Keyword search covers the supplier index. Full browsing awaits the connector update.':'Browsing the full imported supplier catalog—not just your saved selection. Prices and stock are checked in cart.';if(!result.items.length)$('product-grid').append(el('p',result.notice||'No matching products. Try another search.','empty-state'));status(result.items.length?'Choose a quantity and add a product to your cart.':result.notice||'No products found. Try another search.');}catch(e){status(e.message,true);}finally{if(sequence===requestNo){searchBusy=false;controls();}}}
 const checkoutReview=setupCheckoutReview({api,getCart:()=>cart,refreshCart:async()=>{cart=await api({view:'cart'});renderCart();}});
 function renderCart(){
  $('cart-count').textContent=cart.itemCount;$('delivery-form').elements.zip.value=cart.zip||'';
@@ -97,4 +69,5 @@ async function start(){try{const linked=routeProduct(location.pathname)||new URL
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cart.items.length&&Date.parse(cart.validUntil||'')<Date.now()&&!busy)change({action:'refresh'});});
 for(const button of document.querySelectorAll('[data-category]'))button.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();productView.close();const category=button.dataset.category;history.replaceState(null,'',categoryRoute(category));query={q:'',category};$('shop-search').elements.q.value='';$('shop-search').elements.category.value=category;page=0;cursors=[''];nextCursor=null;search();});
 window.addEventListener('popstate',()=>{const id=routeProduct(location.pathname)||new URL(location.href).searchParams.get('product');if(id&&/^[1-9]\d{0,11}$/.test(id))productView.openSku(id);else productView.close({updateURL:false});});
+document.addEventListener('tp:product-closed',()=>{const cards=[...document.querySelectorAll('.product-card')].map(node=>{const p=node._productIdentity;return p?{p,art:node.querySelector('.product-visual')}:null;}).filter(Boolean);if(cards.length)scheduleVisibleImages(cards);});
 start();
