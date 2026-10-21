@@ -12,7 +12,7 @@ export function createShopHandler({env=process.env,service=createShopService({en
   if(view==='page'){res.statusCode=200;res.setHeader('Content-Type','text/html; charset=utf-8');return res.end(req.method==='HEAD'?'':shopPreviewPage());}
   if(req.method!=='GET')throw new HttpError(405,'Use GET.');
   if(view==='content-status'){await rate(req,'shop-content-status',30);return send(res,200,service.contentStatus());}
-  if(view==='content'){await rate(req,'icecat-content-lookup',5);if(!/^[1-9]\d{0,11}$/.test(url.searchParams.get('sku')||''))throw new HttpError(400,'Invalid SKU.');return send(res,200,await service.contentLookup(url.searchParams.get('sku')));}
+  if(view==='content'){await rate(req,'icecat-content-lookup',5);if(!/^[1-9]\d{0,11}$/.test(url.searchParams.get('sku')||''))throw new HttpError(400,'Invalid SKU.');const media=url.searchParams.get('media')||'cover';if(!['cover','gallery'].includes(media))throw new HttpError(400,'Invalid media selection.');return send(res,200,await service.contentLookup(url.searchParams.get('sku'),media));}
   if(view==='products'){await rate(req,'shop-search',40);const input=Object.fromEntries(url.searchParams);delete input.view;return send(res,200,await service.browse(input));}
   const id=cartSession(req,res);if(view==='cart')return send(res,200,await service.read(id));
   if(view==='merchant-diagnostics')return send(res,200,await service.diagnostics(id));
