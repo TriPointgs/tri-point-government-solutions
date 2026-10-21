@@ -27,6 +27,22 @@
   ],
   "rewrites": [
     {
+      "source": "/admin/launch",
+      "destination": "/api/shop?view=launch-page"
+    },
+    {
+      "source": "/shop-preview/product/:sku/:slug",
+      "destination": "/api/shop?view=product-page&sku=:sku&slug=:slug"
+    },
+    {
+      "source": "/shop-preview/product/:sku",
+      "destination": "/api/shop?view=product-page&sku=:sku"
+    },
+    {
+      "source": "/shop-preview/category/:category",
+      "destination": "/api/shop?view=category-page&category=:category"
+    },
+    {
       "source": "/shop-preview",
       "destination": "/api/shop?view=page"
     },

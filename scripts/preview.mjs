@@ -29,6 +29,9 @@ createServer(async(req,res)=>{
  if(pathname==='/solutions/zoom'||pathname==='/solutions/zoom/quote'||pathname==='/contractors/admin/zoom'){const q=new URL(req.url,'http://localhost:3000').searchParams;q.set('view',pathname==='/contractors/admin/zoom'?'admin':pathname.endsWith('/quote')?'quote':'marketing');req.url='/api/zoom-page?'+q;return zoomPage(req,res);}
  if(pathname==='/admin/catalog'){req.url='/api/catalog?view=page';return catalog(req,res);}
  if(pathname==='/admin/inquiries'){req.url='/api/contact?view=admin-page';return contact(req,res);}
+ if(pathname==='/admin/launch'){req.url='/api/shop?view=launch-page';return previewShop(req,res);}
+ const productMatch=pathname.match(/^\/shop-preview\/product\/([1-9]\d{0,11})(?:\/([a-z0-9-]{1,125}))?$/);if(productMatch){req.url='/api/shop?'+new URLSearchParams({view:'product-page',sku:productMatch[1],...(productMatch[2]?{slug:productMatch[2]}:{})});return previewShop(req,res);}
+ const categoryMatch=pathname.match(/^\/shop-preview\/category\/([a-z]+)$/);if(categoryMatch){req.url='/api/shop?'+new URLSearchParams({view:'category-page',category:categoryMatch[1]});return previewShop(req,res);}
  if(pathname==='/shop-preview'){req.url='/api/shop?view=page';return previewShop(req,res);}
  if(pathname==='/admin/products'){req.url='/api/product-controls?view=page';return previewProductControls(req,res);}
  if(pathname==='/admin/orders'){req.url='/api/commerce?view=page';return commerce(req,res);}
