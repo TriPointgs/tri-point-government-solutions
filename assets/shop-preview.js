@@ -107,7 +107,7 @@ $('details-prev').addEventListener('click',()=>setGalleryIndex(galleryIndex-1));
 $('details-next').addEventListener('click',()=>setGalleryIndex(galleryIndex+1));
 async function showDetails(p,art){
  const run=++detailsSequence,dialog=$('product-details');
- $('details-title').textContent=p.title;$('details-brand').textContent=p.manufacturer;
+ $('details-title').textContent=p.title;$('details-brand').textContent=p.manufacturer;$('details-full-name-wrap').hidden=true;$('details-full-name-wrap').open=false;$('details-full-name').textContent='';
  $('details-part').textContent='Manufacturer part: '+p.partNumber;
  $('details-short').textContent='';$('details-description').textContent='';$('details-specs').replaceChildren();
  $('details-spec-count').textContent='';$('details-description-wrap').hidden=true;
@@ -121,7 +121,14 @@ async function showDetails(p,art){
   if(!dialog.open||run!==detailsSequence)return;
   $('details-status').textContent=d.message||'Product-content lookup completed.';
   if(!exactMedia(d,p)){$('details-image').replaceChildren(el('p','Image unavailable'));$('details-count').textContent='No matching photos';return;}
-  $('details-title').textContent=d.product.title||p.title;
+  // Use the concise TD catalog name as the heading. The complete Icecat marketing title
+  // remains available but no longer dominates the top half of the product dialog.
+  $('details-title').textContent=p.title;
+  const fullTitle=String(d.product.title||'').trim(),shortTitle=String(p.title||'').trim();
+  const different=fullTitle.length>0&&fullTitle.toLocaleUpperCase()!==shortTitle.toLocaleUpperCase();
+  $('details-full-name-wrap').hidden=!different;
+  $('details-full-name').textContent=different?fullTitle:'';
+
   $('details-part').textContent=d.product.brand+' · '+d.product.partNumber+' · Exact part verified';
   const description=d.product.description||'No detailed description provided.';
   // Long paragraphs no longer consume the whole scrollable modal on arrival.

@@ -57,3 +57,44 @@
  .details-info #details-title{font-size:22px}
  .details-footer{padding:12px 14px}
 }
+
+
+/* Compact product gallery refinements: preserve all five images, reduce dead space. */
+.product-details-dialog{width:min(1060px,calc(100% - 28px));max-width:1060px;max-height:86vh}
+.details-topbar{padding:10px 20px}
+.details-topbar button{min-height:34px;padding:6px 12px}
+.details-body{grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);gap:20px;padding:16px 20px 12px}
+.details-gallery{top:68px}
+.details-photo-stage{height:298px;padding:8px;background:#f4f7fa}
+.details-photo-stage img{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;transform:scale(1.09);transform-origin:center}
+.details-gallery-toolbar{margin:7px 0 5px}
+.details-gallery-toolbar button{width:34px;height:34px;min-height:34px;padding:4px}
+.details-thumbnails{gap:7px;padding:2px 2px 4px}
+.details-thumb{flex:0 0 64px;width:64px;height:64px;padding:4px}
+.details-brand{margin:0 0 4px;font-size:11px}
+.details-info #details-title{font-size:clamp(20px,2vw,24px);line-height:1.22;margin:0 0 7px;letter-spacing:-.35px}
+.details-part{margin:0 0 6px}
+.details-full-name{margin:0 0 9px}
+.details-full-name[hidden]{display:none!important}
+.details-full-name summary{font-size:11px;color:#245977;font-weight:600;cursor:pointer}
+.details-full-name p{font-size:11px;line-height:1.5;color:#5e7182;margin:6px 0}
+.details-status{padding:7px 10px;margin:0 0 11px}
+.details-overview{padding:10px 0}
+.details-overview h3{margin:0 0 6px!important}
+.details-overview #details-short{margin:0 0 7px;font-size:12px;line-height:1.55}
+.details-specifications{margin:6px 0;padding:10px 0}
+.details-specifications dl{margin:7px 0 0}
+.details-specifications dt,.details-specifications dd{padding:7px 0;line-height:1.4}
+.details-footer{padding:10px 20px}
+@media(max-width:760px){
+ .product-details-dialog{width:calc(100% - 16px);max-height:94vh}
+ .details-body{grid-template-columns:1fr;gap:10px;padding:12px}
+ .details-gallery{position:static}
+ .details-photo-stage{height:245px;padding:5px}
+ .details-photo-stage img{transform:scale(1.045)}
+ .details-thumbnails{gap:6px}
+ .details-thumb{flex-basis:56px;width:56px;height:56px}
+ .details-topbar{padding:9px 12px}
+ .details-info #details-title{font-size:21px}
+ .details-footer{padding:9px 12px}
+}
