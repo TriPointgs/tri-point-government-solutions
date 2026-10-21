@@ -27,6 +27,10 @@
   ],
   "rewrites": [
     {
+      "source": "/admin/fulfillment",
+      "destination": "/api/commerce?mode=tracking&view=page"
+    },
+    {
       "source": "/admin/launch",
       "destination": "/api/shop?view=launch-page"
     },

@@ -9,7 +9,7 @@ staff.addEventListener('submit',async event=>{
  try{
   const response=await fetch('/api/admin',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:staff.elements.password.value})});
   const data=await response.json();if(!response.ok)throw new Error(data.error||'Administrator sign-in failed.');
-  staff.reset();const requested=new URLSearchParams(location.search).get('next');const safe=['/shop-preview','/marketplace','/admin/launch'].includes(requested)||/^\/shop-preview\/product\/[1-9]\d{0,11}(?:\/[a-z0-9-]{1,125})?$/.test(requested||'');location.assign(safe?requested:'/contractors/admin');
+  staff.reset();const requested=new URLSearchParams(location.search).get('next');const safe=['/shop-preview','/marketplace','/admin/launch','/admin/fulfillment'].includes(requested)||/^\/shop-preview\/product\/[1-9]\d{0,11}(?:\/[a-z0-9-]{1,125})?$/.test(requested||'');location.assign(safe?requested:'/contractors/admin');
  }catch(e){status(e.message,true);}finally{button.disabled=false;}
 });
 contractor.addEventListener('submit',async event=>{

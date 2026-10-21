@@ -27,7 +27,7 @@ else {fs.rmSync('dist/preview',{recursive:true,force:true});fs.rmSync('dist/asse
 for(const file of ['dist/contractors/admin.html','dist/contractors/admin/opportunities.html']){let html=fs.readFileSync(file,'utf8');if(preview)html=html.replace('<div class="toolbar">','<div class="toolbar"><a class="button secondary" href="/preview/orders">Order automation lab</a>');fs.writeFileSync(file,html);}
 
 for(const file of ['dist/contractors/admin.html','dist/contractors/admin/opportunities.html']){if(preview){let html=fs.readFileSync(file,'utf8');html=html.replace('<div class="toolbar">','<div class="toolbar"><a class="button secondary" href="/admin/products">Product Control Center</a>');fs.writeFileSync(file,html);}}
-const dynamic=new Set(['/admin/launch','/shop-preview','/admin/catalog','/admin/orders','/admin/products','/admin/inquiries','/contractors/admin/zoom','/solutions/zoom','/solutions/zoom/quote']);
+const dynamic=new Set(['/admin/fulfillment','/admin/launch','/shop-preview','/admin/catalog','/admin/orders','/admin/products','/admin/inquiries','/contractors/admin/zoom','/solutions/zoom','/solutions/zoom/quote']);
 const htmlPages=fs.readdirSync('dist',{recursive:true}).filter(p=>p.endsWith('.html'));
 for(const page of htmlPages){
  const html=fs.readFileSync('dist/'+page,'utf8');
