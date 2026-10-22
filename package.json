@@ -12,6 +12,7 @@
     "preview": "node scripts/preview.mjs"
   },
   "dependencies": {
-    "@vercel/blob": "2.8.0"
+    "@vercel/blob": "2.8.0",
+    "stripe": "23.0.0"
   }
 }
