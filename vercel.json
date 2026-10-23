@@ -27,6 +27,10 @@
   ],
   "rewrites": [
     {
+      "source": "/admin/stripe-checkout",
+      "destination": "/api/commerce?mode=stripe-test&view=page"
+    },
+    {
       "source": "/admin/fulfillment",
       "destination": "/api/commerce?mode=tracking&view=page"
     },
