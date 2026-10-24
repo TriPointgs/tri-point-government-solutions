@@ -65,6 +65,54 @@ test('sandbox page loads existing test status without starting a competing verif
  assert.doesNotMatch(client,/if\(!d.expired\)await check\(\)/);
 });
 
+
+test('owner-scoped read-only Stripe probe validates captured test payment without a single ledger write',async()=>{
+ const underlying=memorySandboxRunStore();let saves=0;
+ const store={read:k=>underlying.read(k),save:async(...args)=>{saves++;return underlying.save(...args);}};
+ const t=sandboxFixture({store});await start(t);const savedCount=saves;t.setPaid();
+ const result=await t.service.probe(t.owner,t.id);
+ assert.equal(result.processorCaptureConfirmed,true);assert.equal(result.marketplaceRecordUpdated,false);
+ assert.equal(result.commercialOrderCreated,false);assert.equal(result.commercialOrderPaid,false);
+ assert.equal(result.supplierOrderSubmitted,false);assert.equal(result.realSupplierDispatchAllowed,false);
+ assert.equal(saves,savedCount);assert.equal(t.calls.retrieve,1);assert.equal(t.calls.intent,1);
+ assert.equal((await t.service.status(t.owner,t.id)).state,'open');
+ assert.doesNotMatch(JSON.stringify(result),/pi_|cs_test_|sk_test_|whsec_|SECRET_CARD_HINT|billing_details|shipping/);
+});
+test('read-only Stripe probe works even when the record version cannot be overwritten',async()=>{
+ const original=memorySandboxRunStore();
+ const store={read:k=>original.read(k),save:async(k,row,tag)=>{
+  if(row.state==='checking')throw Error('etag_conflict');
+  return original.save(k,row,tag);
+ }};
+ const t=sandboxFixture({store});await start(t);t.setPaid();
+ await assert.rejects(t.service.check(t.owner,t.id),e=>e.status===503);
+ const evidence=await t.service.probe(t.owner,t.id);
+ assert.equal(evidence.processorCaptureConfirmed,true);assert.equal(evidence.marketplaceRecordUpdated,false);
+ assert.equal((await t.service.status(t.owner,t.id)).capturedTestPaymentVerified,false);
+});
+test('read-only Stripe probe does not approve missing, unpaid, refunded or dispute-held payments',async()=>{
+ for(const scenario of ['unpaid','refund','hold']){
+  const t=sandboxFixture();await start(t);
+  if(scenario!=='unpaid')t.setPaid();
+  if(scenario==='refund')t.setRefund();
+  if(scenario==='hold')t.setHold();
+  const result=await t.service.probe(t.owner,t.id);
+  assert.equal(result.processorCaptureConfirmed,false);
+  assert.equal(result.supplierOrderSubmitted,false);
+  assert.equal((await t.service.status(t.owner,t.id)).capturedTestPaymentVerified,false);
+ }
+});
+test('read-only Stripe probe is owner-scoped and does not query Stripe for another browser',async()=>{
+ const t=sandboxFixture();await start(t);
+ await assert.rejects(t.service.probe(randomUUID(),t.id),e=>e.status===404);
+ assert.equal(t.calls.retrieve,0);assert.equal(t.calls.intent,0);
+});
+test('sandbox page provides diagnostic proof without presenting it as marketplace ledger approval',()=>{
+ const page=stripeSandboxPage(),script=fs.readFileSync('assets/stripe-sandbox.js','utf8');
+ assert.match(page,/id="sandbox-probe"/);assert.match(page,/id="sandbox-probe-output"/);
+ assert.match(script,/action:'probe'/);
+ assert.match(page,/TD purchase order/);
+});
 process.env.NODE_ENV='test';process.env.TP_SESSION_SECRET='synthetic-sandbox-test-cookie-secret-no-real-value';
 const admin=()=>sign({type:'admin',at:Date.now()});
 async function request({method='GET',query='mode=stripe-test&view=configuration',token,owner,origin,input,env={VERCEL_ENV:'preview'}}={}){let calls=0,output='';const handler=createStripeSandboxHandler({env,rate:async()=>{},service:{configuration:()=>({enabled:true}),start:async()=>{calls++;return {mode:'test'};},status:async()=>{calls++;return {mode:'test'};}}}),res={headers:{},setHeader(k,v){this.headers[k]=v;},end(v=''){output=v;}};const cookie=[token?'__Host-tp_admin='+token:'',owner?'__Host-tp_stripe_demo='+sign({type:'stripe-demo',id:owner,at:Date.now()}):''].filter(Boolean).join('; ');await handler({method,url:'/api/commerce?'+query,headers:{cookie,...(origin?{origin}:{}),...(input?{'content-type':'application/json'}:{})},body:input},res);return {status:res.statusCode,headers:res.headers,calls,output};}
