@@ -113,10 +113,60 @@ test('sandbox page provides diagnostic proof without presenting it as marketplac
  assert.match(script,/action:'probe'/);
  assert.match(page,/TD purchase order/);
 });
+test('admin can independently verify an existing Tri-Point Stripe sandbox PaymentIntent with no browser run or saved order writes',async()=>{
+ const t=sandboxFixture();await start(t);t.setPaid();
+ const before=await t.service.status(t.owner,t.id);
+ const paymentId=[...t.sessions.values()][0].payment_intent;
+ const r=await t.service.probePayment(paymentId);
+ assert.equal(r.readOnly,true);assert.equal(r.processorCaptureConfirmed,true);
+ assert.equal(r.marketplaceRecordUpdated,false);assert.equal(r.commercialOrderPaid,false);
+ assert.equal(r.supplierOrderSubmitted,false);assert.equal(r.realSupplierDispatchAllowed,false);
+ assert.equal(t.calls.create,1);assert.equal(t.calls.intent,1);
+ const after=await t.service.status(t.owner,t.id);assert.deepEqual(after,before);
+ assert.doesNotMatch(JSON.stringify(r),/pi_|cs_test_|sk_test_|whsec_|SECRET_CARD_HINT|PRIVATE STREET/);
+});
+test('existing-payment recovery denies absent, forged or mismatched test metadata',async()=>{
+ const t=sandboxFixture();await start(t);
+ for(const id of ['bad','pi_XYZ','pi_123!'])await assert.rejects(t.service.probePayment(id),e=>e.status===400);
+ const paymentId=[...t.sessions.values()][0].payment_intent;
+ const session=[...t.sessions.values()][0];session.metadata.tp_quote_digest='not-an-authorized-quote';
+ await assert.rejects(t.service.probePayment(paymentId),e=>e.status===400);
+ assert.equal((await t.service.status(t.owner,t.id)).capturedTestPaymentVerified,false);
+});
+test('existing-payment recovery denies refunds and disputes, without supplier release',async()=>{
+ for(const scenario of ['refund','dispute']){
+  const t=sandboxFixture();await start(t);t.setPaid();
+  if(scenario==='refund')t.setRefund();else t.setHold();
+  const paymentId=[...t.sessions.values()][0].payment_intent;
+  const r=await t.service.probePayment(paymentId);
+  assert.equal(r.processorCaptureConfirmed,false);
+  assert.equal(r.marketplaceRecordUpdated,false);assert.equal(r.supplierOrderSubmitted,false);
+ }
+});
+test('existing-payment recovery button is independent of missing browser session reference',()=>{
+ const page=stripeSandboxPage(),script=fs.readFileSync('assets/stripe-sandbox.js','utf8');
+ assert.match(page,/id="sandbox-recover"/);assert.match(page,/id="sandbox-payment-id"/);
+ assert.match(page,/id="sandbox-recover-check"/);assert.match(page,/id="sandbox-recover-output"/);
+ assert.match(script,/action:'probe-payment'/);
+ assert.match(script,/paymentIdOk\(\$\('sandbox-payment-id'\)\.value\.trim\(\)\)/);
+ assert.doesNotMatch(script,/!run\|\|.*action:'probe-payment'/);
+});
 process.env.NODE_ENV='test';process.env.TP_SESSION_SECRET='synthetic-sandbox-test-cookie-secret-no-real-value';
 const admin=()=>sign({type:'admin',at:Date.now()});
-async function request({method='GET',query='mode=stripe-test&view=configuration',token,owner,origin,input,env={VERCEL_ENV:'preview'}}={}){let calls=0,output='';const handler=createStripeSandboxHandler({env,rate:async()=>{},service:{configuration:()=>({enabled:true}),start:async()=>{calls++;return {mode:'test'};},status:async()=>{calls++;return {mode:'test'};}}}),res={headers:{},setHeader(k,v){this.headers[k]=v;},end(v=''){output=v;}};const cookie=[token?'__Host-tp_admin='+token:'',owner?'__Host-tp_stripe_demo='+sign({type:'stripe-demo',id:owner,at:Date.now()}):''].filter(Boolean).join('; ');await handler({method,url:'/api/commerce?'+query,headers:{cookie,...(origin?{origin}:{}),...(input?{'content-type':'application/json'}:{})},body:input},res);return {status:res.statusCode,headers:res.headers,calls,output};}
+async function request({method='GET',query='mode=stripe-test&view=configuration',token,owner,origin,input,env={VERCEL_ENV:'preview'}}={}){let calls=0,output='';const handler=createStripeSandboxHandler({env,rate:async()=>{},service:{configuration:()=>({enabled:true}),start:async()=>{calls++;return {mode:'test'};},status:async()=>{calls++;return {mode:'test'};},probePayment:async()=>{calls++;return {readOnly:true,processorCaptureConfirmed:true,marketplaceRecordUpdated:false};}}}),res={headers:{},setHeader(k,v){this.headers[k]=v;},end(v=''){output=v;}};const cookie=[token?'__Host-tp_admin='+token:'',owner?'__Host-tp_stripe_demo='+sign({type:'stripe-demo',id:owner,at:Date.now()}):''].filter(Boolean).join('; ');await handler({method,url:'/api/commerce?'+query,headers:{cookie,...(origin?{origin}:{}),...(input?{'content-type':'application/json'}:{})},body:input},res);return {status:res.statusCode,headers:res.headers,calls,output};}
 test('anonymous and contractor sessions cannot create or read Stripe sandbox data',async()=>{for(const token of [undefined,sign({type:'contractor',at:Date.now()})]){const r=await request({token});assert.equal(r.status,401);assert.equal(r.calls,0);}});
+test('existing-payment recovery API remains admin-only and CSRF-protected, without a sandbox owner cookie',async()=>{
+ const paymentId='pi_SYNTHETIC123456';
+ const good=await request({method:'POST',token:admin(),origin:'http://localhost:3000',input:{action:'probe-payment',paymentId}});
+ assert.equal(good.status,200);assert.equal(good.calls,1);
+ assert.equal(JSON.parse(good.output).marketplaceRecordUpdated,false);
+ const anonymous=await request({method:'POST',origin:'http://localhost:3000',input:{action:'probe-payment',paymentId}});
+ assert.equal(anonymous.status,401);assert.equal(anonymous.calls,0);
+ const crossSite=await request({method:'POST',token:admin(),origin:'https://evil.test',input:{action:'probe-payment',paymentId}});
+ assert.equal(crossSite.status,403);assert.equal(crossSite.calls,0);
+ const tampered=await request({method:'POST',token:admin(),origin:'http://localhost:3000',input:{action:'probe-payment',paymentId,amount:1}});
+ assert.equal(tampered.status,400);assert.equal(tampered.calls,0);
+});
 test('production always rejects sandbox API even for administrators',async()=>{const r=await request({token:admin(),env:{VERCEL_ENV:'production'}});assert.equal(r.status,503);assert.equal(r.calls,0);});
 test('signed owner cookie is HttpOnly Secure and permits Stripe top-level return without exposing credentials',async()=>{const r=await request({token:admin()});assert.equal(r.status,200);assert.match(r.headers['Set-Cookie'],/HttpOnly; Secure; SameSite=Lax/);assert.match(r.headers['Cache-Control'],/private/);assert.match(r.headers['Cache-Control'],/no-store/);assert.match(r.headers['X-Robots-Tag'],/noindex/);});
 test('sandbox writes reject cross-site request or any client-chosen amount/tax fields',async()=>{for(const input of [{action:'start',id:randomUUID(),consent:true,amount:1},{action:'start',id:randomUUID(),consent:true,taxStatus:'exempt'}]){const r=await request({method:'POST',token:admin(),owner:randomUUID(),origin:'http://localhost:3000',input});assert.equal(r.status,400);assert.equal(r.calls,0);}const r=await request({method:'POST',token:admin(),owner:randomUUID(),origin:'https://evil.test',input:{action:'start',id:randomUUID(),consent:true}});assert.equal(r.status,403);});
