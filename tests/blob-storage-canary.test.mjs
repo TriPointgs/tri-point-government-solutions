@@ -45,11 +45,16 @@ test('explicit preview-only corrected sandbox persistence round trip',{skip:!ena
   const current=await store.read(key);
   try{await store.save(key,{...current.record,revision:current.record.revision+1},before.etag);}catch(e){report.staleRejected=e instanceof BlobPreconditionFailedError;}
   const race=await Promise.allSettled([store.save(key,{...current.record,revision:current.record.revision+1,syntheticRace:'A'},current.etag),store.save(key,{...current.record,revision:current.record.revision+1,syntheticRace:'B'},current.etag)]);
-  report.concurrentResults=race.map(r=>({state:r.status,...(r.status==='rejected'?{kind:r.reason?.name||'unknown',precondition:r.reason instanceof BlobPreconditionFailedError}: {})}));
-  report.singleConcurrentWinner=race.filter(r=>r.status==='fulfilled').length===1&&race.filter(r=>r.status==='rejected'&&r.reason instanceof BlobPreconditionFailedError).length===1;
+  report.concurrentResults=race.map(r=>({state:r.status,...(r.status==='rejected'?{kind:r.reason?.name||'unknown',class:/^Blob[A-Za-z]+$/.test(r.reason?.constructor?.name||'')?r.reason.constructor.name:'other',precondition:r.reason instanceof BlobPreconditionFailedError}: {})}));
+  report.singleConcurrentWinner=race.filter(r=>r.status==='fulfilled').length===1&&race.filter(r=>r.status==='rejected').length===1;
+  const winner=race.findIndex(r=>r.status==='fulfilled'),persisted=await store.read(key);
+  report.concurrentWinnerPersisted=report.singleConcurrentWinner&&persisted.record.syntheticRace===['A','B'][winner];
+  report.loserRetryRejected=false;
+  if(report.singleConcurrentWinner){try{await store.save(key,{...current.record,revision:current.record.revision+1,syntheticRace:['B','A'][winner]},current.etag);}catch(e){report.loserRetryRejected=e instanceof BlobPreconditionFailedError;}}
+
  }finally{
   if(created){try{await del(path,{ifMatch:(await head(path)).etag});report.cleanup=(await get(path,{access:'private',useCache:false}))===null;}catch{report.cleanup=false;}}
   console.info('TP_SANDBOX_STORAGE_ROUNDTRIP',JSON.stringify(report));
  }
- for(const k of ['capturePersisted','repeatedRecoverySafe','staleRejected','singleConcurrentWinner','cleanup'])assert.equal(report[k],true,k);
+ for(const k of ['capturePersisted','repeatedRecoverySafe','staleRejected','singleConcurrentWinner','concurrentWinnerPersisted','loserRetryRejected','cleanup'])assert.equal(report[k],true,k);
 });
