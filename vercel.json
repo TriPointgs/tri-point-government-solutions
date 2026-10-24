@@ -5,6 +5,9 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "functions": {
+    "api/shop.js": {
+      "maxDuration": 60
+    },
     "api/*.js": {
       "maxDuration": 30
     }
@@ -24,6 +27,38 @@
   ],
   "rewrites": [
     {
+      "source": "/admin/stripe-return",
+      "destination": "/api/commerce?mode=stripe-test&view=return"
+    },
+    {
+      "source": "/admin/stripe-checkout",
+      "destination": "/api/commerce?mode=stripe-test&view=page"
+    },
+    {
+      "source": "/admin/fulfillment",
+      "destination": "/api/commerce?mode=tracking&view=page"
+    },
+    {
+      "source": "/admin/launch",
+      "destination": "/api/shop?view=launch-page"
+    },
+    {
+      "source": "/shop-preview/product/:sku/:slug",
+      "destination": "/api/shop?view=product-page&sku=:sku&slug=:slug"
+    },
+    {
+      "source": "/shop-preview/product/:sku",
+      "destination": "/api/shop?view=product-page&sku=:sku"
+    },
+    {
+      "source": "/shop-preview/category/:category",
+      "destination": "/api/shop?view=category-page&category=:category"
+    },
+    {
+      "source": "/shop-preview",
+      "destination": "/api/shop?view=page"
+    },
+    {
       "source": "/admin/catalog",
       "destination": "/api/catalog?view=page"
     },
@@ -34,6 +69,10 @@
     {
       "source": "/admin/inquiries",
       "destination": "/api/contact?view=admin-page"
+    },
+    {
+      "source": "/admin/products",
+      "destination": "/api/product-controls?view=page"
     },
     {
       "source": "/learn/:path*",
