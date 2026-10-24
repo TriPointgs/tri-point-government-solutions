@@ -27,7 +27,7 @@ test('expired test session never returns its old payment link',async()=>{let now
 test('long-delayed unfinished create requires a new deliberate test rather than replay outside the safety window',async()=>{let now=demoNow;const t=sandboxFixture({clock:()=>now});t.setCreateError();await assert.rejects(start(t));now+=300001;t.setCreateError(false);await assert.rejects(start(t),e=>e.status===409);assert.equal(t.calls.create,1);});
 test('original logos are byte-identical and sandbox page never says a real order was accepted',()=>{assert.equal(createHash('sha256').update(fs.readFileSync('assets/tripoint-logo.svg')).digest('hex'),'7c7f1f35bf2d84b05aa5389ab319ad389305b15f6a8d17cb0c81f40183918f5d');const html=stripeSandboxPage();assert.match(html,/test funds only/);assert.match(html,/noindex/);assert.match(html,/No product, service, tax determination/);assert.doesNotMatch(html,/Order confirmed|Purchase complete|sk_test_|whsec_/);});
 test('verification claim distinguishes concurrent write conflict from unrelated storage errors and never changes payment state',async()=>{
- for(const {kind,status,text} of [{kind:'etag_conflict',status:409,text:'Another verification is updating'},{kind:'PRIVATE STORAGE FAILURE',status:503,text:'verification record could not be updated'}]){
+ for(const {kind,status,text} of [{kind:'etag_conflict',status:503,text:'storage version mismatch'},{kind:'PRIVATE STORAGE FAILURE',status:503,text:'verification record could not be updated'}]){
   const base=memorySandboxRunStore();let failClaim=false;
   const store={read:key=>base.read(key),save:(key,row,tag)=>failClaim&&row.state==='checking'?Promise.reject(Error(kind)):base.save(key,row,tag)};
   const t=sandboxFixture({store});await start(t);failClaim=true;
@@ -35,6 +35,18 @@ test('verification claim distinguishes concurrent write conflict from unrelated 
   const result=await t.service.status(t.owner,t.id);
   assert.equal(result.state,'open');assert.equal(result.capturedTestPaymentVerified,false);assert.equal(t.calls.retrieve,0);
  }
+});
+test('a genuine one-time concurrent version advance is reconciled without duplicate Stripe sessions or supplier orders',async()=>{
+ const base=memorySandboxRunStore();let race=true;
+ const store={read:key=>base.read(key),async save(key,row,tag){
+  if(row.state==='checking'&&race){race=false;const prior=await base.read(key);await base.save(key,{...prior.record,revision:prior.record.revision+1},prior.etag);throw Error('etag_conflict');}
+  return base.save(key,row,tag);
+ }};
+ const t=sandboxFixture({store});await start(t);t.setPaid();
+ const result=await t.service.check(t.owner,t.id);
+ assert.equal(result.capturedTestPaymentVerified,true);
+ assert.equal(t.calls.create,1);assert.equal(t.calls.retrieve,1);
+ assert.equal(result.commercialOrderCreated,false);assert.equal(result.supplierOrderSubmitted,false);
 });
 test('an overlapping browser check is rejected without losing the first independently verified captured result',async()=>{
  const t=sandboxFixture();await start(t);t.setPaid();
