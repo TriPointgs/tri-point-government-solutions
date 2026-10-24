@@ -45,6 +45,7 @@ test('explicit preview-only corrected sandbox persistence round trip',{skip:!ena
   const current=await store.read(key);
   try{await store.save(key,{...current.record,revision:current.record.revision+1},before.etag);}catch(e){report.staleRejected=e instanceof BlobPreconditionFailedError;}
   const race=await Promise.allSettled([store.save(key,{...current.record,revision:current.record.revision+1,syntheticRace:'A'},current.etag),store.save(key,{...current.record,revision:current.record.revision+1,syntheticRace:'B'},current.etag)]);
+  report.concurrentResults=race.map(r=>({state:r.status,...(r.status==='rejected'?{kind:r.reason?.name||'unknown',precondition:r.reason instanceof BlobPreconditionFailedError}: {})}));
   report.singleConcurrentWinner=race.filter(r=>r.status==='fulfilled').length===1&&race.filter(r=>r.status==='rejected'&&r.reason instanceof BlobPreconditionFailedError).length===1;
  }finally{
   if(created){try{await del(path,{ifMatch:(await head(path)).etag});report.cleanup=(await get(path,{access:'private',useCache:false}))===null;}catch{report.cleanup=false;}}
