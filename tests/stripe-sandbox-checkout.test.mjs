@@ -35,3 +35,42 @@ test('signed owner cookie is HttpOnly Secure and permits Stripe top-level return
 test('sandbox writes reject cross-site request or any client-chosen amount/tax fields',async()=>{for(const input of [{action:'start',id:randomUUID(),consent:true,amount:1},{action:'start',id:randomUUID(),consent:true,taxStatus:'exempt'}]){const r=await request({method:'POST',token:admin(),owner:randomUUID(),origin:'http://localhost:3000',input});assert.equal(r.status,400);assert.equal(r.calls,0);}const r=await request({method:'POST',token:admin(),owner:randomUUID(),origin:'https://evil.test',input:{action:'start',id:randomUUID(),consent:true}});assert.equal(r.status,403);});
 test('page authentication redirect preserves only a validated test reference',async()=>{const id=randomUUID(),r=await request({query:'mode=stripe-test&view=page&run='+id});assert.equal(r.status,303);assert.equal(r.headers.Location,'/login?next='+encodeURIComponent('/admin/stripe-checkout?run='+id));});
 test('test data storage uses private no-cache origin reads and ETag guarded writes',async()=>{const t=sandboxFixture();await start(t);const key=sandboxRunKey(demoEnv.TP_STRIPE_TEST_ACCOUNT_ID,t.id),sample=(await t.store.read(key)).record,calls=[];const store=createSandboxRunStore({env:demoEnv,blob:{get:async(p,opts)=>{calls.push(opts);return {stream:new Response(JSON.stringify(sample)).body,blob:{etag:'v1'}};},put:async(p,s,opts)=>calls.push(opts)}});await store.read(key);await store.save(key,sample,'v1');assert.equal(calls[0].access,'private');assert.equal(calls[0].useCache,false);assert.equal(calls[1].ifMatch,'v1');});
+test('Stripe external return has a public data-free same-site hop rather than relaxing Strict admin cookie',async()=>{
+ const id=randomUUID();
+ const r=await request({query:'mode=stripe-test&view=return&run='+id});
+ assert.equal(r.status,200);assert.match(r.headers['Content-Type'],/text\/html/);
+ assert.match(r.output,/assets\/stripe-return.js/);
+ assert.match(r.output,/does not verify or confirm a payment/);
+ assert.doesNotMatch(r.output,/(?:sk_test_|whsec_|pi_|client_secret)/);
+ assert.ok(!r.headers['Set-Cookie'],'no new session issued on external redirect');
+ const src=fs.readFileSync('assets/stripe-return.js','utf8');
+ assert.match(src,/location\.replace\('\/admin\/stripe-checkout\?run='/);
+ assert.match(src,/\^\[0-9a-f\]/);
+ assert.equal(fs.readFileSync('lib/security.mjs','utf8').includes('SameSite=Strict'),true);
+});
+test('return hop refuses malformed or duplicate run IDs and never discloses saved record',async()=>{
+ for(const query of ['mode=stripe-test&view=return','mode=stripe-test&view=return&run=bad','mode=stripe-test&view=return&run='+randomUUID()+'&run='+randomUUID(),'mode=stripe-test&view=return&run='+randomUUID()+'&url=https://evil.test']){
+   const r=await request({query});assert.equal(r.status,400);assert.equal(r.calls,0);
+ }
+});
+test('failed Stripe session read records safe diagnostic stage, not provider credentials or raw message',async()=>{
+ const t=sandboxFixture();await start(t);t.setReadError();
+ await assert.rejects(t.service.check(t.owner,t.id),e=>e.status===503);
+ const row=await t.service.status(t.owner,t.id);
+ assert.equal(row.state,'check-failed');assert.ok(row.reasons.includes('processor_recheck_failed'));
+ assert.match(row.message,/Stripe Checkout Session retrieval/);
+ assert.doesNotMatch(JSON.stringify(row),/PRIVATE FAILED RESPONSE|sk_test_|whsec_|client_secret/);
+});
+test('failed merchant validation records account stage without accepting customer payment',async()=>{
+ const t=sandboxFixture();await start(t);t.setWrongAccount();
+ await assert.rejects(t.service.check(t.owner,t.id),e=>e.status===503);
+ const row=await t.service.status(t.owner,t.id);
+ assert.match(row.message,/Stripe account check/);assert.equal(row.capturedTestPaymentVerified,false);
+});
+test('new hosted Session URLs return via the data-free same-site hop',async()=>{
+ const t=sandboxFixture();await start(t);
+ const sess=[...t.sessions.values()][0];
+ assert.match(sess.success_url,/\/admin\/stripe-return\?run=/);
+ assert.match(sess.cancel_url,/\/admin\/stripe-return\?run=/);
+ assert.doesNotMatch(sess.success_url,/x-vercel-protection-bypass/);
+});
