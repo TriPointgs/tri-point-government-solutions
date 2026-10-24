@@ -26,6 +26,33 @@ test('older browser verification is explicitly marked as historical',async()=>{l
 test('expired test session never returns its old payment link',async()=>{let now=demoNow;const t=sandboxFixture({clock:()=>now});await start(t);now+=3600001;const r=await t.service.status(t.owner,t.id);assert.equal(r.expired,true);assert.equal(r.url,undefined);});
 test('long-delayed unfinished create requires a new deliberate test rather than replay outside the safety window',async()=>{let now=demoNow;const t=sandboxFixture({clock:()=>now});t.setCreateError();await assert.rejects(start(t));now+=300001;t.setCreateError(false);await assert.rejects(start(t),e=>e.status===409);assert.equal(t.calls.create,1);});
 test('original logos are byte-identical and sandbox page never says a real order was accepted',()=>{assert.equal(createHash('sha256').update(fs.readFileSync('assets/tripoint-logo.svg')).digest('hex'),'7c7f1f35bf2d84b05aa5389ab319ad389305b15f6a8d17cb0c81f40183918f5d');const html=stripeSandboxPage();assert.match(html,/test funds only/);assert.match(html,/noindex/);assert.match(html,/No product, service, tax determination/);assert.doesNotMatch(html,/Order confirmed|Purchase complete|sk_test_|whsec_/);});
+test('verification claim distinguishes concurrent write conflict from unrelated storage errors and never changes payment state',async()=>{
+ for(const {kind,status,text} of [{kind:'etag_conflict',status:409,text:'Another verification is updating'},{kind:'PRIVATE STORAGE FAILURE',status:503,text:'verification record could not be updated'}]){
+  const base=memorySandboxRunStore();let failClaim=false;
+  const store={read:key=>base.read(key),save:(key,row,tag)=>failClaim&&row.state==='checking'?Promise.reject(Error(kind)):base.save(key,row,tag)};
+  const t=sandboxFixture({store});await start(t);failClaim=true;
+  await assert.rejects(t.service.check(t.owner,t.id),e=>e.status===status&&e.message.includes(text)&&!e.message.includes('PRIVATE'));
+  const result=await t.service.status(t.owner,t.id);
+  assert.equal(result.state,'open');assert.equal(result.capturedTestPaymentVerified,false);assert.equal(t.calls.retrieve,0);
+ }
+});
+test('an overlapping browser check is rejected without losing the first independently verified captured result',async()=>{
+ const t=sandboxFixture();await start(t);t.setPaid();
+ let entered,release;const inside=new Promise(resolve=>entered=resolve),hold=new Promise(resolve=>release=resolve);
+ const original=t.client.checkout.sessions.retrieve;
+ t.client.checkout.sessions.retrieve=async(...args)=>{entered();await hold;return original(...args);};
+ const first=t.service.check(t.owner,t.id);await inside;
+ await assert.rejects(t.service.check(t.owner,t.id),e=>e.status===409&&/already running/.test(e.message));
+ assert.equal((await t.service.status(t.owner,t.id)).capturedTestPaymentVerified,false);
+ release();const settled=await first;assert.equal(settled.capturedTestPaymentVerified,true);
+ assert.equal(settled.supplierOrderSubmitted,false);
+});
+test('sandbox page loads existing test status without starting a competing verification automatically',()=>{
+ const client=fs.readFileSync('assets/stripe-sandbox.js','utf8');
+ assert.match(client,/if\(run&&configured\)\{const d=await api\(\{view:'status',id:run\}\);show\(d\);\}/);
+ assert.doesNotMatch(client,/if\(!d.expired\)await check\(\)/);
+});
+
 process.env.NODE_ENV='test';process.env.TP_SESSION_SECRET='synthetic-sandbox-test-cookie-secret-no-real-value';
 const admin=()=>sign({type:'admin',at:Date.now()});
 async function request({method='GET',query='mode=stripe-test&view=configuration',token,owner,origin,input,env={VERCEL_ENV:'preview'}}={}){let calls=0,output='';const handler=createStripeSandboxHandler({env,rate:async()=>{},service:{configuration:()=>({enabled:true}),start:async()=>{calls++;return {mode:'test'};},status:async()=>{calls++;return {mode:'test'};}}}),res={headers:{},setHeader(k,v){this.headers[k]=v;},end(v=''){output=v;}};const cookie=[token?'__Host-tp_admin='+token:'',owner?'__Host-tp_stripe_demo='+sign({type:'stripe-demo',id:owner,at:Date.now()}):''].filter(Boolean).join('; ');await handler({method,url:'/api/commerce?'+query,headers:{cookie,...(origin?{origin}:{}),...(input?{'content-type':'application/json'}:{})},body:input},res);return {status:res.statusCode,headers:res.headers,calls,output};}
