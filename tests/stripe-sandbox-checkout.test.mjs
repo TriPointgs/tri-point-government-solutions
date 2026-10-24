@@ -121,7 +121,7 @@ test('admin can independently verify an existing Tri-Point Stripe sandbox Paymen
  assert.equal(r.readOnly,true);assert.equal(r.processorCaptureConfirmed,true);
  assert.equal(r.marketplaceRecordUpdated,false);assert.equal(r.commercialOrderPaid,false);
  assert.equal(r.supplierOrderSubmitted,false);assert.equal(r.realSupplierDispatchAllowed,false);
- assert.equal(t.calls.create,1);assert.equal(t.calls.intent,1);
+ assert.equal(t.calls.create,1);assert.equal(t.calls.intent,2); // metadata discovery plus independent capture recheck
  const after=await t.service.status(t.owner,t.id);assert.deepEqual(after,before);
  assert.doesNotMatch(JSON.stringify(r),/pi_|cs_test_|sk_test_|whsec_|SECRET_CARD_HINT|PRIVATE STREET/);
 });
