@@ -12,7 +12,7 @@ test('explicit preview-only synthetic Blob version diagnostic',{skip:!enabled,ti
  const write=async(tag,label)=>{try{await put(path,JSON.stringify({kind:'synthetic-storage-canary',stage:label}),{...opts,allowOverwrite:true,ifMatch:tag});report[label]='passed';return true;}catch(e){report[label]=e instanceof BlobPreconditionFailedError?'precondition':'other-error';return false;}};
  let created=false;
  try{
-  const first=await put(path,JSON.stringify({kind:'synthetic-storage-canary',stage:'initial'}),{...opts,allowOverwrite:false});created=true;
+  const first=await put(path,JSON.stringify({kind:'synthetic-storage-canary',stage:'initial',padding:'synthetic-only-'.repeat(600)}),{...opts,allowOverwrite:false});created=true;
   const a=await read(),b=await read({'Accept-Encoding':'identity'}),h=await head(path);
   Object.assign(report,{defaultReadMatchesUpload:a.tag===first.etag,identityReadMatchesUpload:b.tag===first.etag,headMatchesUpload:h.etag===first.etag,uploadTagShape:shape(first.etag),defaultTagShape:shape(a.tag),identityTagShape:shape(b.tag),defaultEncoding:a.encoding,identityEncoding:b.encoding});
   let ok=await write(a.tag,'defaultCAS');
