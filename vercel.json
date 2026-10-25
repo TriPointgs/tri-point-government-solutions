@@ -5,6 +5,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "functions": {
+    "api/payment-events.js": {"maxDuration": 60},
     "api/shop.js": {
       "maxDuration": 60
     },
@@ -26,6 +27,7 @@
     }
   ],
   "rewrites": [
+    {"source":"/admin/checkout-recovery","destination":"/api/shop?view=cart-checkout-recovery-page"},
     {"source":"/shop-preview/checkout-return","destination":"/api/shop?view=cart-checkout-return"},
     {"source":"/shop-preview/checkout","destination":"/api/shop?view=cart-checkout-page"},
     {
