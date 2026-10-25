@@ -4,10 +4,15 @@ process.env.NODE_ENV='test';process.env.TP_SESSION_SECRET='synthetic-cart-route-
 const admin=()=>sign({type:'admin',at:Date.now()}),owner=randomUUID(),order=randomUUID(),review=randomUUID();
 const cart=()=>sign({type:'shop-preview',at:Date.now(),id:owner});
 async function request({method='GET',view='cart-checkout-config',query='',token=admin(),cartToken=cart(),origin='http://localhost:3000',input,env={VERCEL_ENV:'preview'},shop=false}={}){
- let output='',calls=[];const service={configuration:async()=>{calls.push('config');return {ready:false,mode:'test'};},read:async(who,id)=>{calls.push(['read',who,id]);return {id,mode:'test'};},finalize:async(who,v)=>{calls.push(['finalize',who,v]);return {mode:'test'};},open:async(who,v)=>{calls.push(['open',who,v]);return {mode:'test'};},reconcile:async(who,v)=>{calls.push(['reconcile',who,v]);return {mode:'test'};}},rate=async()=>{},handler=shop?createShopHandler({env,service:{},rate}):createCartCheckoutHandler({env,service,rate});
+ let output='',calls=[];const service={configuration:async()=>{calls.push('config');return {ready:false,mode:'test'};},read:async(who,id)=>{calls.push(['read',who,id]);return {id,mode:'test'};},finalize:async(who,v)=>{calls.push(['finalize',who,v]);return {mode:'test'};},open:async(who,v)=>{calls.push(['open',who,v]);return {mode:'test'};},reconcile:async(who,v)=>{calls.push(['reconcile',who,v]);return {mode:'test'};},history:async(who,v)=>{calls.push(['history',who,v]);return {mode:'test',records:[],hasMore:false,cursor:null,realSupplierDispatchAllowed:false};}},rate=async()=>{},handler=shop?createShopHandler({env,service:{},rate}):createCartCheckoutHandler({env,service,rate});
  const res={headers:{},setHeader(k,v){this.headers[k]=v;},end(s=''){output=s;}};
  await handler({method,url:'/api/shop?view='+view+query,headers:{origin,'content-type':'application/json',cookie:[token?'__Host-tp_admin='+token:'',cartToken?'__Host-tp_shop_preview='+cartToken:''].filter(Boolean).join('; ')},body:input},res);return {status:res.statusCode,headers:res.headers,output,calls};
 }
+test('private history accepts only signed original owner and ignores externally supplied owner values',async()=>{
+ const good=await request({view:'cart-checkout-history'});assert.equal(good.status,200);assert.deepEqual(good.calls,[['history',owner,null]]);
+ const next=await request({view:'cart-checkout-history',query:'&cursor=opaque-cursor'});assert.equal(next.status,200);assert.deepEqual(next.calls,[['history',owner,'opaque-cursor']]);
+ for(const opts of [{token:''},{cartToken:''},{query:'&owner='+randomUUID()},{query:'&view=cart-checkout-history'},{method:'POST'}]){const bad=await request({view:'cart-checkout-history',...opts});assert.ok(bad.status>=400);assert.equal(bad.calls.length,0);}
+});
 test('new checkout page is wired through the existing shop handler and requires administrator access',async()=>{
  const r=await request({view:'cart-checkout-page',shop:true});assert.equal(r.status,200);assert.match(r.output,/cc-finalize/);assert.match(r.output,/NO LIVE PURCHASE/);
  for(const token of ['',sign({type:'contractor',at:Date.now()})]){const bad=await request({view:'cart-checkout-page',token,shop:true});assert.equal(bad.status,303);assert.match(bad.headers.Location,/login/);}
