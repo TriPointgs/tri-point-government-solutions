@@ -26,6 +26,8 @@
     }
   ],
   "rewrites": [
+    {"source":"/shop-preview/checkout-return","destination":"/api/shop?view=cart-checkout-return"},
+    {"source":"/shop-preview/checkout","destination":"/api/shop?view=cart-checkout-page"},
     {
       "source": "/admin/stripe-return",
       "destination": "/api/commerce?mode=stripe-test&view=return"

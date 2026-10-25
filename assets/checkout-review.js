@@ -20,6 +20,7 @@ export function setupCheckoutReview({api,getCart,refreshCart}){
   const expires=Date.parse(result.expiresAt),localExpired=!Number.isFinite(expires)||expires<=Date.now(),changed=result.cartRevision!==getCart().revision;
   if(localExpired||changed)result={...result,needsRecheck:true,status:localExpired?'expired-review':'recheck-required',holds:[...new Set([localExpired?'This review expired. Recheck the cart before continuing.':'The cart changed after this review. Recheck before continuing.',...result.holds])]};
   const stale=result.needsRecheck===true;
+  const paymentLink=$('checkout-payment-link');if(paymentLink){paymentLink.hidden=stale;paymentLink.href='/shop-preview/checkout?review='+encodeURIComponent(result.id);}
   $('checkout-review-result').hidden=false;form.hidden=true;
   $('checkout-review-result-title').textContent=stale?'Review needs updating':'Checkout review saved';
   $('checkout-review-reference').textContent=result.reference+' · '+new Date(result.createdAt).toLocaleString();

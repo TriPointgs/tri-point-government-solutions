@@ -1,3 +1,5 @@
+import {createCartCheckoutHandler} from '../lib/cart-checkout-handler.mjs';
+import {createCartCheckoutService} from '../lib/cart-checkout-service.mjs';
 import {createImageRequestBudget} from '../lib/product-image-budget.mjs';
 import {productHtml,categoryHtml,productContentSecurity} from '../lib/storefront-seo-page.mjs';
 import {launchPage} from '../lib/launch-readiness.mjs';
@@ -9,8 +11,9 @@ import {HttpError} from '../lib/model.mjs';import {limit} from '../lib/storage.m
 import {createShopService} from '../lib/shop-cart-service.mjs';import {shopPreviewPage} from '../lib/shop-preview-page.mjs';
 const COOKIE='__Host-tp_shop_preview';
 function cartSession(req,res){const value=String(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);const p=verify(value,'shop-preview',86400000);if(p&&typeof p.id==='string'&&/^[0-9a-f-]{36}$/.test(p.id))return p.id;const id=randomUUID();res.setHeader('Set-Cookie',COOKIE+'='+sign({type:'shop-preview',id,at:Date.now()})+'; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=86400');return id;}
-export function createShopHandler({env=process.env,service=createShopService({env}),rate=limit,imageRate=rate===limit?createImageRequestBudget({env}):async(req,action)=>rate(req,'image-'+action,action==='provider'?60:240)}={}){return async(req,res)=>{
+export function createShopHandler({env=process.env,service=createShopService({env}),rate=limit,imageRate=rate===limit?createImageRequestBudget({env}):async(req,action)=>rate(req,'image-'+action,action==='provider'?60:240)}={}){const checkout=createCartCheckoutHandler({env,rate,service:createCartCheckoutService({env,shop:service})});return async(req,res)=>{
  const url=new URL(req.url,'https://tripointgs.com'),view=url.searchParams.get('view')||'cart';res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Robots-Tag','noindex, nofollow');
+ if(view.startsWith('cart-checkout-'))return checkout(req,res);
  try{requireAdmin(req);if(env.VERCEL_ENV==='production')throw new HttpError(503,'Shopping has not been released to the public website.');
  for(const key of url.searchParams.keys())if(url.searchParams.getAll(key).length!==1)throw new HttpError(400,'Duplicate fields.');
  if(req.method==='GET'||req.method==='HEAD'){

@@ -1,3 +1,4 @@
+import {createCartCheckoutService} from '../lib/cart-checkout-service.mjs';
 // Signed test-mode Stripe snapshots only. The default is disabled. NEVER routes to TD.
 import {createPaymentVerificationService} from '../lib/payment-verification-service.mjs';
 import {stripeTestConfiguration} from '../lib/stripe-payment-verifier.mjs';
@@ -13,7 +14,7 @@ export async function paymentRawBody(req){
  const b=Buffer.isBuffer(supplied.value)?supplied.value:Buffer.from(supplied.value);if(b.length>262144)throw new HttpError(413,'Payment event too large.');return b;
 
 }
-export function createPaymentEventsHandler({env=process.env,service=createPaymentVerificationService({env})}={}){return async(req,res)=>{
+export function createPaymentEventsHandler({env=process.env,service=createCartCheckoutService({env})}={}){return async(req,res)=>{
  res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Robots-Tag','noindex, nofollow');
  try{if(req.method!=='POST'){res.setHeader('Allow','POST');throw new HttpError(405,'Use a signed provider POST.');}
   if(!stripeTestConfiguration(env).configured)throw new HttpError(503,'Test payment verification is not enabled.');
