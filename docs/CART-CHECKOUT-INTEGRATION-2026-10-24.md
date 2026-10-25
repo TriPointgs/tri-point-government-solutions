@@ -1,36 +1,76 @@
 # Private cart checkout integration — October 24, 2026 (Eastern)
 
-## Starting checkpoint and boundaries
-The user supplied a screenshot confirming the existing $20 sandbox capture AND saved sandbox record. This is user-provided hosted evidence completing the previous storage-recovery milestone, not evidence of commercial fulfillment. Baseline/rollback: 11393e454abfe340a723f2ba7581aca985e45e7a, feature/td-product-controls, draft PR 23. Main observed at start: c1af230f4b4bc647a649c837f19d96a901a998d3.
+## Verified milestone and source
+The user supplied a screenshot confirming the prior $20 sandbox capture AND saved sandbox record. That is user-provided hosted evidence completing the storage-recovery milestone, not evidence of commercial fulfillment.
 
-This change is restricted to private merchant preview. No main merge, production deployment, new hosted Stripe Session/payment, live payment, TD purchase order, refund, customer email, policy approval, or credential change is performed. Original logo/brand and Wasabi work are untouched. The repository remains public; test addresses and policy text are explicitly synthetic.
+Baseline/rollback: 11393e454abfe340a723f2ba7581aca985e45e7a.
+Repository: TriPointgs/tri-point-government-solutions.
+Branch: feature/td-product-controls; PR 23 remains draft/unmerged.
+Main independently checked before and after implementation: c1af230f4b4bc647a649c837f19d96a901a998d3.
 
-## Implemented
-- Saved cart reviews link to /shop-preview/checkout?review=<reference>. The server creates one immutable test order using the existing supplier, availability, margin/MAP, freight, tax and policy gates. Exact approved terms text and its SHA-256 digest are disclosed and separately accepted. A digest/version alone without the reviewed text cannot activate the new flow.
-- Finalization, opening/resuming Checkout, saved-status reads and payment rechecks are owner-scoped and administrator-only through the existing api/shop.js function. New handlers reject production, duplicate/extra fields, forged paid/totals fields, missing original cart cookies, and cross-site writes. They do not mint a replacement cart owner to recover access.
-- Opening test Checkout requires a second explicit test-payment consent. The original immutable order is rechecked against the saved review, current supplier quote, product/pricing revisions and approved policy before payment opens. Repeat starts use the existing order and stable Stripe idempotency key.
-- Integrated Stripe requests use the pinned SDK's hosted_page UI and allowed_payment_method_types card filter, explicit automatic capture and a bounded 31-minute Session expiry. No unknown tax is set to zero and no government exemption is assumed.
-- A public, data-free return hop permits the browser's existing Strict cookies on the following same-site navigation. It neither confirms payment nor creates a session/cookie. The private order page requires authenticated ownership again. A browser return performs no automatic charge or payment approval.
-- Signed PaymentIntent events can link a paid Checkout Session to its authoritative stored order BEFORE the browser returns. Exact account/test mode/Session/payment/amount/order/version/digest are checked. Unknown payments do not manufacture orders; a known but not-yet-reconciled Session yields a retryable failure. Existing fixed-$20 sandbox and prior bound-payment event behavior remain supported.
-- Payment binding from an already-opened Session uses a fresh, non-serializable server proof and retains the original quote timestamps. Late captured funds can be recorded without pretending the quote is still valid. The current release gate remains false and UI says captured-review-required. No automatic refund or supplier dispatch occurs.
-- The UI separates finalized totals, captured-payment confirmation, stored payment status, quote expiry, and disabled supplier/email operations. A failed recheck clears the visible success state. Reloading saved status does not call Stripe. Contact/payment details are not written to browser storage.
+Deployed implementation: c26e9c25881797b43cce8e7545e78f9504fdb527.
+Exact implementation tree: 936234b55493b3e6d594a93ccb1eab26848ff4f8, independently matched to the local tested tree after the final retry-parameter correction.
+Vercel deployment: dpl_QuvwzZZBKicDzvRgj1QzfJVetSCF; READY, Preview (target null), aliasError null.
+Unique host: tri-point-government-solutions-1r2v2wq6e-tri-point.vercel.app.
+Stable host: tri-point-government-solutions-git-feature-td-edc7b1-tri-point.vercel.app.
+Checkout path: /shop-preview/checkout; normally enter through the saved review's Continue to private test checkout link.
 
-## Verification before deployment
+## Scope preserved
+Private merchant preview only. No main merge, production deployment, new hosted Stripe Session/payment, live payment, TD purchase order, refund, customer email, tax-policy approval, or credential change occurred. Original logo/brand and unrelated Wasabi work are untouched. The repository is public; fixture addresses and terms are explicitly synthetic. No persistent personal-memory update is claimed.
+
+The integration is implemented and tested, but actual product-linked hosted payment creation is NOT activated. TP_CART_CHECKOUT_PREVIEW_ENABLED was not created or enabled. Approval and configuration guards must be satisfied before activation; a successful build is not authorization to bypass them.
+
+## Implemented workflow
+Saved cart review -> server-finalized immutable test order -> explicit Stripe TEST Checkout -> authenticated payment/charge verification -> durable order/payment binding and saved status.
+
+The finalizer reuses supplier availability, pricing/margin/MAP, freight, tax and policy checks. Exact approved purchase-terms text is displayed and bound by its SHA-256 digest; accepting a version without reviewed text cannot activate checkout. No unknown tax is converted to zero or government exemption assumed.
+
+All private order reads and writes require administrator authentication and the original signed cart owner. Same-origin checks, rate limits, field validation and production rejection remain enforced. Missing cart cookies are not silently replaced to regain access. Forged browser totals or paid flags are rejected.
+
+Opening Checkout requires separate test-payment consent and a fresh check that cart, product/pricing revisions, stock/quote, shipping and merchant policies still match the finalized order. A saved open Session is resumed, not replaced. Uncertain creation retries use the same order, Stripe idempotency key AND identical parameters; expiry is derived from the saved first-attempt time, not the retry clock.
+
+Integrated Stripe requests use the pinned SDK's hosted_page interface, allowed_payment_method_types card filter, explicit automatic capture and a 31-minute Session expiry. A data-free public return hop enables the following same-site navigation without weakening Strict authentication cookies. Browser return does not itself mark paid or create a payment.
+
+Signed provider events can reconcile a paid Session before the browser returns. Exact account, test mode, Session, payment, amount, order, version and quote digest must match. Unknown payments do not manufacture orders. The prior fixed-$20 sandbox and already-bound payment event handling remain supported. Turning off creation does not discard valid signed payments from already-opened Sessions.
+
+A fresh, non-serializable server linkage proof permits recording a late captured payment against its ORIGINAL quote timestamps. The order remains held when the supplier quote expires; the system does not silently reprice, change the quote deadline, authorize TD dispatch or automatically refund. The UI distinguishes verified capture from an expired-quote review hold. Saved status reads do not contact Stripe; a failed recheck clears the visible approval. No payment/contact data is stored in browser storage.
+
+## Local verification
 - Existing 957 regular tests remained passing.
-- 30 added automated tests cover the integrated service, signed-event-first completion, late payment holds, correct ownership, CSRF, exact terms digest, revoked/changed cart/stock/policy, replay, concurrent starts, unavailable creation, altered Session identity, refunds/adverse events, stale proof, forged linkage, restricted return hop and production refusal.
+- 30 added integration/route tests cover exact totals, signed-event-first completion, quote-expiry holds, ownership, CSRF, exact terms digest, changed cart/stock/policy, replay, concurrent starts, uncertain creation, delayed retry payload stability, altered Session identity, refunds/adverse events, stale proof, forged linkage, safe return hop and production denial.
 - Total: 990 tests; 987 passed, zero failed, three explicitly gated hosted-storage tests skipped locally.
-- Clean preview and production-mode builds passed (25 and 24 final HTML pages respectively). A production-mode build is not a production release.
-- Real Chromium/Playwright against the real HTTP handler plus injected Stripe/TD/tax fixtures passed nine workflows: review-linked terms consent, exact totals, explicit Checkout, return hop, manual reconciliation, saved-status reread, expired quote hold, failed-verify clearing, disabled configuration. Widths 390/768/1440: no horizontal overflow. No browser script errors; no Stripe or other uncontrolled external network requests. The Stripe URL was intercepted locally; one synthetic Session, zero real payments/TD orders.
-- Browser harness initially failed because its mocked Stripe HTML lacked a UTF-8 charset for an em dash. Adding the charset to the fixture fixed the selector; no application workaround was needed.
+- Clean preview and production-mode builds passed with 25 and 24 final HTML pages. A production-mode build is NOT a production deployment.
+- Real Chromium/Playwright against the actual HTTP handler with injected Stripe/TD/tax fixtures passed nine workflows: review-linked terms consent, immutable totals, explicit Checkout, return hop, manual reconciliation, saved-status reread, expired-quote hold, failed-verification clearing, and disabled configuration.
+- Browser widths 390/768/1440 had no horizontal overflow. No browser script errors or uncontrolled external network requests. Stripe navigation was intercepted locally: one mock Session, zero Stripe network requests, zero real payments or TD orders.
+- The browser harness initially failed because mocked Stripe HTML lacked UTF-8 for an em dash. Correcting the fixture charset fixed its selector; no application workaround was introduced.
 
-## Hosted gate and activation
-The new page and configuration/status routes are implemented. Creating a product-linked test order/session remains disabled unless TP_CART_CHECKOUT_PREVIEW_ENABLED, TP_TEST_ORDER_FINALIZATION_ENABLED, TP_STRIPE_TEST_CHECKOUT_ENABLED, the existing Stripe read configuration, reviewed tax activation, exact product tax classifications, approved shipping policy, and reviewed terms text are all valid. No missing approvals are invented or enabled by this commit. Existing signed events can still reconcile already-opened checkouts when the new-creation flag is turned off.
+## Hosted verification: passed
+The c26e9c2 Vercel build reports 990 passed, zero failed, zero skipped, final 25-page validation passed and Deployment completed. READY was independently read.
 
-The opt-in tests/cart-checkout-storage-canary.test.mjs exercises this entire order/Session/payment chain using actual Blob records with synthetic Stripe/TD/tax providers, under a unique disposable preview/cart-checkout-canary prefix. It verifies original order persistence, signed-event completion before return, saved capture reread, retry safety, an expired-quote hold, and cleanup. The exact branch and TP_BLOB_STORAGE_CANARY=diagnose are required. Do not claim this hosted test passed until its deployment log has been inspected. Disable the temporary diagnostic flag afterward.
+TP_CART_CHECKOUT_STORAGE_TEST used the actual final-order, Checkout Session and payment-ledger services with REAL Blob storage and SYNTHETIC Stripe, TD and tax providers. The unique disposable preview/cart-checkout-canary namespace avoided all existing records. Its log reports:
 
-## Next action / unresolved business inputs
-The user should not make another $20 test payment. Product-linked hosted checkout remains gated pending reviewed purchase/returns/cancellation/warranty terms, merchant-fixed customer shipping policy, tax registrations/settings and exact product tax codes, plus explicit activation. The existing contractor-network terms and Florida resale certificate are not substitutes. Then use a separately authorized product-linked sandbox pilot before any live release.
+- realBlob: true; syntheticStripe: true; syntheticTD: true
+- finalOrderSaved: true
+- paymentSaved: true (including independent saved-status reread)
+- webhookBeforeReturn: true
+- lateHoldSaved: true
+- retrySafe: true
+- cleanup: true
 
-Remaining launch work includes real policy approval evidence, real cart-to-Stripe hosted pilot, abandoned-session handling and reviewed refund/cancellation procedures, durable customer accounts/order history, supplier PO acceptance/idempotency/uncertain-response reconciliation, actual fulfillment/tracking/email, and reconciliation against newer main. No real supplier release exists in this integration.
+The two earlier explicitly enabled Blob diagnostics also passed. This is not a real product-linked hosted Stripe payment pilot and does not claim to place an actual TD order.
 
-Primary API references checked: https://docs.stripe.com/api/checkout/sessions/create ; https://docs.stripe.com/checkout/fulfillment ; pinned stripe 23.0.0. Stripe's minimum hosted Session expiry is longer than the existing 15-minute supplier quote, so late capture is explicitly recorded and held rather than silently repriced.
+After verification, the existing non-secret branch-scoped TP_BLOB_STORAGE_CANARY setting was restored to off and independently read back. All three hosted-storage tests are disabled by default. A later documentation-only build should therefore report 987 passed and three intentional skips, with the implementation unchanged. No recurring diagnostic task was created.
+
+## Hosted smoke checks
+The stable preview served /assets/cart-checkout.js with HTTP 200 and the expected new implementation. A request to the protected cart-checkout-config route returned HTTP 401; authenticated configuration contents were not inspected through that request. Deployment protection bypass does not bypass application administrator authentication.
+
+The public /shop-preview/checkout-return hop with a synthetic UUID returned HTTP 200, data-free explanatory HTML, private/no-store and no-referrer headers, no Set-Cookie, and no payment/order details. It did not create or inspect an order.
+
+## Remaining activation requirements and next action
+Do not make another fixed-$20 payment. The new page can show readiness blockers until reviewed inputs and explicit activation exist. Those disabled controls are deliberate business-approval guards, not the earlier lost-reference bug.
+
+Before a separately authorized product-linked hosted sandbox pilot, supply and review the actual purchase/returns/cancellation/warranty terms, customer shipping policy, tax registrations/settings and exact product tax classifications, plus the required test flags. Contractor-network terms and a Florida resale certificate do not substitute for those requirements. No such approval was fabricated by this implementation.
+
+After activation and a real hosted test pilot, remaining launch work includes abandoned-session handling, reviewed refunds/cancellations, durable customer accounts/order history, TD PO acceptance/idempotency/uncertain-response recovery, actual fulfillment/tracking/email, and reconciliation with newer main. Live payments, TD ordering and production publication require separate approval and verification.
+
+Primary API references checked: https://docs.stripe.com/api/checkout/sessions/create and https://docs.stripe.com/checkout/fulfillment; pinned stripe 23.0.0. Stripe's minimum hosted Session expiry exceeds the existing 15-minute supplier quote, so late capture is explicitly recorded and held rather than silently repriced.
