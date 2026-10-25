@@ -20,3 +20,8 @@ The endpoint reuses existing /api/shop and the administrator authentication, ori
 
 ## Remaining business/development work
 This is not a conventional customer login/order portal. Future work still needs durable customer accounts and migration from browser-session ownership after an owner-approved identity model; approved tax/purchase/returns/shipping policy; abandoned checkout and refund operational workflow; TD SYNNEX supplier acceptance and uncertain-order response handling; customer communications; actual hosted product-linked payment test; final integration with main and explicit production release. No real transaction or production changes were authorized here.
+
+## Verified private-preview deployment checkpoint
+The source implementation commit is `659299cf05534fe4bb035b006abf70878526ee62` (local tested tree `0464ea501b3a9f577f34337b463094951c160bb4`). The isolated hosted build `dpl_J9y7HVmK4mu8GYedwyuU8cSxjUUj` passed all **1,006 tests** with **zero failed and zero skipped**, including the explicitly enabled synthetic real-Blob owner-history test. This test exercises cleanup as a required assertion. No external Stripe payment or TD supplier order was initiated.
+
+The temporary branch-scoped `TP_BLOB_STORAGE_CANARY` flag was restored to `off` and verified. The normal preview rebuild `dpl_87cndzkuKE5hxAwPSsGKZ6nEmPYb` was independently checked **READY** for the same implementation commit, with **1,002 passed, zero failed and four intentionally skipped diagnostics**. Both deployments targeted **Preview**, not production. PR #23 remains draft and unmerged. Existing orders are not retroactively indexed; owner-session identity is not a permanent customer login.
