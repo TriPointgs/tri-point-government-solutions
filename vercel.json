@@ -27,6 +27,8 @@
     }
   ],
   "rewrites": [
+    {"source":"/buyer-preview/order","destination":"/api/shop?view=cart-checkout-buyer-page"},
+    {"source":"/admin/order-operations","destination":"/api/shop?view=cart-checkout-ops-page"},
     {"source":"/admin/checkout-setup","destination":"/api/shop?view=cart-checkout-setup-page"},
     {"source":"/admin/checkout-recovery","destination":"/api/shop?view=cart-checkout-recovery-page"},
     {"source":"/shop-preview/checkout-return","destination":"/api/shop?view=cart-checkout-return"},

@@ -4,6 +4,8 @@
 Tri-Point Government Solutions; repository TriPointgs/tri-point-government-solutions. Continue scoped work on feature/td-product-controls / draft PR 23. Verify current refs and deployments before changes; do not infer success from an earlier assistant response. Keep main, production, unrelated branding and Wasabi work untouched unless separately authorized. Never store credentials/customer records in this public repository. Captured payment, not authorization alone, precedes any supplier-release design. Repeated whole-suite and differing browser tests are requested; never call test workers independent AI agents.
 
 ## Current project state — start with these sources
+Read `docs/ORDER-ACCESS-HANDOFF-2026-10-26.md` for the paired buyer-order access and supplier handoff patch; verify deployment evidence separately. One-order invitations are not permanent accounts, and supplier preflight/UAT matching is not SubmitPO. The new feature flags remain independently gated.
+
 Read `docs/CHECKOUT-SETUP-2026-10-25.md` for the new private merchant setup workspace. Consult live GitHub/Vercel for its deployment evidence; local implementation notes are not proof of deployment. Read `docs/CHECKOUT-VERIFIED-2026-10-25.md` for the prior verified checkout milestone and `docs/CHECKOUT-ACCEPTANCE-2026-10-25.md` only for detailed failure-recovery work. `docs/MARKETPLACE-OWNER-DECISIONS.md` separates decided payment flow from unapproved merchant inputs.
 
 ## Decisions versus proposals
