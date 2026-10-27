@@ -7,7 +7,7 @@
   "functions": {
     "api/payment-events.js": {"maxDuration": 60},
     "api/shop.js": {
-      "maxDuration": 60
+      "maxDuration": 120
     },
     "api/*.js": {
       "maxDuration": 30
@@ -27,6 +27,7 @@
     }
   ],
   "rewrites": [
+    {"source":"/admin/fulfillment-pilot","destination":"/api/shop?view=cart-checkout-pilot-page"},
     {"source":"/buyer-preview/order","destination":"/api/shop?view=cart-checkout-buyer-page"},
     {"source":"/admin/order-operations","destination":"/api/shop?view=cart-checkout-ops-page"},
     {"source":"/admin/checkout-setup","destination":"/api/shop?view=cart-checkout-setup-page"},
