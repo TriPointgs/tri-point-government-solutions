@@ -27,6 +27,8 @@
     }
   ],
   "rewrites": [
+    {"source":"/admin/buyer-checkout","destination":"/api/shop?view=cart-checkout-pay-admin-page"},
+    {"source":"/buyer-preview/checkout","destination":"/api/shop?view=cart-checkout-pay-page"},
     {"source":"/admin/fulfillment-pilot","destination":"/api/shop?view=cart-checkout-pilot-page"},
     {"source":"/buyer-preview/order","destination":"/api/shop?view=cart-checkout-buyer-page"},
     {"source":"/admin/order-operations","destination":"/api/shop?view=cart-checkout-ops-page"},
