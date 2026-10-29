@@ -7,7 +7,7 @@
     "node": "24.x"
   },
   "scripts": {
-    "build": "node scripts/check.mjs && node --test tests/*.test.mjs && node scripts/build.mjs && node scripts/public-boundary.mjs && node scripts/zoom-build.mjs && node scripts/lenovo-build.mjs && node scripts/fortinet-build.mjs && node scripts/check-address.mjs && node scripts/blog-build.mjs && node scripts/experience-build.mjs && node scripts/audit-pilot-readiness.mjs && node scripts/marketplace-theme-build.mjs",
+    "build": "node scripts/check.mjs && node --test tests/*.test.mjs && node scripts/build.mjs && node scripts/public-boundary.mjs && node scripts/zoom-build.mjs && node scripts/lenovo-build.mjs && node scripts/fortinet-build.mjs && node scripts/check-address.mjs && node scripts/blog-build.mjs && node scripts/experience-build.mjs && node scripts/audit-pilot-readiness.mjs && node scripts/prepare-launch-blockers.mjs && node scripts/marketplace-theme-build.mjs",
     "test": "node --test tests/*.test.mjs",
     "preview": "node scripts/preview.mjs"
   },
