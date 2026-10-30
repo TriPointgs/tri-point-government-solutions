@@ -4,6 +4,8 @@
 Tri-Point Government Solutions; repository TriPointgs/tri-point-government-solutions. Continue scoped work on feature/td-product-controls / draft PR 23. Verify current refs and deployments before changes; do not infer success from an earlier assistant response. Keep main, production, unrelated branding and Wasabi work untouched unless separately authorized. Never store credentials/customer records in this public repository. Captured payment, not authorization alone, precedes any supplier-release design. Repeated whole-suite and differing browser tests are requested; never call test workers independent AI agents.
 
 ## Current project state — start with these sources
+Read `docs/UAT-AND-RELEASE-READINESS-2026-10-30.md` for the separate UAT probe, safe rejection diagnostics, reconciliation of pinned main into Preview, and corrected launch-status workspace. Read its verified checkpoint for actual provider results. A passing build must not be mistaken for successful OAuth or public-launch readiness.
+
 Read `docs/LAUNCH-PREPARATION-2026-10-29.md` for the exact-commit additive TEST-webhook repair, signed no-op transport check and create-only unapproved merchant draft. Use its later verified checkpoint for actual results. No tax/business approval or public release is implied.
 
 Read `docs/PILOT-READINESS-AUDIT-2026-10-29.md` for the exact-commit, read-only Preview build diagnostic. Its provider and two-record storage observations are distinct from runtime/checkout verification. Check the later verified checkpoint for actual results; no merchant approvals or transaction gates are granted by this audit.
