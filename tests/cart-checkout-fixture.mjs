@@ -1,3 +1,5 @@
+import {createOrderReleaseControl} from '../lib/order-release-control.mjs';
+import {memoryOrderExtensionStore} from '../lib/order-extension-store.mjs';
 import {createHash} from 'node:crypto';
 import {finalizationFixture} from './cart-finalization-fixture.mjs';
 import {NOW} from './checkout-safety-fixture.mjs';
@@ -7,7 +9,7 @@ import {memoryCheckoutSessionStore} from '../lib/stripe-checkout-session.mjs';
 import {memoryPaymentVerificationStore} from '../lib/payment-verification-store.mjs';
 import {memoryCartOrderHistoryStore} from '../lib/cart-order-history.mjs';
 import {processorIntent,eventBytes} from './payment-first-fixture.mjs';
-export async function cartPaymentFixture({patch={},paymentStore=memoryPaymentVerificationStore(),checkoutStore=memoryCheckoutSessionStore(),orderStore,history=memoryCartOrderHistoryStore()}={}){
+export async function cartPaymentFixture({patch={},paymentStore=memoryPaymentVerificationStore(),checkoutStore=memoryCheckoutSessionStore(),orderStore,releaseStore=memoryOrderExtensionStore(),history=memoryCartOrderHistoryStore()}={}){
  let now=NOW;const base=await finalizationFixture({clock:()=>now,...(orderStore?{store:orderStore}:{})}),env={...base.env,TP_CART_CHECKOUT_PREVIEW_ENABLED:'true',TP_STRIPE_TEST_CHECKOUT_ENABLED:'true',VERCEL_BRANCH_URL:'synthetic.vercel.app',...patch};
  const terms='SYNTHETIC TEST TERMS ONLY. Not approved business terms. No goods or services are purchased.';
  base.policy().terms.text=terms;base.policy().terms.contentDigest=createHash('sha256').update(terms).digest('hex');
@@ -18,9 +20,10 @@ export async function cartPaymentFixture({patch={},paymentStore=memoryPaymentVer
   async list({payment_intent,limit}){if(payment_intent!==pid||limit!==2)throw Error('synthetic invalid list');return {object:'list',has_more:false,data:session?[await this.retrieve(sid)]:[]};},
   async retrieve(id){counts.session++;if(!session||id!==sid)throw Error('synthetic missing session');return {...structuredClone(session),payment_intent:paid?pid:null,payment_status:paid?'paid':'unpaid',status:paid?'complete':'open',...sessionPatch};}
  }},paymentIntents:{async retrieve(id){counts.intent++;if(intentError)throw Error('synthetic read failed');if(!session||id!==pid)throw Error('synthetic unknown payment');const b={paymentId:pid,orderId:session.client_reference_id,orderVersion:1,quoteDigest:session.metadata.tp_quote_digest,amountCents:session.amount_total};const p=processorIntent(b);p.metadata.tp_flow=session.metadata.tp_flow;if(!paid){p.status='requires_payment_method';p.amount_received=0;p.latest_charge.paid=false;p.latest_charge.captured=false;}if(refund){p.latest_charge.refunded=true;p.latest_charge.amount_refunded=p.amount;p.latest_charge.refunds.data=[{id:'re_SYNTHETIC'}];}return {...p,...intentPatch};}},charges:{retrieve:async()=>({id:'ch_SYNTHETIC123456',livemode:false,payment_intent:pid})}};
- const verifier=createStripePaymentVerifier({env,client,clock:()=>now}),service=createCartCheckoutService({env,shop:base.service,orders:base.store,policies:base.policies,tax:base.tax,client,verifier,paymentStore,checkoutStore,history,clock:()=>now});
+ const release=createOrderReleaseControl({env,orders:base.store,store:releaseStore,clock:()=>now});
+ const verifier=createStripePaymentVerifier({env,client,clock:()=>now}),service=createCartCheckoutService({env,shop:base.service,orders:base.store,policies:base.policies,tax:base.tax,client,verifier,paymentStore,checkoutStore,history,release,clock:()=>now});
  const request={...base.request,termsDigest:base.policy().terms.contentDigest,testConsent:true};
- return {...base,env,service,verifier,paymentStore,checkoutStore,history,counts,requests,pid,request,client,
+ return {...base,env,service,verifier,release,releaseStore,paymentStore,checkoutStore,history,counts,requests,pid,request,client,
   now:()=>now,advance:n=>{now+=n;},paid:()=>{paid=true;},refund:()=>{refund=true;},setIntentError:v=>{intentError=v;},setSessionPatch:v=>{sessionPatch=v;},setIntentPatch:v=>{intentPatch=v;},setCreateError:v=>{createError=v;},createOptions:()=>options,
   finalize:()=>service.finalize(base.owner,request),
   sessionEvent:async(type='checkout.session.completed')=>eventBytes({type,at:now,object:await client.checkout.sessions.retrieve(sid)}),
