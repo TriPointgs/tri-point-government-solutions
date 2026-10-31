@@ -27,6 +27,8 @@
     }
   ],
   "rewrites": [
+    {"source":"/admin/order-notifications","destination":"/api/shop?view=cart-checkout-mail-page"},
+    {"source":"/buyer-preview/verify-email","destination":"/api/shop?view=cart-checkout-mail-verify-page"},
     {"source":"/admin/order-exceptions","destination":"/api/shop?view=cart-checkout-exception-page"},
     {"source":"/admin/buyer-checkout","destination":"/api/shop?view=cart-checkout-pay-admin-page"},
     {"source":"/buyer-preview/checkout","destination":"/api/shop?view=cart-checkout-pay-page"},
