@@ -6,14 +6,14 @@ const at='2026-10-19T00:00:00.000Z';
 const fixture=(scenario='standard')=>createSimulationOrder({id:'SIM-test-order-0001',createdAt:at,scenario});
 let sequence=0;
 const step=(o,a)=>transitionOrder(o,simulationEvent(o,a,'event-'+(++sequence).toString().padStart(6,'0'),at)).order;
-const prepared=()=>['authorize','approve','submit','accept','capture'].reduce(step,fixture());
+const prepared=()=>['authorize','approve','capture','submit','accept'].reduce(step,fixture());
 
 test('order fixtures are explicitly synthetic with immutable initial price snapshot',()=>{
  const o=fixture();assert.equal(o.mode,'simulation');assert.equal(o.customer.email,'buyer@example.invalid');assert.equal(o.totals.totalCents,278500);assert.equal(o.totals.productGrossProfitCents,36000);assert.equal(o.revision,1);assert.equal(o.outbox.length,2);assert.equal(orderStatus(o),'awaiting_payment');assert.equal(o.supplier.poNumber,'TP-'+o.id);
  const next=step(o,'authorize');assert.equal(o.payment.status,'unpaid');assert.equal(next.payment.status,'authorized');assert.deepEqual(next.lines,o.lines);
 });
-test('complete simulated order follows payment, supplier acceptance, capture, shipping and delivery',()=>{
- let o=fixture();const checks=[['authorize','awaiting_review'],['approve','ready_for_supplier'],['submit','supplier_pending'],['accept','processing'],['capture','processing'],['ship_remaining','shipped'],['deliver_next','delivered']];
+test('complete simulated order requires capture before supplier submission, then shipping and delivery',()=>{
+ let o=fixture();const checks=[['authorize','awaiting_review'],['approve','awaiting_capture'],['capture','ready_for_supplier'],['submit','supplier_pending'],['accept','processing'],['ship_remaining','shipped'],['deliver_next','delivered']];
  for(const [a,status] of checks){o=step(o,a);assert.equal(orderStatus(o),status);}
  assert.equal(o.payment.capturedCents,o.totals.totalCents);assert.equal(o.shipments.length,1);assert.equal(o.shipments[0].status,'delivered');assert.equal(remainingItems(o).length,0);assert.equal(o.events.length,7);
 });
@@ -21,13 +21,13 @@ test('split shipments preserve remaining quantities and do not mark the entire o
  let o=step(prepared(),'ship_partial');assert.equal(fulfillmentStatus(o),'partially_shipped');assert.deepEqual(remainingItems(o),[{lineId:'line-1',quantity:1},{lineId:'line-2',quantity:2}]);o=step(o,'deliver_next');assert.equal(orderStatus(o),'partially_delivered');o=step(o,'ship_remaining');assert.equal(orderStatus(o),'partially_delivered');o=step(o,'deliver_next');assert.equal(orderStatus(o),'delivered');assert.equal(o.shipments.length,2);
 });
 test('uncertain supplier submission blocks automatic resubmission and must reconcile the existing PO',()=>{
- let o=['authorize','approve','submit','timeout'].reduce(step,fixture());const po=o.supplier.poNumber;assert.equal(orderStatus(o),'reconciliation_required');assert.throws(()=>step(o,'submit'),OrderError);assert.throws(()=>step(o,'accept'),OrderError);assert.throws(()=>step(o,'capture'),OrderError);o=step(o,'reconcile');assert.equal(o.supplier.poNumber,po);assert.equal(o.supplier.status,'accepted');assert.equal(o.events.filter(e=>e.type==='supplier.submission_started').length,1);assert.equal(o.outbox.filter(e=>e.kind==='supplier_submission').length,1);
+ let o=['authorize','approve','capture','submit','timeout'].reduce(step,fixture());const po=o.supplier.poNumber;assert.equal(orderStatus(o),'reconciliation_required');assert.throws(()=>step(o,'submit'),OrderError);assert.throws(()=>step(o,'accept'),OrderError);assert.throws(()=>step(o,'capture'),OrderError);o=step(o,'reconcile');assert.equal(o.supplier.poNumber,po);assert.equal(o.supplier.status,'accepted');assert.equal(o.events.filter(e=>e.type==='supplier.submission_started').length,1);assert.equal(o.outbox.filter(e=>e.kind==='supplier_submission').length,1);
 });
 test('supplier rejection stops processing and does not invent a payment refund',()=>{
- let o=['authorize','approve','submit','reject'].reduce(step,fixture());assert.equal(orderStatus(o),'on_hold');assert.equal(o.payment.status,'authorized');assert.equal(o.payment.capturedCents,0);assert.throws(()=>step(o,'capture'),OrderError);assert.throws(()=>step(o,'ship_remaining'),OrderError);
+ let o=['authorize','approve','capture','submit','reject'].reduce(step,fixture());assert.equal(orderStatus(o),'refund_review_required');assert.equal(o.payment.status,'captured');assert.equal(o.payment.capturedCents,o.totals.totalCents);assert.equal(o.payment.refundStatus,'required');assert.throws(()=>step(o,'capture'),OrderError);assert.throws(()=>step(o,'ship_remaining'),OrderError);
 });
 test('high-value scenario begins held and requires explicit review',()=>{
- let o=fixture('high-value');assert.equal(orderStatus(o),'on_hold');assert.throws(()=>step(o,'submit'),OrderError);o=step(o,'authorize');assert.equal(orderStatus(o),'on_hold');o=step(o,'approve');assert.equal(orderStatus(o),'ready_for_supplier');
+ let o=fixture('high-value');assert.equal(orderStatus(o),'on_hold');assert.throws(()=>step(o,'submit'),OrderError);o=step(o,'authorize');assert.equal(orderStatus(o),'on_hold');o=step(o,'approve');assert.equal(orderStatus(o),'awaiting_capture');
 });
 test('a duplicate event is idempotent even when its original expected revision is old',()=>{
  const o=fixture(),event=simulationEvent(o,'authorize','event-duplicate-0001',at);const first=transitionOrder(o,event),second=transitionOrder(first.order,event);assert.equal(second.duplicate,true);assert.deepEqual(second.order,first.order);assert.equal(second.order.events.length,1);assert.equal(second.order.outbox.length,3);
@@ -38,7 +38,7 @@ test('reusing an event ID with a different payload is rejected',()=>{
 test('stale revisions and out-of-order event times are rejected without mutation',()=>{
  const o=fixture(),before=structuredClone(o),event=simulationEvent(o,'authorize','event-valid-0003',at);assert.throws(()=>transitionOrder(o,{...event,expectedRevision:0}),e=>e.status===409);assert.throws(()=>transitionOrder(o,{...event,at:'2026-10-18T23:59:59.000Z'}),e=>e.status===409);assert.deepEqual(o,before);
 });
-test('payment amounts must match and capture cannot precede supplier acceptance',()=>{
+test('payment amounts must match and capture requires sourcing approval before supplier submission',()=>{
  const o=fixture(),event=simulationEvent(o,'authorize','event-amount-0004',at);assert.throws(()=>transitionOrder(o,{...event,payload:{...event.payload,amountCents:1}}),OrderError);assert.throws(()=>step(o,'capture'),OrderError);const a=step(o,'authorize');assert.throws(()=>step(a,'capture'),OrderError);assert.throws(()=>step(a,'ship_partial'),OrderError);
 });
 test('review requires every eligibility, stock, freight, price and risk check',()=>{

@@ -1,0 +1,21 @@
+import {cartPaymentFixture} from './cart-checkout-fixture.mjs';
+import {createTdUatPo} from '../lib/td-po-uat.mjs';
+import {createSupplierDispatch} from '../lib/supplier-dispatch.mjs';
+import {createOrderUpdateQueue} from '../lib/order-update-queue.mjs';
+import {memoryOrderExtensionStore} from '../lib/order-extension-store.mjs';
+import {randomUUID} from 'node:crypto';
+export async function dispatchFixture({store=memoryOrderExtensionStore(),queueStore=memoryOrderExtensionStore(),envPatch={},paid=true}={}){
+ const t=await cartPaymentFixture({releaseStore:store}),order=await t.finalize();if(paid){await t.service.open(t.owner,{orderId:order.id,testConsent:true});t.paid();await t.service.reconcile(t.owner,{orderId:order.id});}
+ const env={...t.env,TP_TD_UAT_PILOT_APPROVED:'true',TP_TD_UAT_SUBMIT_ENABLED:'true',TP_TD_UAT_CLIENT_ID:'synthetic-uat-client',TP_TD_UAT_CLIENT_SECRET:'synthetic-uat-secret',TP_TD_UAT_CUSTOMER_NO:'123456',TP_TD_UAT_PILOT_ORDER_ID:order.id,TP_TD_UAT_MAX_GOODS_CENTS:'50000',TP_TD_UAT_ACCOUNT_CURRENCY:'USD',...envPatch};
+ let cost=10000,reply='accepted',status='accepted',afterToken=null,patch=x=>x,freightPatch=x=>x;const calls={token:0,submit:0,status:0,price:0,freight:0},requests=[];
+ const reads={async lookup(){calls.price++;return [{source:'tdsynnex-priceavailability',environment:'uat',checkedAt:new Date(t.now()).toISOString(),sku:'12345',mfgPart:'TEST-12345',status:'Active',priceType:'REGULAR',identityMatched:true,currency:'USD',costCents:cost,stockQuantity:100,endUserRequired:false,parcelShippable:true,issues:[]}];},async freight(q){calls.freight++;return freightPatch({source:'tdsynnex-freightquote',environment:'uat',checkedAt:new Date(t.now()).toISOString(),zip:q.zip,currency:'USD',amountCents:1250,extraChargesComplete:true,shipmentCount:1,shipments:[{methodCode:'FX',items:q.items}]});}};
+ const response=data=>new Response(JSON.stringify(data),{headers:{'content-type':'application/json'}});
+ const fetcher=async(url,options)=>{requests.push({url,method:options.method,body:String(options.body),redirect:options.redirect});if(url.endsWith('/token')){calls.token++;if(afterToken)await afterToken();return response({access_token:'synthetic-access-token-not-real',token_type:'Bearer',expires_in:3600});}
+  const body=JSON.parse(options.body),reference=body.OrderRequest?.PONumber||body.OrderStatusRequest?.PONumber;
+  const lines=[{lineNumber:1,SKU:'12345',MfgPN:'TEST-12345',OrderQuantity:2,CustPOLineNo:'1',Code:'accepted',OrderType:'SO',OrderNumber:10001}];
+  if(url.endsWith('/SubmitPO')){calls.submit++;if(reply==='timeout')throw Error('PRIVATE NETWORK ERROR');if(reply==='http')return new Response('PRIVATE',{status:500});if(reply==='invalid')return new Response('{',{headers:{'content-type':'application/json'}});return response(patch({version:'3.1',OrderResponse:{PONumber:reference,CustomerNumber:123456,Code:reply,Items:{Item:reply==='rejected'?[]:lines}},errorMessage:null,errorDetail:null}));}
+  if(url.endsWith('/GetPOStatus')){calls.status++;if(status==='timeout')throw Error('PRIVATE NETWORK ERROR');return response(patch({version:'2.6',OrderStatusResponse:{PONumber:reference,CustomerNumber:123456,Code:status,Items:{Item:status==='notFound'?[]:lines}}}));}throw Error('Unexpected network URL');};
+ const adapter=createTdUatPo({env,fetcher,reads,clock:t.now}),dispatch=createSupplierDispatch({env,orders:t.store,checkout:t.service,sourcing:r=>t.finalizer.assertCheckoutReady(r.owner,r.id),adapter,store,clock:t.now}),queue=createOrderUpdateQueue({env,orders:t.store,checkout:t.service,dispatch,store:queueStore,clock:t.now});
+ const input=async()=>({orderId:order.id,requestId:randomUUID(),expectedRevision:(await dispatch.read(order.id)).revision,consent:true});
+ return {t,env,order,store,queueStore,dispatch,queue,adapter,reads,fetcher,calls,requests,input,prepare:async()=>dispatch.prepare(await input()),submit:async()=>{const i=await input(),r=await dispatch.read(order.id);return dispatch.submit({...i,planDigest:r.planDigest});},reconcile:async()=>dispatch.reconcile(await input()),sync:async()=>queue.sync({orderId:order.id,requestId:randomUUID(),expectedRevision:(await queue.read(order.id)).revision}),setCost:v=>{cost=v;},setReply:v=>{reply=v;},setStatus:v=>{status=v;},setAfterToken:v=>{afterToken=v;},setPatch:v=>{patch=v;},setFreightPatch:v=>{freightPatch=v;}};
+}
