@@ -10,3 +10,5 @@ assert.match(contact,/mailto:info@tripointgs.com/);
 for(const p of ['dist/assets/marketplace-theme.css','dist/assets/marketplace-coming-soon.css','dist/assets/experience.js','dist/assets/tripoint-logo.svg'])assert.ok(fs.existsSync(p));
 const theme=fs.readFileSync('dist/assets/marketplace-theme.css','utf8');assert.match(theme,/#0b243e/);assert.match(theme,/#d4ac53/);
 console.log('PASS public redesign/coming-soon boundary checks');
+
+const ptz=fs.readFileSync('dist/solutions/ptzoptics.html','utf8');assert.match(ptz,/PTZOptics camera solutions/);assert.match(ptz,/Product guides &amp; specifications/);assert.match(ptz,/name="robots" content="noindex, follow"/);assert.doesNotMatch(ptz,/Add to cart|Buy now|SubmitPO|authorized reseller/i);assert.match(home,/href="\/solutions\/ptzoptics"/);
