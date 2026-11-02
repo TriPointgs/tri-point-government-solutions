@@ -7,7 +7,7 @@ const order=()=>({lines:[{sku:'12345',quantity:2,unitPriceCents:11500,approvedTa
 address:{line1:'123 Synthetic St',city:'Leesburg',state:'FL',postalCode:'34748',country:'US'}});
 function mock(result={},options={}){
  const r=order(),p=taxCalculationRequest({...r,accountId:env.TP_STRIPE_TEST_ACCOUNT_ID});
- const cal={id:'taxcalc_SYNTHETIC123456',object:'tax.calculation',currency:'usd',tax_amount_exclusive:1800,tax_amount_inclusive:0,amount_total:26050,expires_at:(now+1800000)/1000,customer_details:{address:{...p.request.customer_details.address}},...result};
+ const cal={id:'taxcalc_SYNTHETIC123456',object:'tax.calculation',livemode:false,tax_breakdown:[{amount:1800,inclusive:false,taxable_amount:24250,taxability_reason:'standard_rated'}],currency:'usd',tax_amount_exclusive:1800,tax_amount_inclusive:0,amount_total:26050,expires_at:(now+1800000)/1000,customer_details:{address:{...p.request.customer_details.address},taxability_override:'none'},...result};
  const calls={account:0,calculate:0};return {calls,cal,plan:p,client:{accounts:{async retrieve(){calls.account++;return {id:options.accountId||env.TP_STRIPE_TEST_ACCOUNT_ID};}},tax:{calculations:{async create(input){calls.calculate++;assert.deepEqual(input,p.request);if(options.fail)throw Error('PRIVATE BANK TOKEN');return cal;}}}}};
 }
 test('tax is disabled until specifically reviewed, even when test Stripe keys are configured',()=>{
@@ -23,6 +23,7 @@ test('customer address, Stripe account and per-item tax code must be fully suppl
 test('tax calculation does not use client-provided tax amount or pricing overrides',()=>{
  const r=taxCalculationRequest({...order(),accountId:env.TP_STRIPE_TEST_ACCOUNT_ID});
  assert.equal(r.request.line_items[0].amount,23000);
+ assert.equal(r.request.line_items[0].quantity,2);
  assert.equal(r.request.shipping_cost.amount,1250);
  assert.equal(r.request.currency,'usd');
  assert.equal(r.request.customer_details.address_source,'shipping');
@@ -61,3 +62,33 @@ test('test-only tax quote returns a checked amount for the specific address with
  const out=await q.calculate(order());assert.equal(out.taxCents,1800);assert.equal(q.configuration().liveTaxCollectionEnabled,false);assert.equal(q.configuration().automaticCustomerExemptionEnabled,false);assert.equal(m.calls.calculate,1);
 });
 test('same ZIP with a different street, city or state fails the tax-address evidence check',()=>{for(const patch of [{line1:'123 Other Street'},{city:'Other City'},{state:'CA'}]){const m=mock();m.cal.customer_details.address={...m.cal.customer_details.address,...patch};assert.throws(()=>validateTaxCalculation(m.cal,m.plan,{now}),e=>e.status===503);}});
+
+test('Florida multi-unit line preserves quantity and total amount for per-unit thresholds',()=>{
+ const base=order();base.lines[0]={...base.lines[0],unitPriceCents:600000,quantity:2};
+ const p=taxCalculationRequest({...base,accountId:env.TP_STRIPE_TEST_ACCOUNT_ID});
+ assert.equal(p.request.line_items[0].amount,1200000);
+ assert.equal(p.request.line_items[0].quantity,2);
+ assert.equal(p.subtotalCents,1200000); // No local surtax-rate or cap approximation.
+});
+test('unconfigured, unsupported, exempt-customer and unknown reasons fail even with consistent zero totals',()=>{
+ for(const reason of ['not_collecting','not_supported','not_subject_to_tax','customer_exempt','reverse_charge','future_reason',undefined]){
+  const m=mock({tax_amount_exclusive:0,amount_total:24250,tax_breakdown:[{amount:0,inclusive:false,taxable_amount:24250,taxability_reason:reason}]});
+  assert.throws(()=>validateTaxCalculation(m.cal,m.plan,{now}),e=>e.status===503);
+ }
+});
+test('explicit product exemption may yield zero without becoming a customer exemption',()=>{
+ const m=mock({tax_amount_exclusive:0,amount_total:24250,tax_breakdown:[{amount:0,inclusive:false,taxable_amount:0,taxability_reason:'product_exempt'}]});
+ const proof=validateTaxCalculation(m.cal,m.plan,{now});assert.equal(proof.taxCents,0);assert.equal(proof.exemptionReviewed,false);
+});
+test('missing, live, malformed or inconsistent collection evidence is rejected',()=>{
+ for(const patch of [{livemode:true},{livemode:undefined},{tax_breakdown:undefined},{tax_breakdown:[]},{tax_breakdown:[null]},{tax_breakdown:[{amount:1,inclusive:false,taxable_amount:24250,taxability_reason:'standard_rated'}]},{tax_breakdown:[{amount:1800,inclusive:true,taxable_amount:24250,taxability_reason:'standard_rated'}]}]){
+  const m=mock(patch);assert.throws(()=>validateTaxCalculation(m.cal,m.plan,{now}),e=>e.status===503);
+ }
+ for(const value of ['customer_exempt',undefined,null,'']){const m=mock();m.cal.customer_details.taxability_override=value;
+ assert.throws(()=>validateTaxCalculation(m.cal,m.plan,{now}),e=>e.status===503);}
+});
+test('partly collected tax cannot hide an unconfigured jurisdiction',async()=>{
+ const m=mock();m.cal.tax_breakdown.push({amount:0,inclusive:false,taxable_amount:24250,taxability_reason:'not_collecting'});
+ const q=createStripeTaxQuote({env,stripeClient:m.client,clock:()=>now});
+ await assert.rejects(q.calculate(order()),e=>e.status===503);
+});
