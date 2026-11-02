@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';
+for(const p of ['dist/index.html','dist/marketplace.html','dist/contact.html','dist/contractors.html','dist/privacy.html'])assert.ok(fs.existsSync(p),`missing ${p}`);
+const market=fs.readFileSync('dist/marketplace.html','utf8'),home=fs.readFileSync('dist/index.html','utf8'),contact=fs.readFileSync('dist/contact.html','utf8');
+assert.match(market,/Our Marketplace Is/);assert.match(market,/Coming Soon/);assert.match(market,/We're excited to bring you the Tri-Point Marketplace soon/);
+assert.match(market,/href="\/contact"/);assert.match(market,/meta name="description"/);assert.match(market,/experience-header/);
+assert.doesNotMatch(market,/checkout.stripe.com|Add to cart|Pay now|Buy now|SubmitPO|data-product-price|cart-action|stripe-test/);
+assert.match(home,/Technology that moves/);assert.match(home,/Marketplace coming soon/);
+assert.match(home,/id="capabilities"/);assert.match(home,/id="contracting"/);assert.match(home,/info@tripointgs.com/);
+assert.match(contact,/mailto:info@tripointgs.com/);
+for(const p of ['dist/assets/marketplace-theme.css','dist/assets/marketplace-coming-soon.css','dist/assets/experience.js','dist/assets/tripoint-logo.svg'])assert.ok(fs.existsSync(p));
+const theme=fs.readFileSync('dist/assets/marketplace-theme.css','utf8');assert.match(theme,/#0b243e/);assert.match(theme,/#d4ac53/);
+console.log('PASS public redesign/coming-soon boundary checks');
