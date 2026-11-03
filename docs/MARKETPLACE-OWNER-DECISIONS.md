@@ -1,6 +1,6 @@
 # One-time business decisions before opening checkout
 
-November 3 continuation: the owner will file Florida returns. The registration effective date remains unknown; a supplied certificate expiry is not that date. A connected account received a read-only Stripe settings/registration review, but its use for this marketplace is not yet confirmed. See `MARKETPLACE-CONTINUATION-2026-11-03.md` for current state; earlier unverified/no-connection observations below are historical. No tax or checkout activation follows from this update.
+November 3 continuation: the owner will file Florida returns and has selected a separate Tri-Point Stripe account. The owner reports that the certificate does not show an effective date; keep it unconfirmed and do not substitute the expiry date or ask for that date from the same certificate. The previously inspected other-brand account is excluded from marketplace use; its read-only review is historical context, not verification of the dedicated account. See `MARKETPLACE-CONTINUATION-2026-11-03.md` for current state; earlier unverified/no-connection observations below are historical. No tax or checkout activation follows from this update.
 
 Status: owner-decision register, reconciled October 25, 2026. Unapproved entries are preparation items, not adopted terms or legal/tax advice. This is for Tri-Point operations, not a shopper worksheet.
 
