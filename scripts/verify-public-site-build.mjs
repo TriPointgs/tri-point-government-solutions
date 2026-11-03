@@ -11,4 +11,10 @@ for(const p of ['dist/assets/marketplace-theme.css','dist/assets/marketplace-com
 const theme=fs.readFileSync('dist/assets/marketplace-theme.css','utf8');assert.match(theme,/#0b243e/);assert.match(theme,/#d4ac53/);
 console.log('PASS public redesign/coming-soon boundary checks');
 
-const ptz=fs.readFileSync('dist/solutions/ptzoptics.html','utf8');assert.match(ptz,/PTZOptics camera solutions/);assert.match(ptz,/Product guides &amp; specifications/);assert.match(ptz,/name="robots" content="noindex, follow"/);assert.doesNotMatch(ptz,/Add to cart|Buy now|SubmitPO|authorized reseller/i);assert.match(home,/href="\/solutions\/ptzoptics"/);
+for(const brand of ['ptzoptics','wasabi']){
+ const html=fs.readFileSync('dist/solutions/'+brand+'.html','utf8');
+ assert.match(html,/data-product-card/);assert.match(html,/id="portfolio"/);assert.match(html,/id="brand-compare-dialog"/);assert.match(html,/name="robots" content="noindex, follow"/);
+ assert.doesNotMatch(html,/Add to cart|Buy now|SubmitPO|authorized reseller/i);
+ assert.ok(home.includes('href="/solutions/'+brand+'"'));assert.match(html,/href="\/contact\?manufacturer=/);
+}
+assert.match(contact,/id="brand-inquiry-selection"/);assert.match(contact,/src="\/assets\/brand-inquiry.js"/);

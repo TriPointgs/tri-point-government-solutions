@@ -3,7 +3,7 @@ import {ptzopticsPage} from '../lib/ptzoptics-page.mjs';
 import {siteHeader,siteFooter} from '../lib/site-experience.mjs';
 test('new public PTZOptics stage fits existing visual system and route',()=>{
  const page=ptzopticsPage();
- for(const marker of ['PTZOptics camera solutions','Product guides &amp; specifications','Videos &amp; brochures','/assets/ptzoptics.css','experience-header','experience-footer'])assert.ok(page.includes(marker),marker);
+ for(const marker of ['PTZOptics Cameras, Controllers & Production Tools','data-product-card','id="portfolio"','/assets/brand-solutions.css','experience-header','experience-footer'])assert.ok(page.includes(marker),marker);
  assert.match(page,/robots" content="noindex, follow"/);
  assert.doesNotMatch(page,/Add to cart|Pay now|Buy now|SubmitPO|official distributor|authorized reseller|\$[0-9]/i);
 });
