@@ -24,6 +24,14 @@
   ],
   "rewrites": [
     {
+      "source": "/api/contact",
+      "destination": "/api/intake?channel=quote"
+    },
+    {
+      "source": "/admin/inquiries",
+      "destination": "/api/intake?channel=quote&view=admin-page"
+    },
+    {
       "source": "/admin/catalog",
       "destination": "/api/catalog?view=page"
     },
