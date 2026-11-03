@@ -1,5 +1,7 @@
 # Florida checkout and tax preparation — November 2, 2026
 
+November 3 continuation: the owner will file Florida returns. The registration effective date remains unknown; a supplied certificate expiry is not that date. A connected account received a read-only Stripe settings/registration review, but its use for this marketplace is not yet confirmed. See `MARKETPLACE-CONTINUATION-2026-11-03.md` for current state; earlier unverified/no-connection observations below are historical. No tax or checkout activation follows from this update.
+
 Status: review draft, not adopted customer terms or approval to collect. The owner confirms Tri-Point Government Solutions LLC is registered to collect Florida sales tax. Registration number, effective date, provider settings and filing arrangements were not supplied or verified. Do not ask the owner again whether registered; verify the remaining details securely.
 
 ## Verified starting state

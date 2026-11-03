@@ -1,5 +1,7 @@
 # One-time business decisions before opening checkout
 
+November 3 continuation: the owner will file Florida returns. The registration effective date remains unknown; a supplied certificate expiry is not that date. A connected account received a read-only Stripe settings/registration review, but its use for this marketplace is not yet confirmed. See `MARKETPLACE-CONTINUATION-2026-11-03.md` for current state; earlier unverified/no-connection observations below are historical. No tax or checkout activation follows from this update.
+
 Status: owner-decision register, reconciled October 25, 2026. Unapproved entries are preparation items, not adopted terms or legal/tax advice. This is for Tri-Point operations, not a shopper worksheet.
 
 Use `/admin/checkout-setup` in the private preview to prepare a saved draft and export a review packet. Saving there does not approve policy, activate payments, or change the public website. Verified implementation evidence is in `docs/CHECKOUT-VERIFIED-2026-10-25.md`; the earlier fixed-$20 payment success does not establish product-linked pilot completion.
