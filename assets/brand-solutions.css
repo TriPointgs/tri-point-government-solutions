@@ -10,3 +10,7 @@ html body[data-experience] .brand-wasabi{--brand-accent:#277f31;--brand-soft:#ea
 /* Keep the selected catalog category distinct from the site's default button style. */
 html body[data-experience] .brand-page .brand-categories button[aria-pressed="false"]{background:#fff!important;color:#375065!important;border:1px solid #c8d5df!important}
 html body[data-experience] .brand-page .brand-categories button[aria-pressed="true"]{background:var(--brand-dark)!important;color:#fff!important;border-color:var(--brand-dark)!important}
+/* An ID-scoped rule keeps labels readable against the site's generic important button colors. */
+html body[data-experience] #brand-category-filters button[aria-pressed="false"]{background:#fff!important;color:#375065!important;-webkit-text-fill-color:#375065!important;border:1px solid #c8d5df!important}
+html body[data-experience] #brand-category-filters button[aria-pressed="true"]{background:var(--brand-dark)!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border-color:var(--brand-dark)!important}
+.brand-usecases{grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr))}
