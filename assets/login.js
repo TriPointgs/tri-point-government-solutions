@@ -22,12 +22,19 @@ async function initialize(){
  if(claim){history.replaceState(null,'',location.pathname);status('Verifying your one-time profile link…');try{await auth({action:'verify',token:claim});location.replace('/contractors/account');}catch(e){status(e.message,true);}}
  try{
   const response=await fetch('/api/contractor-auth',{credentials:'same-origin',cache:'no-store'});
-  if(response.ok){
+  if(!response.ok)throw new Error('Sign-in availability could not be checked.');
+  {
    const data=await response.json();
+   if(typeof data.enabled!=='boolean')throw new Error('Sign-in availability was not confirmed.');
    contractor.querySelector('button').disabled=!data.enabled;
-   if(!data.enabled)document.querySelector('#contractor-availability').textContent='Contractor email sign-in will be enabled after Tri-Point verifies its sending domain. For profile changes, email info@tripointgs.com from your application contact address.';
+   if(!data.enabled)document.querySelector('#contractor-availability').textContent='Email sign-in is not currently available. For profile changes, email info@tripointgs.com from your application contact address.';
+   if(data.enabled)document.querySelector('#contractor-availability').textContent='Enter your application email above to request a private sign-in link.';
    if(data.enabled&&data.signedIn&&!claim)document.querySelector('#contractor-availability').textContent='You already have a profile session. Open your company profile below.';
   }
- }catch{status('Unable to check contractor sign-in availability. Administrator sign-in remains available.',true);}
+ }catch{
+  contractor.querySelector('button').disabled=true;
+  document.querySelector('#contractor-availability').textContent='Email sign-in is temporarily unavailable. Please try again or email info@tripointgs.com for help.';
+  status('Unable to check contractor sign-in availability. Administrator sign-in remains available.',true);
+ }
 }
 initialize();
