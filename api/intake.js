@@ -3,7 +3,9 @@ import {validateSubcontractorApplication} from '../lib/subcontractor-intake.mjs'
 import {body,challenge,verify,requireOrigin,send,fail} from '../lib/security.mjs';
 import {limit,saveApplication} from '../lib/storage.mjs';
 import {notifySignup} from '../lib/signup-notification.mjs';
+import contactHandler from '../lib/contact-handler.mjs';
 export default async function handler(req,res){try{
+ if((new URL(req.url,'https://tripointgs.com').searchParams.get('channel')||req.query?.channel)==='quote')return contactHandler(req,res);
  if(req.method==='GET'){return send(res,200,{challenge:challenge()});}
  if(req.method!=='POST'){res.setHeader('Allow','GET, POST');throw new HttpError(405,'Method not allowed.');}
  requireOrigin(req);const b=await body(req);
