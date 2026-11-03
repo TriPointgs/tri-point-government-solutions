@@ -3,6 +3,9 @@
 ## Stable workflow and boundaries
 Tri-Point Government Solutions; repository TriPointgs/tri-point-government-solutions. Continue scoped work on feature/td-product-controls / draft PR 23. Verify current refs and deployments before changes; do not infer success from an earlier assistant response. Keep main, production, unrelated branding and Wasabi work untouched unless separately authorized. Never store credentials/customer records in this public repository. Captured payment, not authorization alone, precedes any supplier-release design. Repeated whole-suite and differing browser tests are requested; never call test workers independent AI agents.
 
+## Wasabi / PTZOptics design checkpoint - November 2, 2026
+Full product pages are now implemented on the same feature branch, using the supplied marketing library and verified manufacturer references. Read `docs/BRAND-PAGES-CHECKPOINT-2026-11-02.md` plus the two asset-coverage documents. Wasabi has 19 illustrated offerings/capabilities; PTZOptics has 47 illustrated product-family/legacy cards with 95 variant/model/plan entries. The pages use search, categories, comparison and product-specific inquiry prefill; no payment/tax/email/supplier activation occurred. This supersedes earlier notes describing Wasabi as unimplemented or the PTZOptics page as an empty staging placeholder. Public release remains separate.
+
 ## Florida tax preparation - November 2, 2026
 The owner confirms Florida sales-tax registration. This supersedes only registration being unknown; Stripe settings/registration, effective date, product codes, exemptions and policy approval remain unverified. Read `docs/FLORIDA-CHECKOUT-TAX-PREPARATION-2026-11-02.md` for the review packet and precise remaining inputs, and `docs/FLORIDA-TAX-CHECKPOINT-2026-11-02.md` for validation. No activation is authorized. The tax adapter preserves item quantity and rejects ambiguous collection/mode/exemption evidence; all provider gates remain unchanged.
 

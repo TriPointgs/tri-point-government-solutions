@@ -1,3 +1,5 @@
+import {wasabiPage} from '../lib/wasabi-page.mjs';
+import {ptzopticsPage} from '../lib/ptzoptics-page.mjs';
 import {shopPreviewPage} from '../lib/shop-preview-page.mjs';
 import {contactPage} from '../lib/contact-page.mjs';
 import assert from 'node:assert/strict';
@@ -5,9 +7,12 @@ import {orderLabPage} from '../lib/order-lab-page.mjs';
 import fs from 'node:fs';
 import {applySiteExperience,homeHero,marketplacePage} from '../lib/site-experience.mjs';
 const preview=process.env.VERCEL_ENV!=='production';
+fs.mkdirSync('dist/solutions',{recursive:true});
+fs.writeFileSync('dist/solutions/wasabi.html',wasabiPage());
+fs.writeFileSync('dist/solutions/ptzoptics.html',ptzopticsPage());
 fs.writeFileSync('dist/contact.html',contactPage());
 fs.writeFileSync('dist/marketplace.html',marketplacePage().replace('content="noindex, nofollow"',`content="${preview?'noindex, nofollow':'index, follow'}"`));
-for(const file of fs.readdirSync('dist',{recursive:true}).filter(x=>x.endsWith('.html'))){
+for(const file of fs.readdirSync('dist',{recursive:true}).map(x=>x.replaceAll('\\','/')).filter(x=>x.endsWith('.html'))){
  let html=fs.readFileSync('dist/'+file,'utf8');const route=file==='index.html'?'/':'/'+file.slice(0,-5);
  if(route==='/'){
   html=html.replace(/<section class="hero">[\s\S]*?<\/section>/,homeHero());
@@ -28,7 +33,7 @@ for(const file of ['dist/contractors/admin.html','dist/contractors/admin/opportu
 
 for(const file of ['dist/contractors/admin.html','dist/contractors/admin/opportunities.html']){if(preview){let html=fs.readFileSync(file,'utf8');html=html.replace('<div class="toolbar">','<div class="toolbar"><a class="button secondary" href="/admin/products">Product Control Center</a>');fs.writeFileSync(file,html);}}
 const dynamic=new Set(['/admin/stripe-checkout','/admin/fulfillment','/admin/launch','/shop-preview','/admin/catalog','/admin/orders','/admin/products','/admin/inquiries','/contractors/admin/zoom','/solutions/zoom','/solutions/zoom/quote']);
-const htmlPages=fs.readdirSync('dist',{recursive:true}).filter(p=>p.endsWith('.html'));
+const htmlPages=fs.readdirSync('dist',{recursive:true}).map(p=>p.replaceAll('\\','/')).filter(p=>p.endsWith('.html'));
 for(const page of htmlPages){
  const html=fs.readFileSync('dist/'+page,'utf8');
  assert.equal((html.match(/<h1\b/g)||[]).length,1,'One primary heading: '+page);

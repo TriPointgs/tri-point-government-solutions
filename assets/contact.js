@@ -1,5 +1,6 @@
 const $=id=>document.getElementById(id),form=$('contact-form');let challenge=null,preview=true,busy=false,submitted=false,items=[];
 const params=new URLSearchParams(location.search);for(const name of ['manufacturer','topic']){const v=params.get(name);if(v&&[...form.elements[name].options].some(o=>o.value===v))form.elements[name].value=v;}
+const requestedProduct=params.get('product');if(requestedProduct&&requestedProduct.length<=160&&!/[\x00-\x1f\x7f]/.test(requestedProduct))form.elements.message.value='Please help me review '+requestedProduct+' for our project.\n\nQuantity or capacity:\nApplication and requirements:\nTiming:\n';
 if(params.get('fromList')==='1'){try{const saved=JSON.parse(sessionStorage.getItem('tp-sourcing-list-v1')||'[]');if(Array.isArray(saved))items=saved.filter(i=>typeof i.description==='string'&&i.description.length<=160&&Number.isInteger(i.quantity)&&i.quantity>=1&&i.quantity<=9999).slice(0,15);}catch{}}
 function renderItems(){$('contact-items').replaceChildren(...items.map(i=>{const li=document.createElement('li');li.textContent=i.quantity+' × '+i.description;return li;}));$('contact-items-empty').hidden=items.length>0;$('contact-clear-items').hidden=!items.length;}
 $('contact-clear-items').addEventListener('click',()=>{items=[];renderItems();});renderItems();
