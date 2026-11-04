@@ -1,6 +1,6 @@
 # Shared Stripe account and marketplace payment labels
 
-The owner selected the existing merchant account used for Spoken Letters for Tri-Point's marketplace on November 4, 2026. This supersedes the earlier separate-account choice and connection request. A fresh read of the selected connected account confirmed Tri-Point Government Solutions LLC as the company, the existing Spoken Letters business profile, and the current SPOKEN LETTERS statement descriptor. Account identifiers and credentials remain outside this public repository.
+The owner selected the existing merchant account used for Spoken Letters for Tri-Point's marketplace on November 4, 2026. This supersedes the earlier separate-account choice and connection request. The first account read confirmed Tri-Point Government Solutions LLC as the company, the existing Spoken Letters business profile, and a SPOKEN LETTERS statement descriptor. After the owner changed the descriptor in Stripe, a second read of that same connected account confirmed the account-wide statement descriptor is now TPGSSL. The Dashboard account name and public business profile still identify Spoken Letters, and the public website remains spokenletters.com. Account identifiers and credentials remain outside this public repository.
 
 ## Payment organization
 
@@ -13,7 +13,7 @@ These are the existing TEST-only flows. No live checkout flow is added. A future
 
 For supported Stripe payment searches, use `metadata["tp_business_unit"]:"TPGS Marketplace"`. The metadata is an organizational label, not payment proof or an account boundary. Stripe copies PaymentIntent metadata to its newly created Charge as a one-time snapshot. Existing Session/payment/Charge records are not backfilled. [Stripe metadata](https://docs.stripe.com/metadata), [Stripe search](https://docs.stripe.com/search).
 
-Descriptions may be visible on customer-facing payment details. They contain only the business label, TEST purpose and an order/test reference, not buyer contact details, addresses, product free text, tax identifiers or credentials. No account-wide branding, statement descriptor, receipt setting, customer metadata or other-brand record is changed. Internal metadata does not rename the bank statement entry; the existing shared-account branding and statement descriptor still need review before paid public checkout.
+Descriptions may be visible on customer-facing payment details. They contain only the business label, TEST purpose and an order/test reference, not buyer contact details, addresses, product free text, tax identifiers or credentials. This implementation did not change account-wide branding, statement descriptor, receipt settings, customer metadata or other-brand records. The owner separately changed the shared account's static statement descriptor to TPGSSL in Stripe. Internal metadata is still organizational only. Actual card-statement display, checkout/receipt branding, customer recognition and effects on Spoken Letters payments have not been tested or approved as paid-launch evidence.
 
 ## Recovery and release boundaries
 
