@@ -4,6 +4,49 @@ import {paymentOrderKey,paymentRecordKey} from '../lib/payment-verification-stor
 import {checkoutSessionKey} from '../lib/stripe-checkout-session.mjs';
 import {createPaymentVerificationService} from '../lib/payment-verification-service.mjs';
 const opened=async t=>{const o=await t.finalize();return t.service.open(t.owner,{orderId:o.id,testConsent:true});};
+test('desktop pilot binds its exact part and one unit to a simulated Florida checkout',async()=>{
+ const product={
+  sku:'14784711',
+  mfgPart:'13B90032US',
+  manufacturer:'Lenovo',
+  description:'ThinkCentre neo 50q Gen 5 Tiny desktop',
+  category:'desktops'
+ };
+ // All financial values and approvals come from the in-memory fixture.
+ const t=await cartPaymentFixture({product,quantity:1});
+ const classification=t.policy().tax.products[0];
+ classification.manufacturerPart='DIFFERENT-PART';
+ await assert.rejects(t.finalize(),/exact product tax classification requires review/);
+ assert.equal(t.taxCounts.tax,0);
+ assert.equal(t.counts.create,0);
+
+ classification.manufacturerPart=product.mfgPart;
+ const order=await opened(t);
+ assert.deepEqual(order.items,[{
+  sku:product.sku,manufacturerPart:product.mfgPart,title:product.description,
+  quantity:1,unitPriceCents:11500
+ }]);
+ assert.equal(order.shippingCents,1250);
+ assert.equal(order.taxCents,1500);
+ assert.equal(order.totalCents,14250);
+ const request=t.requests[0];
+ const [desktopLine,shippingLine,taxLine]=request.line_items;
+ assert.deepEqual(desktopLine.price_data.product_data.metadata,{
+  tp_sku:product.sku,tp_manufacturer_part:product.mfgPart
+ });
+ assert.equal(desktopLine.quantity,1);
+ assert.deepEqual([desktopLine,shippingLine,taxLine].map(line=>line.price_data.unit_amount),[11500,1250,1500]);
+ assert.equal(request.automatic_tax.enabled,false);
+
+ t.paid();
+ const event=await t.sessionEvent();
+ await t.service.receive(event.raw,event.signature);
+ const verified=await t.service.read(t.owner,order.id);
+ assert.equal(verified.captureConfirmed,true);
+ assert.equal(verified.paymentGatePassed,true);
+ assert.equal(verified.realSupplierDispatchAllowed,false);
+ assert.equal(verified.emailSent,false);
+});
 test('cart review to immutable order, exact test Checkout, verified payment and durable status works end to end',async()=>{
  const t=await cartPaymentFixture();assert.equal((await t.service.configuration()).ready,true);const o=await opened(t);
  assert.equal(o.totalCents,25750);assert.equal(o.taxCents,1500);assert.match(o.checkoutURL,/^https:\/\/checkout.stripe.com\//);assert.equal(o.paymentGatePassed,false);

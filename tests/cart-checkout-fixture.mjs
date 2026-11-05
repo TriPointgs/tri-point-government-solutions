@@ -10,8 +10,8 @@ import {memoryCheckoutSessionStore} from '../lib/stripe-checkout-session.mjs';
 import {memoryPaymentVerificationStore} from '../lib/payment-verification-store.mjs';
 import {memoryCartOrderHistoryStore} from '../lib/cart-order-history.mjs';
 import {processorIntent,eventBytes} from './payment-first-fixture.mjs';
-export async function cartPaymentFixture({patch={},paymentStore=memoryPaymentVerificationStore(),checkoutStore=memoryCheckoutSessionStore(),orderStore,releaseStore=memoryOrderExtensionStore(),refundStore=memoryOrderExtensionStore(),history=memoryCartOrderHistoryStore()}={}){
- let now=NOW;const base=await finalizationFixture({clock:()=>now,...(orderStore?{store:orderStore}:{})}),env={...base.env,TP_CART_CHECKOUT_PREVIEW_ENABLED:'true',TP_STRIPE_TEST_CHECKOUT_ENABLED:'true',VERCEL_BRANCH_URL:'synthetic.vercel.app',...patch};
+export async function cartPaymentFixture({patch={},paymentStore=memoryPaymentVerificationStore(),checkoutStore=memoryCheckoutSessionStore(),orderStore,releaseStore=memoryOrderExtensionStore(),refundStore=memoryOrderExtensionStore(),history=memoryCartOrderHistoryStore(),product,quantity}={}){
+ let now=NOW;const base=await finalizationFixture({clock:()=>now,store:orderStore,product,quantity}),env={...base.env,TP_CART_CHECKOUT_PREVIEW_ENABLED:'true',TP_STRIPE_TEST_CHECKOUT_ENABLED:'true',VERCEL_BRANCH_URL:'synthetic.vercel.app',...patch};
  const terms='SYNTHETIC TEST TERMS ONLY. Not approved business terms. No goods or services are purchased.';
  base.policy().terms.text=terms;base.policy().terms.contentDigest=createHash('sha256').update(terms).digest('hex');
  let paid=false,refund=false,intentError=false,sessionPatch={},intentPatch={},createError=false,session=null,options=null;const counts={create:0,session:0,intent:0},requests=[];
@@ -25,7 +25,7 @@ export async function cartPaymentFixture({patch={},paymentStore=memoryPaymentVer
  const refunds=createOrderRefund({env,orders:base.store,ledger:paymentStore,release,store:refundStore,client,clock:()=>now});
  const verifier=createStripePaymentVerifier({env,client,clock:()=>now}),service=createCartCheckoutService({env,shop:base.service,orders:base.store,policies:base.policies,tax:base.tax,client,verifier,paymentStore,checkoutStore,history,release,refunds,clock:()=>now});
  const request={...base.request,termsDigest:base.policy().terms.contentDigest,testConsent:true};
- return {...base,env,service,verifier,release,releaseStore,refunds,refundStore,paymentStore,checkoutStore,history,counts,requests,pid,request,client,
+ return {...base,env,service,verifier,release,releaseStore,refunds,refundStore,paymentStore,checkoutStore,history,counts,taxCounts:base.counts,requests,pid,request,client,
   now:()=>now,advance:n=>{now+=n;},paid:()=>{paid=true;},refund:()=>{refund=true;},setIntentError:v=>{intentError=v;},setSessionPatch:v=>{sessionPatch=v;},setIntentPatch:v=>{intentPatch=v;},setCreateError:v=>{createError=v;},createOptions:()=>options,
   finalize:()=>service.finalize(base.owner,request),
   sessionEvent:async(type='checkout.session.completed')=>eventBytes({type,at:now,object:await client.checkout.sessions.retrieve(sid)}),
