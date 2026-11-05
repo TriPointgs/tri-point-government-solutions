@@ -59,8 +59,8 @@ test('session idempotency is tied to immutable order, version and quote digest',
  assert.notEqual(one.idempotencyKey,checkoutSessionPlan({...o,id:randomUUID()},{accountId:env.TP_STRIPE_TEST_ACCOUNT_ID,origin,now}).idempotencyKey);
  assert.notEqual(one.idempotencyKey,checkoutSessionPlan({...o,version:2},{accountId:env.TP_STRIPE_TEST_ACCOUNT_ID,origin,now}).idempotencyKey);
 });
-test('production, disabled Checkout flag or missing payment configuration fails before provider calls and storage',async()=>{
- for(const patch of [{VERCEL_ENV:'production'},{TP_STRIPE_TEST_CHECKOUT_ENABLED:'false'},{TP_STRIPE_TEST_READS_ENABLED:'false'},{TP_STRIPE_TEST_SECRET_KEY:''}]){
+test('production, disabled Checkout flag or missing marketplace account pin fails before provider calls and storage',async()=>{
+ for(const patch of [{VERCEL_ENV:'production'},{TP_STRIPE_TEST_CHECKOUT_ENABLED:'false'},{TP_STRIPE_TEST_READS_ENABLED:'false'},{TP_STRIPE_TEST_SECRET_KEY:''},{TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID:''},{TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID:'acct_OTHER1234'}]){
   const t=setup({config:{...env,...patch}});
   assert.equal(t.bridge.configuration().enabled,false);
   await assert.rejects(t.bridge.begin(t.o.id),e=>e.status===503);

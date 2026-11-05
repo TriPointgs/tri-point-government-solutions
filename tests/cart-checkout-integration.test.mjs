@@ -81,8 +81,8 @@ test('anonymous/forged webhook and cross-order linkage cannot create payment rec
 test('production or disabled integration refuses actions without creating Stripe sessions',async()=>{
  for(const patch of [{VERCEL_ENV:'production'},{TP_CART_CHECKOUT_PREVIEW_ENABLED:'false'}]){const t=await cartPaymentFixture({patch});assert.equal((await t.service.configuration()).ready,false);await assert.rejects(t.finalize(),e=>e.status===503);assert.equal(t.counts.create,0);}
 });
-test('turning off new checkout creation does not discard a signed payment from an already-opened checkout',async()=>{
- const t=await cartPaymentFixture(),o=await opened(t);t.env.TP_CART_CHECKOUT_PREVIEW_ENABLED='false';t.paid();const e=t.event();assert.equal((await t.service.receive(e.raw,e.signature)).paymentGatePassed,true);assert.equal(t.counts.create,1);
+test('turning off new checkout creation or removing the account pin preserves signed payment recovery',async()=>{
+ const t=await cartPaymentFixture(),o=await opened(t);t.env.TP_CART_CHECKOUT_PREVIEW_ENABLED='false';delete t.env.TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID;t.paid();const e=t.event();assert.equal((await t.service.receive(e.raw,e.signature)).paymentGatePassed,true);assert.equal((await t.service.read(t.owner,o.id)).status,'test-payment-verified');assert.equal(t.counts.create,1);
 });
 test('concurrent checkout starts use the same provider idempotency key and same stored session',async()=>{
  const t=await cartPaymentFixture(),o=await t.finalize(),keys=[],original=t.client.checkout.sessions.create;t.client.checkout.sessions.create=async(p,opt)=>{keys.push(opt.idempotencyKey);return original(p,opt);};

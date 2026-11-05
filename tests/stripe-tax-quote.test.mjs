@@ -12,7 +12,7 @@ function mock(result={},options={}){
 }
 test('tax is disabled until specifically reviewed, even when test Stripe keys are configured',()=>{
  assert.equal(stripeTaxConfig(baseEnv).enabled,false);
- for(const patch of [{TP_STRIPE_TAX_SETUP_APPROVED:'false'},{TP_STRIPE_TEST_TAX_ENABLED:'false'},{VERCEL_ENV:'production'},{TP_STRIPE_TEST_READS_ENABLED:'false'}])
+ for(const patch of [{TP_STRIPE_TAX_SETUP_APPROVED:'false'},{TP_STRIPE_TEST_TAX_ENABLED:'false'},{VERCEL_ENV:'production'},{TP_STRIPE_TEST_READS_ENABLED:'false'},{TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID:''},{TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID:'acct_OTHER1234'}])
   assert.equal(stripeTaxConfig({...env,...patch}).enabled,false);
 });
 test('customer address, Stripe account and per-item tax code must be fully supplied by the server',()=>{
@@ -48,7 +48,7 @@ test('merchant mismatch prevents tax API requests',async()=>{
  await assert.rejects(q.calculate(order()),e=>e.status===503);assert.equal(m.calls.calculate,0);
 });
 test('disabled production or missing tax registration approval prevents any Stripe call',async()=>{
- for(const patch of [{VERCEL_ENV:'production'},{TP_STRIPE_TAX_SETUP_APPROVED:''},{TP_STRIPE_TEST_TAX_ENABLED:'false'}]){
+ for(const patch of [{VERCEL_ENV:'production'},{TP_STRIPE_TAX_SETUP_APPROVED:''},{TP_STRIPE_TEST_TAX_ENABLED:'false'},{TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID:''},{TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID:'acct_OTHER1234'}]){
   const m=mock(),q=createStripeTaxQuote({env:{...env,...patch},stripeClient:m.client,clock:()=>now});
   await assert.rejects(q.calculate(order()),e=>e.status===503);assert.equal(m.calls.account,0);
  }

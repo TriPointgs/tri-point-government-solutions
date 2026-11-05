@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import {createStripePaymentVerifier} from '../lib/stripe-payment-verifier.mjs';
 import {bindingForFinalOrder,PAID_FIRST_POLICY} from '../lib/payment-release-policy.mjs';
 export const now=Date.parse('2026-10-22T16:00:00.000Z');
-export const env={VERCEL_ENV:'preview',TP_STRIPE_TEST_READS_ENABLED:'true',TP_STRIPE_TEST_SECRET_KEY:'sk_test_SYNTHETICONLYNOTREAL123456',TP_STRIPE_TEST_WEBHOOK_SECRET:'whsec_SYNTHETICNOTREAL123456',TP_STRIPE_TEST_ACCOUNT_ID:'acct_SYNTHETIC123456'};
+export const env={VERCEL_ENV:'preview',TP_STRIPE_TEST_READS_ENABLED:'true',TP_STRIPE_TEST_SECRET_KEY:'sk_test_SYNTHETICONLYNOTREAL123456',TP_STRIPE_TEST_WEBHOOK_SECRET:'whsec_SYNTHETICNOTREAL123456',TP_STRIPE_TEST_ACCOUNT_ID:'acct_SYNTHETIC123456',TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID:'acct_SYNTHETIC123456'};
 export const paymentId='pi_SYNTHETIC123456';
 export function finalOrder(){return {kind:'payable-order',status:'awaiting-payment',mode:'test',policy:PAID_FIRST_POLICY,currency:'USD',id:randomUUID(),version:1,lines:[{sku:'12345',manufacturerPart:'EXACT-PART',quantity:2,unitPriceCents:11500}],holds:[],subtotalCents:23000,shippingCents:1250,taxCents:0,taxStatus:'exempt-reviewed',taxEvidence:'a'.repeat(64),totalCents:24250,addressDigest:'b'.repeat(64),termsVersion:'synthetic-test-terms-v1',quoteCheckedAt:new Date(now).toISOString(),quoteExpiresAt:new Date(now+900000).toISOString()};}
 export function makeBinding(order=finalOrder()){return bindingForFinalOrder(order,{accountId:env.TP_STRIPE_TEST_ACCOUNT_ID,paymentId,now});}
