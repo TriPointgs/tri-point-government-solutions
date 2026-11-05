@@ -57,4 +57,10 @@ for(const page of htmlPages){
 if(!preview){assert.ok(!fs.existsSync('dist/preview/orders.html'));assert.ok(!fs.existsSync('dist/assets/order-lab-core.mjs'));assert.ok(!fs.existsSync('dist/assets/order-lab.js'));}
 console.log(`Final experience validation passed for ${htmlPages.length} HTML pages. Simulation build: ${preview}.`);
 
-if(preview){const shop=shopPreviewPage();assert.equal((shop.match(/<h1\b/g)||[]).length,1);assert.match(shop,/id="shop-main"/);for(const src of ['/assets/shop-preview.js','/assets/shop-preview.css','/assets/tripoint-logo.svg'])assert.ok(fs.existsSync('dist'+src));fs.writeFileSync('dist/marketplace.html',shop);console.log('Shopping preview: simplified storefront installed; production marketplace unchanged.');}
+if(preview){
+ const desktop='Lenovo ThinkCentre neo 50q Gen 5 Tiny desktop (TD SKU 14784711 / MPN 13B90032US)';
+ const quoteUrl='/contact?manufacturer=Lenovo&topic=Product%20quote&product='+encodeURIComponent(desktop);
+ const card=`<section class="desktop-review" aria-labelledby="desktop-review-title"><div><p class="eyebrow">FIRST DESKTOP UNDER REVIEW · QUOTE ONLY</p><h2 id="desktop-review-title">Lenovo ThinkCentre neo 50q Gen 5 Tiny</h2><p><strong>TD SKU 14784711 · Lenovo part 13B90032US.</strong> The listed configuration includes preinstalled Windows 11 Pro, keyboard and mouse, and a one-year onsite manufacturer warranty. Confirm the exact configuration and warranty terms before quoting.</p><p>Pricing, availability, delivery and eligibility require staff review. TD marks this SKU as not TAA compliant; check each solicitation's requirements. This card is not an offer or order.</p></div><a href="${quoteUrl}">Request a quote for this desktop →</a></section>`;
+ const shop=shopPreviewPage().replace('<div class="shop-layout">',card+'<div class="shop-layout">');
+ assert.equal((shop.match(/<h1\b/g)||[]).length,1);assert.match(shop,/id="shop-main"/);assert.match(shop,/TD SKU 14784711/);for(const src of ['/assets/shop-preview.js','/assets/shop-preview.css','/assets/tripoint-logo.svg'])assert.ok(fs.existsSync('dist'+src));fs.writeFileSync('dist/marketplace.html',shop);console.log('Shopping preview: quote-only desktop review card installed; production marketplace unchanged.');
+}
