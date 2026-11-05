@@ -11,6 +11,15 @@ fs.mkdirSync('dist/solutions',{recursive:true});
 fs.writeFileSync('dist/solutions/wasabi.html',wasabiPage());
 fs.writeFileSync('dist/solutions/ptzoptics.html',ptzopticsPage());
 fs.writeFileSync('dist/contact.html',contactPage());
+const quoteOptions=[];
+for(const slug of ['wasabi','ptzoptics']){
+ const catalog=JSON.parse(fs.readFileSync(`content/${slug}/catalog.json`,'utf8'));
+ for(const product of catalog.products.filter(product=>product.status!=='legacy')){
+  if(!product.name||!product.image?.startsWith('/assets/'))continue;
+  quoteOptions.push({brand:catalog.brand,name:product.name,description:catalog.brand+' · '+product.name,category:product.category,image:product.image});
+ }
+}
+fs.writeFileSync('dist/assets/quote-options.json',JSON.stringify(quoteOptions));
 fs.writeFileSync('dist/marketplace.html',marketplacePage().replace('content="noindex, nofollow"',`content="${preview?'noindex, nofollow':'index, follow'}"`));
 for(const file of fs.readdirSync('dist',{recursive:true}).map(x=>x.replaceAll('\\','/')).filter(x=>x.endsWith('.html'))){
  let html=fs.readFileSync('dist/'+file,'utf8');const route=file==='index.html'?'/':'/'+file.slice(0,-5);
@@ -18,7 +27,7 @@ for(const file of fs.readdirSync('dist',{recursive:true}).map(x=>x.replaceAll('\
   html=html.replace(/<section class="hero">[\s\S]*?<\/section>/,homeHero());
   html=html.replace('id="top"','id="main"');
  }
- if(route==='/privacy')html=html.replace('</article>','<h2 id="website-inquiries">Website quote and contact requests</h2><p>When you use the website contact form, Tri-Point stores the organization, contact information, product requirements, message, consent, and a request reference in a private inquiry workspace. This is separate from subcontractor profiles and does not create a customer account or purchase. Authorized staff use the request to respond to you. Hosting and email providers may process necessary data to operate this workflow. Preview requests are kept separate and do not send email. Do not submit sensitive documents, passwords, tax identifiers, or payment information through this form. Contact info@tripointgs.com to request access, correction, or deletion, subject to identity verification and recordkeeping obligations.</p></article>');
+ if(route==='/privacy')html=html.replace('</article>','<h2 id="website-inquiries">Website quote and contact requests</h2><p>When you use the website contact form, Tri-Point stores the organization and contact details, selected interests, brands, items and quantities, project requirements, delivery details, review preferences, consent, and request reference in a private inquiry workspace. This is separate from subcontractor profiles and does not create a customer account or purchase. Authorized staff use the request to respond to you. Hosting and email providers may process necessary data to operate this workflow. An enabled internal alert contains only a reference and private review link, not your request details. Preview requests are kept separate and do not send email. Item selections may stay in this browser tab while you move between pages; contact details are not stored in browser storage. A tax-exemption review request does not approve an exemption. Do not submit sensitive documents, passwords, tax identifiers, or payment information through this form. Contact info@tripointgs.com to request access, correction, or deletion, subject to identity verification and recordkeeping obligations.</p></article>');
  if(route==='/contractors/join')html=html.replace('<form id="join-form"',`<p class="signup-environment-note">${preview?'Preview test: your application is stored in the preview directory. No confirmation email or staff email alert is sent from this preview.':'After submitting, keep your on-screen reference. This form does not send an automatic confirmation email to the applicant or create a sign-in account.'}</p><form id="join-form"`);
  if(route==='/contractors/thanks')html=html.replace('<h2>Application reference</h2>','<h2>Application reference</h2><p class="fine">A saved reference confirms website receipt. It is not an approval, account activation, or email-delivery confirmation.</p>');
  if(route==='/contractors/admin'||route==='/contractors/admin/opportunities')html=html.replace('<div class="toolbar">','<div class="toolbar"><a class="button secondary" href="/admin/inquiries">Website inquiries</a>');

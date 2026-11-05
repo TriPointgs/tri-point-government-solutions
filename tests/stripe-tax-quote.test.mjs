@@ -37,8 +37,12 @@ test('a successful validated calculation yields immutable tax evidence and TTL',
  assert.equal(out.addressDigest,m.plan.addressDigest);assert.equal(out.taxStatus,'calculated');assert.equal(out.exemptionReviewed,false);
  assert.doesNotMatch(JSON.stringify(out),/Synthetic St|buyer|sk_test_/);
 });
+test('a valid provider expiry beyond one day is accepted but local use ends within one day',()=>{
+ const m=mock({expires_at:(now+172800000)/1000}),out=validateTaxCalculation(m.cal,m.plan,{now});
+ assert.equal(out.expiresAt,new Date(now+86400000).toISOString());
+});
 test('invalid, expired, altered currency/address or incomplete tax data never convert to zero-tax checkout',()=>{
- for(const result of [{currency:'eur'},{amount_total:24250},{tax_amount_exclusive:null},{tax_amount_inclusive:5},{expires_at:1},{expires_at:null},{customer_details:{address:{country:'US',postal_code:'00000'}}},{id:'other'}]){
+ for(const result of [{currency:'eur'},{amount_total:24250},{tax_amount_exclusive:null},{tax_amount_inclusive:5},{expires_at:1},{expires_at:null},{expires_at:1.5},{expires_at:Number.MAX_SAFE_INTEGER},{customer_details:{address:{country:'US',postal_code:'00000'}}},{id:'other'}]){
   const m=mock(result);assert.throws(()=>validateTaxCalculation(m.cal,m.plan,{now}),e=>e.status===503);
  }
 });
