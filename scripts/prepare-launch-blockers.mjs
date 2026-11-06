@@ -7,7 +7,8 @@ const HOST='tri-point-government-solutions-git-feature-td-edc7b1-tri-point.verce
 const EVENT='checkout.session.completed';
 const sha=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
 const sameSet=(a,b)=>Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.every(x=>b.includes(x));
-export const launchPrepEnabled=e=>e.VERCEL_ENV==='preview'&&e.VERCEL_GIT_COMMIT_REF==='feature/td-product-controls'&&e.VERCEL_BRANCH_URL===HOST&&/^[a-f0-9]{40}$/.test(e.VERCEL_GIT_COMMIT_SHA||'')&&e.TP_LAUNCH_PREP_COMMIT===e.VERCEL_GIT_COMMIT_SHA;
+const verifyAndDraft=e=>e.TP_LAUNCH_PREP_COMMIT==='verify:'+e.VERCEL_GIT_COMMIT_SHA;
+export const launchPrepEnabled=e=>e.VERCEL_ENV==='preview'&&e.VERCEL_GIT_COMMIT_REF==='feature/td-product-controls'&&e.VERCEL_BRANCH_URL===HOST&&/^[a-f0-9]{40}$/.test(e.VERCEL_GIT_COMMIT_SHA||'')&&(e.TP_LAUNCH_PREP_COMMIT===e.VERCEL_GIT_COMMIT_SHA||verifyAndDraft(e));
 async function json(r,max=300000){const reader=r.body.getReader(),parts=[];let size=0;try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>max){await reader.cancel();throw Error('bounded');}parts.push(Buffer.from(value));}}finally{reader.releaseLock();}return JSON.parse(Buffer.concat(parts).toString('utf8'));}
 function endpoint(x){try{const u=new URL(x.url);return x.object==='webhook_endpoint'&&/^we_[A-Za-z0-9]+$/.test(x.id)&&x.livemode===false&&x.status==='enabled'&&u.protocol==='https:'&&u.hostname===HOST&&!u.username&&!u.password&&!u.port&&!u.hash&&u.pathname==='/api/payment-events'&&Array.isArray(x.enabled_events)&&x.enabled_events.length>0&&x.enabled_events.length<250&&new Set(x.enabled_events).size===x.enabled_events.length&&x.enabled_events.every(v=>typeof v==='string'&&/^(\*|[a-z0-9_.]+)$/.test(v));}catch{return false;}}
 const identity=x=>sha([x.id,x.url,x.api_version??null,x.application??null,x.description??null,x.status,x.livemode,x.metadata??{}]);
@@ -15,9 +16,14 @@ export async function prepareLaunchBlockers({env=process.env,fetcher=fetch,setup
  if(!launchPrepEnabled(env))return {enabled:false,status:'skipped-exact-commit-gate'};
  const out={enabled:true,mode:'test',observedAt:new Date(clock()).toISOString(),webhook:{status:'not-checked'},transport:{status:'not-tested',actualStripeDeliveryVerified:false},draft:{status:'not-checked',approved:false},tax:{status:'not-checked',changed:false},paymentCreated:false,supplierRequested:false,publicRelease:false};
  const key=env.TP_STRIPE_TEST_SECRET_KEY;
+ const verifyOnly=verifyAndDraft(env);
  if(!/^(sk|rk)_test_[A-Za-z0-9]{8,}$/.test(key||'')||env.TP_STRIPE_TEST_READS_ENABLED!=='true'||!/^acct_[A-Za-z0-9]{4,100}$/.test(env.TP_STRIPE_TEST_ACCOUNT_ID||'')){out.webhook.status='blocked-test-account-configuration';return out;}
+ if(verifyOnly&&env.TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID!==env.TP_STRIPE_TEST_ACCOUNT_ID){
+  out.webhook.status='blocked-marketplace-account-pin';return out;
+ }
  async function stripe(path,{events,idempotency}={}){
   const write=events!==undefined;
+  if(write&&verifyOnly)throw Error('Stripe writes are disabled during verification');
   if(!(path==='/v1/account'||path==='/v1/webhook_endpoints?limit=100'||path==='/v1/tax/settings'||/^\/v1\/webhook_endpoints\/we_[A-Za-z0-9]+$/.test(path))||(write&&!/^\/v1\/webhook_endpoints\/we_[A-Za-z0-9]+$/.test(path)))throw Error('route');
   const form=new URLSearchParams();if(write)for(const v of events)form.append('enabled_events[]',v);
   const r=await fetcher('https://api.stripe.com'+path,{method:write?'POST':'GET',redirect:'error',cache:'no-store',headers:{Authorization:'Bearer '+key,Accept:'application/json',...(write?{'Content-Type':'application/x-www-form-urlencoded','Idempotency-Key':idempotency}:{})},...(write?{body:form.toString()}:{}),signal:AbortSignal.timeout(12000)});
@@ -32,6 +38,7 @@ export async function prepareLaunchBlockers({env=process.env,fetcher=fetch,setup
    const first=matches[0],path='/v1/webhook_endpoints/'+first.id;
    const current=await stripe(path);if(!endpoint(current)||identity(first)!==identity(current)||!sameSet(first.enabled_events,current.enabled_events))throw Error('changed');
    if(current.enabled_events.includes(EVENT)||current.enabled_events.includes('*')){selected=current;out.webhook={status:'already-subscribed',eventPresent:true,changed:false};}
+   else if(verifyOnly){out.webhook={status:'missing-subscription-unchanged',eventPresent:false,changed:false};}
    else {
     const afterEvents=[...current.enabled_events,EVENT];let replyConfirmed=false;
     try{const changed=await stripe(path,{events:afterEvents,idempotency:'tp-test-webhook-event-'+sha([current.id,current.enabled_events,EVENT])});replyConfirmed=endpoint(changed)&&identity(changed)===identity(current)&&sameSet(changed.enabled_events,afterEvents);}catch{/* Re-read the same endpoint. Never retry this write automatically. */}

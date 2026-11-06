@@ -34,6 +34,30 @@ function fixture({envPatch={},eventList=['payment_intent.succeeded','charge.refu
  return {env,store,setup,calls,getEndpoint:()=>endpoint,run:(p=proposal)=>prepareLaunchBlockers({env,setup,proposal:p,fetcher,clock:()=>now})};
 }
 test('exact-commit preview/branch/host gating fails closed before reads or writes',async()=>{for(const patch of [{VERCEL_ENV:'production'},{VERCEL_ENV:'development'},{VERCEL_GIT_COMMIT_REF:'main'},{VERCEL_BRANCH_URL:'evil.vercel.app'},{TP_LAUNCH_PREP_COMMIT:'true'},{TP_LAUNCH_PREP_COMMIT:'b'.repeat(40)}]){const f=fixture({envPatch:patch});assert.equal(launchPrepEnabled(f.env),false);assert.equal((await f.run()).enabled,false);assert.equal(f.calls.length,0);assert.equal(await f.store.read(),null);}});
+test('verify-and-draft mode binds the marketplace account and never edits Stripe',async()=>{
+ const envPatch={
+  TP_LAUNCH_PREP_COMMIT:'verify:'+commit,
+  TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID:base.TP_STRIPE_TEST_ACCOUNT_ID
+ };
+ const wrong=fixture({envPatch:{...envPatch,TP_STRIPE_MARKETPLACE_TEST_ACCOUNT_ID:'acct_OTHER'}});
+ assert.equal((await wrong.run()).webhook.status,'blocked-marketplace-account-pin');
+ assert.deepEqual(wrong.calls,[]);
+ assert.equal(await wrong.store.read(),null);
+
+ for(const subscribed of [false,true]){
+  const eventList=subscribed?['payment_intent.succeeded','checkout.session.completed']:['payment_intent.succeeded'];
+  const f=fixture({envPatch,eventList}),result=await f.run();
+  assert.equal(result.webhook.status,subscribed?'already-subscribed':'missing-subscription-unchanged');
+  assert.deepEqual(f.getEndpoint().enabled_events,eventList);
+  assert.equal(result.transport.status,subscribed?'signed-noop-accepted-invalid-signature-rejected':'not-tested');
+  assert.ok(f.calls.filter(call=>call.url.startsWith('https://api.stripe.com')).every(call=>call.method==='GET'));
+  const draft=await f.setup.read();
+  assert.equal(draft.approved,false);
+  assert.equal(draft.checkoutActivated,false);
+  assert.match(draft.fields.shippingNotes,/14784711.*13B90032US/);
+  assert.deepEqual(draft.fields.products,[]);
+ }
+});
 test('real handler rejects bad signature and accepts ignored noop without creating an order',async()=>{const f=fixture(),r=await f.run();assert.equal(r.webhook.status,'event-added-and-read-back');assert.equal(r.transport.status,'signed-noop-accepted-invalid-signature-rejected');assert.equal(r.transport.actualStripeDeliveryVerified,false);assert.equal(r.paymentCreated,false);assert.equal(r.supplierRequested,false);assert.equal(r.publicRelease,false);});
 test('repair is additive and preserves URL, version, status and all earlier subscriptions',async()=>{const f=fixture(),before=structuredClone(f.getEndpoint()),r=await f.run(),after=f.getEndpoint();assert.equal(r.webhook.existingSubscriptionsPreserved,true);assert.deepEqual(after,{...before,enabled_events:[...before.enabled_events,'checkout.session.completed']});const writes=f.calls.filter(x=>x.method==='POST'&&x.url.startsWith('https://api.stripe.com'));assert.equal(writes.length,1);assert.deepEqual([...new Set(new URLSearchParams(writes[0].body).keys())],['enabled_events[]']);});
 test('second execution finds subscribed endpoint and existing draft without duplicate writes',async()=>{const f=fixture();await f.run();const writes=f.calls.filter(x=>x.method==='POST'&&x.url.startsWith('https://api.stripe.com')).length;const r=await f.run();assert.equal(r.webhook.status,'already-subscribed');assert.equal(r.draft.status,'existing-draft-preserved');assert.equal(r.draft.matchingProposal,true);assert.equal(f.calls.filter(x=>x.method==='POST'&&x.url.startsWith('https://api.stripe.com')).length,writes);assert.equal((await f.setup.read()).revision,1);});
