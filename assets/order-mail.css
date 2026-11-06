@@ -1,0 +1,2 @@
+@import url('/assets/cart-checkout.css');
+#om-id,#om-slot,#om-provider-id{box-sizing:border-box;width:100%;font:inherit;border:1px solid #b8cadb;border-radius:6px;padding:12px;margin:12px 0}#om-preview{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;line-height:1.6}#om-status,#mv-status{min-height:24px;overflow-wrap:anywhere}main p{overflow-wrap:anywhere}button:disabled{opacity:.55;cursor:not-allowed}[hidden]{display:none!important}

@@ -1,0 +1,16 @@
+import {randomUUID} from 'node:crypto';
+import {cartPaymentFixture} from './cart-checkout-fixture.mjs';
+import {memoryOrderExtensionStore} from '../lib/order-extension-store.mjs';
+import {createOrderMail} from '../lib/order-mail.mjs';
+import {createOrderMailProvider} from '../lib/order-mail-provider.mjs';
+export async function mailFixture({store=memoryOrderExtensionStore(),patch={}}={}){
+ const t=await cartPaymentFixture(),order=await t.finalize(),env={...t.env,TP_ORDER_MAIL_API_KEY:'re_SYNTHETIC_NEVER_REAL',TP_ORDER_MAIL_FROM:'orders@send.example.com',TP_ORDER_MAIL_TO:'operator@example.com',TP_ORDER_MAIL_DOMAIN_ID:randomUUID(),TP_ORDER_MAIL_ORDER_ID:order.id,TP_ORDER_MAIL_ORIGIN:'https://synthetic.vercel.app',TP_ORDER_MAIL_PREVIEW_ENABLED:'true',TP_ORDER_MAIL_PILOT_APPROVED:'true',...patch};
+ const calls={send:0,get:0,domain:0},sent=[],rows=new Map();let failure='',getFailure=false,domainPatch={},emailPatch=x=>x,hook=null;
+ const fetcher=async(url,options)=>{const p=new URL(url);if(p.origin!=='https://api.resend.com'||options.redirect!=='error')throw Error('unsafe transport');if(p.pathname.startsWith('/domains/')){calls.domain++;return Response.json({id:env.TP_ORDER_MAIL_DOMAIN_ID,name:'send.example.com',status:'verified',capabilities:{sending:'enabled'},open_tracking:false,click_tracking:false,...domainPatch});}
+  if(options.method==='POST'&&p.pathname==='/emails'){calls.send++;if(failure==='before')throw Error('PRIVATE provider error');const body=JSON.parse(options.body),id=randomUUID(),row={object:'email',id,...body,created_at:new Date(t.now()).toISOString(),bcc:[],cc:[],reply_to:[],scheduled_at:null,last_event:'sent'};rows.set(id,row);sent.push({id,body,key:options.headers['Idempotency-Key']});if(hook)await hook();if(failure==='after')throw Error('PRIVATE lost provider reply');if(failure==='invalid')return new Response('{');return Response.json({id});}
+  if(p.pathname.startsWith('/emails/')&&options.method!=='POST'){calls.get++;if(getFailure)throw Error('PRIVATE get failure');const row=rows.get(p.pathname.split('/').at(-1));if(!row)return Response.json({error:'not found'},{status:404});return Response.json(emailPatch(structuredClone(row)));}throw Error('unexpected network call');};
+ const provider=createOrderMailProvider({env,fetcher}),fulfillment=async()=>({state:'supplier-not-confirmed',observedAt:null,tracking:[],realSupplierOrderSubmitted:false}),service=createOrderMail({env,orders:t.store,checkout:t.service,fulfillment,store,provider,clock:t.now});
+ const input=async()=>({orderId:order.id,expectedRevision:(await service.read(order.id)).revision,requestId:randomUUID(),consent:true});
+ const token=()=>new URL(sent[0].body.text.split('\n').find(x=>x.startsWith('https://'))).hash.slice('#verify='.length);
+ return {t,order,env,store,provider,fetcher,fulfillment,service,calls,sent,rows,input,token,challenge:async()=>service.challenge(await input()),confirm:()=>service.confirm({token:token(),consent:true}),notify:async()=>service.notify({...await input(),digest:(await service.read(order.id)).preview.digest}),reconcile:(slot='verification',providerEmailId='')=>service.reconcile({orderId:order.id,slot,providerEmailId,consent:true}),setFailure:v=>{failure=v;},setGetFailure:v=>{getFailure=v;},setDomainPatch:v=>{domainPatch=v;},setEmailPatch:v=>{emailPatch=v;},setHook:v=>{hook=v;}};
+}

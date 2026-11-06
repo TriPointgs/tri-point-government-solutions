@@ -1,0 +1,994 @@
+{
+  "brand": "PTZOptics",
+  "reviewedAt": "2026-11-02",
+  "heroImage": "/assets/brands/ptzoptics/hero-classroom.webp",
+  "heroAlt": "PTZOptics supplied marketing image of a camera-enabled modern classroom",
+  "familyImage": "/assets/brands/ptzoptics/product-family.webp",
+  "familyAlt": "PTZOptics manufacturer camera and controller product family",
+  "governmentImage": "/assets/brands/ptzoptics/government-courtroom.webp",
+  "governmentAlt": "PTZOptics supplied marketing image of a courtroom camera installation",
+  "logo": "/assets/brands/ptzoptics/ptzoptics-logo.svg",
+  "products": [
+    {
+      "id": "rise-4k",
+      "name": "Rise 4K",
+      "category": "cameras",
+      "description": "A broadcast PTZ camera for multicamera studios and live events, pairing a larger sensor with production synchronization and professional connections.",
+      "features": [
+        "Up to 4K at 60 fps",
+        "1-inch sensor and 20X optical zoom",
+        "12G-SDI, genlock and timecode"
+      ],
+      "variants": [
+        "PT20X-RISE-4K-BK"
+      ],
+      "image": "/assets/brands/ptzoptics/rise-4k.webp",
+      "imageAlt": "Rise 4K manufacturer product image",
+      "source": "rise: Rise/Rise 4K/PT20X-RISE-4K-BK/Images/Photos/Product-Photo-PT20X-RISE-4K-BK-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/ptz-cameras",
+      "specs": {
+        "Resolution": "4K60",
+        "Zoom": "20X",
+        "Best for": "Broadcast and live production"
+      }
+    },
+    {
+      "id": "move-4k",
+      "name": "Move 4K",
+      "category": "cameras",
+      "description": "An automated Ultra HD pan-tilt-zoom camera for flexible production in classrooms, meeting spaces, worship and live venues. Select the lens range around the camera-to-subject distance.",
+      "features": [
+        "Up to 4K at 60 fps",
+        "Auto-tracking and auto-framing",
+        "NDI HX3 and baseband/IP output options"
+      ],
+      "variants": [
+        "PT12X-4K-GY-G3",
+        "PT12X-4K-WH-G3",
+        "PT20X-4K-GY-G3",
+        "PT20X-4K-RD-G3",
+        "PT20X-4K-WH-G3",
+        "PT30X-4K-GY-G3",
+        "PT30X-4K-WH-G3"
+      ],
+      "image": "/assets/brands/ptzoptics/move-4k.webp",
+      "imageAlt": "Move 4K manufacturer product image",
+      "source": "move: Move/Move 4K/PT20X-4K-GY-G3/Images/Photos/Product-Photo-PT20X-4K-GY-G3-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/ptz-cameras",
+      "specs": {
+        "Resolution": "4K60",
+        "Zoom": "12X / 20X / 30X",
+        "Best for": "Flexible live production"
+      }
+    },
+    {
+      "id": "move-se",
+      "name": "Move SE",
+      "category": "cameras",
+      "description": "A Full HD PTZ camera for everyday live streaming and room capture, with presenter tracking and flexible connections in three optical zoom ranges.",
+      "features": [
+        "Up to 1080p at 60 fps",
+        "Automatic presenter tracking",
+        "HDMI, SDI, USB and IP connections"
+      ],
+      "variants": [
+        "PT12X-SE-GY-G3",
+        "PT12X-SE-WH-G3",
+        "PT20X-SE-GY-G3",
+        "PT20X-SE-WH-G3",
+        "PT30X-SE-GY-G3",
+        "PT30X-SE-WH-G3"
+      ],
+      "image": "/assets/brands/ptzoptics/move-se.webp",
+      "imageAlt": "Move SE manufacturer product image",
+      "source": "move: Move/Move SE/PT20X-SE-GY-G3/Images/Photos/Product-Photo-PT20X-SE-GY-G3-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/ptz-cameras",
+      "specs": {
+        "Resolution": "1080p60",
+        "Zoom": "12X / 20X / 30X",
+        "Best for": "Education and everyday streaming"
+      }
+    },
+    {
+      "id": "link-4k",
+      "name": "Link 4K",
+      "category": "cameras",
+      "description": "A motorized 4K camera designed for Dante AV-H environments, combining optical zoom, automated framing and networked AV integration.",
+      "features": [
+        "Up to 4K60 on supported outputs",
+        "Dante AV-H video up to 1080p60",
+        "12X, 20X and 30X optical zoom"
+      ],
+      "variants": [
+        "PT12X-LINK-4K-GY",
+        "PT12X-LINK-4K-WH",
+        "PT20X-LINK-4K-GY",
+        "PT20X-LINK-4K-WH",
+        "PT30X-LINK-4K-GY",
+        "PT30X-LINK-4K-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/link-4k.webp",
+      "imageAlt": "Link 4K manufacturer product image",
+      "source": "link: Link/Link 4K/PT20X-LINK-4K-GY/Images/Photos/Product-Photo-PT20X-LINK-4K-GY-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/ptz-cameras",
+      "specs": {
+        "Resolution": "4K60; Dante up to 1080p60",
+        "Zoom": "12X / 20X / 30X",
+        "Best for": "Dante AV-H systems"
+      }
+    },
+    {
+      "id": "studio-4k",
+      "name": "Studio 4K",
+      "category": "cameras",
+      "description": "A compact fixed-body camera with optical zoom for lecterns, studios and extra production angles, without a motorized pan-and-tilt head.",
+      "features": [
+        "Up to 4K at 60 fps",
+        "12X or 20X optical zoom",
+        "Built-in microphone and tally light"
+      ],
+      "variants": [
+        "PT12X-STUDIO-4K-GY-G3",
+        "PT12X-STUDIO-4K-WH-G3",
+        "PT20X-STUDIO-4K-GY-G3",
+        "PT20X-STUDIO-4K-WH-G3"
+      ],
+      "image": "/assets/brands/ptzoptics/studio-4k.webp",
+      "imageAlt": "Studio 4K manufacturer product image",
+      "source": "studio: Studio/Studio 4K/PT20X-STUDIO-4K-GY-G3/Images/Photos/Product-Photo-PT20X-STUDIO-4K-GY-G3-Cutout-Angle-Left-NEW.png",
+      "status": "current",
+      "manufacturerUrl": "https://docs.ptzoptics.com/",
+      "specs": {
+        "Resolution": "4K60",
+        "Zoom": "12X / 20X",
+        "Best for": "Fixed production angles"
+      }
+    },
+    {
+      "id": "studio-se",
+      "name": "Studio SE",
+      "category": "cameras",
+      "description": "A Full HD fixed-body camera for planned capture positions or a complementary angle alongside PTZ cameras. Its discreet form suits teaching and meeting spaces.",
+      "features": [
+        "Up to 1080p at 60 fps",
+        "12X or 20X optical zoom",
+        "Built-in microphone and tally light"
+      ],
+      "variants": [
+        "PT12X-STUDIO-SE-GY-G3",
+        "PT12X-STUDIO-SE-WH-G3",
+        "PT20X-STUDIO-SE-GY-G3",
+        "PT20X-STUDIO-SE-WH-G3"
+      ],
+      "image": "/assets/brands/ptzoptics/studio-se.webp",
+      "imageAlt": "Studio SE manufacturer product image",
+      "source": "studio: Studio/Studio SE/PT20X-STUDIO-SE-GY-G3/Images/Photos/Product-Photo-PT20X-STUDIO-SE-GY-G3-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://docs.ptzoptics.com/",
+      "specs": {
+        "Resolution": "1080p60",
+        "Zoom": "12X / 20X",
+        "Best for": "Fixed room capture"
+      }
+    },
+    {
+      "id": "simpltrack3",
+      "name": "SimplTrack3",
+      "category": "cameras",
+      "description": "A dual-sensor camera that uses a wide reference view to follow presenters and frame groups. Tracking zones suit lectures, conferences and presentations.",
+      "features": [
+        "1080p60 capture; USB up to 30 fps",
+        "20X optical zoom",
+        "Dual-sensor tracking and framing"
+      ],
+      "variants": [
+        "HC20X-SIMPLTRACK3"
+      ],
+      "image": "/assets/brands/ptzoptics/simpltrack3.webp",
+      "imageAlt": "SimplTrack3 manufacturer product image",
+      "source": "simpltrack: SimplTrack/HC20X-SIMPLTRACK3/Images/Photos/Product-Photo-HC20X-SIMPLTRACK3-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/ptz-cameras",
+      "specs": {
+        "Resolution": "1080p60",
+        "Zoom": "20X",
+        "Best for": "Presenter tracking"
+      }
+    },
+    {
+      "id": "webcam-80",
+      "name": "Webcam 80",
+      "category": "cameras",
+      "description": "A compact USB webcam with a focused view for desk-based video and small production setups. Adjustable image controls help match the camera to its room.",
+      "features": [
+        "1080p at 30 fps",
+        "80-degree field of view",
+        "USB power and built-in microphones"
+      ],
+      "variants": [
+        "PT-WEBCAM-80-v2"
+      ],
+      "image": "/assets/brands/ptzoptics/webcam-80.webp",
+      "imageAlt": "Webcam 80 manufacturer product image",
+      "source": "webcam: Webcam/PT-WEBCAM-80-v2/Images/Photos/Product-Photo-PT-WEBCAM-80-v2-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://docs.ptzoptics.com/",
+      "specs": {
+        "Resolution": "1080p30",
+        "Zoom": "Electronic framing",
+        "Best for": "Desktop video"
+      }
+    },
+    {
+      "id": "superjoy",
+      "name": "SuperJoy",
+      "category": "controllers",
+      "description": "A tactile controller for productions needing IP and serial camera operation together. Groups, presets and configurable commands simplify repeat production actions.",
+      "features": [
+        "Simultaneous IP and serial control",
+        "Camera grouping and preset recall",
+        "PoE or external power"
+      ],
+      "variants": [
+        "PT-SUPERJOY-G1"
+      ],
+      "image": "/assets/brands/ptzoptics/superjoy.webp",
+      "imageAlt": "SuperJoy manufacturer product image",
+      "source": "joysticks: Joysticks/PT-SUPERJOY-G1/Images/Photos/Product-Photo-PT-SUPERJOY-G1-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "pt-joy-g4",
+      "name": "PT Joy G4",
+      "category": "controllers",
+      "description": "An IP or serial controller for selecting cameras, recalling positions and adjusting images in new or mixed existing production systems.",
+      "features": [
+        "IP or serial control",
+        "Preset and image-adjustment controls",
+        "LCD status display"
+      ],
+      "variants": [
+        "PT-JOY-G4"
+      ],
+      "image": "/assets/brands/ptzoptics/pt-joy-g4.webp",
+      "imageAlt": "PT Joy G4 manufacturer product image",
+      "source": "joysticks: Joysticks/PT-JOY-G4/Images/Photos/Product-Photo-PT-JOY-G4-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "minijoy",
+      "name": "MiniJoy",
+      "category": "controllers",
+      "description": "A compact hardware joystick for streamlined camera control where desktop space is limited. Confirm camera and protocol compatibility for the proposed system.",
+      "features": [
+        "Compact desktop footprint",
+        "Physical joystick operation",
+        "Camera compatibility review"
+      ],
+      "variants": [
+        "PT-MINIJOY-G1"
+      ],
+      "image": "/assets/brands/ptzoptics/minijoy.webp",
+      "imageAlt": "MiniJoy manufacturer product image",
+      "source": "joysticks: Joysticks/PT-MINIJOY-G1/Images/CGI 3D Renders/Dark Background/Product-Render-PT-MINIJOY-G1-Dark-Background-Angle-Left.png",
+      "status": "verify-current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "hc-joy-g4",
+      "name": "HC Joy G4",
+      "category": "controllers",
+      "description": "A serial joystick for supported PTZ cameras, with direct camera selection, preset management and exposure controls for existing serial installations.",
+      "features": [
+        "RS232, RS485 and RS422 interfaces",
+        "VISCA and Pelco options",
+        "Direct camera and preset buttons"
+      ],
+      "variants": [
+        "HC-JOY-G4"
+      ],
+      "image": "/assets/brands/ptzoptics/hc-joy-g4.webp",
+      "imageAlt": "HC Joy G4 manufacturer product image",
+      "source": "joysticks: Joysticks/HC-JOY-G4/Images/Photos/Product-Photo-HC-JOY-G4-Cutout-Angle-Left-A.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "hive-studio",
+      "name": "Hive Studio",
+      "category": "software",
+      "description": "A shared workspace for remote camera control, production and collaboration. Review current Standard, Pro and Enterprise plans against camera compatibility and team size.",
+      "features": [
+        "Remote control and collaboration",
+        "Switching and image tools",
+        "Multiple licensing options"
+      ],
+      "variants": [
+        "PT-HIVE-STD-YR",
+        "PT-HIVE-PRO-YR",
+        "Enterprise - request configuration"
+      ],
+      "image": "/assets/brands/ptzoptics/hive-studio.webp",
+      "imageAlt": "Hive Studio manufacturer product image",
+      "source": "software: Software/Hive Studio/PT-HIVE-STD-YR/Hive-Camera-Switching.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/hive"
+    },
+    {
+      "id": "horizon",
+      "name": "Horizon",
+      "category": "software",
+      "description": "A modern control interface for compatible PTZOptics cameras, bringing intelligent video tools and camera operation into one workspace. Features depend on model and firmware.",
+      "features": [
+        "Unified camera interface",
+        "Automation on supported cameras",
+        "Model and firmware compatibility review"
+      ],
+      "variants": [
+        "Horizon - model/firmware dependent"
+      ],
+      "image": "/assets/brands/ptzoptics/horizon.webp",
+      "imageAlt": "Horizon manufacturer product image",
+      "source": "software: Software/Horizon/Horizon-1.png",
+      "status": "current",
+      "manufacturerUrl": "https://docs.ptzoptics.com/apps/"
+    },
+    {
+      "id": "ptzcontrol-pro2",
+      "name": "PTZControl Pro 2",
+      "category": "software",
+      "description": "Mobile camera-control software for supported PTZOptics systems. Confirm the device platform, camera network and supported functions before deployment.",
+      "features": [
+        "Mobile camera controls",
+        "Supported iOS devices",
+        "Camera/network compatibility review"
+      ],
+      "variants": [
+        "PTZControl Pro 2 (iOS)"
+      ],
+      "image": "/assets/brands/ptzoptics/ptzcontrol-pro2.webp",
+      "imageAlt": "PTZControl Pro 2 manufacturer product image",
+      "source": "software: Software/Mobile Apps/iOS/PTZ Control Pro 2/App Icons/PTZ-Control-Pro-2-iOs-App-Icon.png",
+      "status": "current",
+      "manufacturerUrl": "https://docs.ptzoptics.com/apps/"
+    },
+    {
+      "id": "hcm-1",
+      "name": "HCM-1 small wall mount",
+      "category": "accessories",
+      "description": "A dedicated mounting option for a planned camera position. Check camera-base dimensions, mounting surface, fasteners and load requirements before selecting the exact mount.",
+      "features": [
+        "Small-camera wall mounting",
+        "Black or white finish",
+        "Installation compatibility review"
+      ],
+      "variants": [
+        "HCM-1-BK",
+        "HCM-1-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/hcm-1.webp",
+      "imageAlt": "HCM-1 small wall mount manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/HCM-1-BK/Images/Photos/Product-Photo-HCM-1-BK-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "hcm-2",
+      "name": "HCM-2 large wall mount",
+      "category": "accessories",
+      "description": "A dedicated mounting option for a planned camera position. Check camera-base dimensions, mounting surface, fasteners and load requirements before selecting the exact mount.",
+      "features": [
+        "Larger camera-base support",
+        "Black or white finish",
+        "Installation compatibility review"
+      ],
+      "variants": [
+        "HCM-2-BK",
+        "HCM-2-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/hcm-2.webp",
+      "imageAlt": "HCM-2 large wall mount manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/HCM-2-BK/Images/Photos/Product-Photo-HCM-2-BK-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "hcm-1c",
+      "name": "HCM-1C small pole mount",
+      "category": "accessories",
+      "description": "A dedicated mounting option for a planned camera position. Check camera-base dimensions, mounting surface, fasteners and load requirements before selecting the exact mount.",
+      "features": [
+        "Small-camera pole mounting",
+        "Confirm pole and camera fit",
+        "Installation compatibility review"
+      ],
+      "variants": [
+        "HCM-1C-BK",
+        "HCM-1C-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/hcm-1c.webp",
+      "imageAlt": "HCM-1C small pole mount manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/HCM-1C-BK/Images/CGI 3D Renders/Transparent Background/HCM-1C-BK-Transparent-Background-Front-Left-Angle.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "hcm-2c",
+      "name": "HCM-2C large pole mount",
+      "category": "accessories",
+      "description": "A dedicated mounting option for a planned camera position. Check camera-base dimensions, mounting surface, fasteners and load requirements before selecting the exact mount.",
+      "features": [
+        "Larger-camera pole mounting",
+        "Confirm load and dimensions",
+        "Installation compatibility review"
+      ],
+      "variants": [
+        "HCM-2C-BK",
+        "HCM-2C-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/hcm-2c.webp",
+      "imageAlt": "HCM-2C large pole mount manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/HCM-2C-BK/Images/CGI 3D Renders/Transparent Background/HCM-2C-BK-Transparent-Background-Front-Left-Angle.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "pt-cm-1",
+      "name": "PT-CM-1 ceiling mount",
+      "category": "accessories",
+      "description": "A dedicated mounting option for a planned camera position. Check camera-base dimensions, mounting surface, fasteners and load requirements before selecting the exact mount.",
+      "features": [
+        "Small-camera ceiling mounting",
+        "Black or white finish",
+        "Installation compatibility review"
+      ],
+      "variants": [
+        "PT-CM-1-BK",
+        "PT-CM-1-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/pt-cm-1.webp",
+      "imageAlt": "PT-CM-1 ceiling mount manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/PT-CM-1-BK/Images/Photos/Product-Photo-PT-CM-1-BK-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "pt-cm-3",
+      "name": "PT-CM-3 ceiling mount",
+      "category": "accessories",
+      "description": "A dedicated mounting option for a planned camera position. Check camera-base dimensions, mounting surface, fasteners and load requirements before selecting the exact mount.",
+      "features": [
+        "Larger-camera ceiling mounting",
+        "Black or white finish",
+        "Installation compatibility review"
+      ],
+      "variants": [
+        "PT-CM-3-BK",
+        "PT-CM-3-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/pt-cm-3.webp",
+      "imageAlt": "PT-CM-3 ceiling mount manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/PT-CM-3-BK/Images/Photos/Product-Photo-PT-CM-3-BK-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "pt-pm-3",
+      "name": "PT-PM-3 pole mount",
+      "category": "accessories",
+      "description": "A dedicated mounting option for a planned camera position. Check camera-base dimensions, mounting surface, fasteners and load requirements before selecting the exact mount.",
+      "features": [
+        "Pole-mount installation",
+        "Black or white finish",
+        "Installation compatibility review"
+      ],
+      "variants": [
+        "PT-PM-3-BK",
+        "PT-PM-3-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/pt-pm-3.webp",
+      "imageAlt": "PT-PM-3 pole mount manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/PT-PM-3-BK/Images/CGI 3D Renders/Transparent Background/PT-PM-3-BK-Transparent-Background-Front-Left-Angle.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "pt-wm-3",
+      "name": "PT-WM-3 wall mount",
+      "category": "accessories",
+      "description": "A dedicated mounting option for a planned camera position. Check camera-base dimensions, mounting surface, fasteners and load requirements before selecting the exact mount.",
+      "features": [
+        "Wall-mount installation",
+        "Black or white finish",
+        "Installation compatibility review"
+      ],
+      "variants": [
+        "PT-WM-3-BK",
+        "PT-WM-3-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/pt-wm-3.webp",
+      "imageAlt": "PT-WM-3 wall mount manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/PT-WM-3-BK/Images/Photos/Product-Photo-PT-WM-3-BK-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "hdsdi-cables",
+      "name": "3G-SDI camera cables",
+      "category": "accessories",
+      "description": "Pre-terminated cables for carrying camera video to compatible production equipment. Match the cable length, installation rating and required video format.",
+      "features": [
+        "25, 50, 75 and 100-foot options",
+        "Male-to-male SDI connections",
+        "Baseband video workflows"
+      ],
+      "variants": [
+        "HDSDI-25",
+        "HDSDI-50",
+        "HDSDI-75",
+        "HDSDI-100"
+      ],
+      "image": "/assets/brands/ptzoptics/hdsdi-cables.webp",
+      "imageAlt": "3G-SDI camera cables manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/HDSDI/HDSDI-50/Product-Photo-HDSDI-50-Cutout-Angle-Left.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "pt-psb-u",
+      "name": "PT-PSB-U camera power supply",
+      "category": "accessories",
+      "description": "A spare international supply for supported PTZOptics pan-tilt-zoom cameras. Verify electrical rating and connector against the exact camera model.",
+      "features": [
+        "International adapter set",
+        "Supported PTZ camera models",
+        "Electrical compatibility review"
+      ],
+      "variants": [
+        "PT-PSB-U"
+      ],
+      "image": "/assets/brands/ptzoptics/pt-psb-u.webp",
+      "imageAlt": "PT-PSB-U camera power supply manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Power Supply/PT-PSB-U/Product-Photo-PT-PSB-U-Cutout-Angle-Left.png",
+      "status": "verify-current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "pt-ps-boxcam-u",
+      "name": "PT-PS-BOXCAM-U power supply",
+      "category": "accessories",
+      "description": "A spare international supply for supported box and Studio camera models. Confirm the model-specific power specification before ordering.",
+      "features": [
+        "Supported box/Studio models",
+        "International adapter set",
+        "Model-specific compatibility"
+      ],
+      "variants": [
+        "PT-PS-BOXCAM-U"
+      ],
+      "image": "/assets/brands/ptzoptics/pt-ps-boxcam-u.webp",
+      "imageAlt": "PT-PS-BOXCAM-U power supply manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Power Supply/PT-PS-BOXCAM-U/Product-Photo-PT-PS-BOXCAM-U-Cutout-Angle-Left.png",
+      "status": "verify-current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "pt-remote",
+      "name": "PTZOptics IR remote",
+      "category": "accessories",
+      "description": "A replacement infrared remote for compatible cameras, providing local preset recall and camera-menu access where infrared control is supported.",
+      "features": [
+        "Handheld infrared control",
+        "Preset and menu operation",
+        "Camera compatibility review"
+      ],
+      "variants": [
+        "PT-REMOTE"
+      ],
+      "image": "/assets/brands/ptzoptics/pt-remote.webp",
+      "imageAlt": "PTZOptics IR remote manufacturer product image",
+      "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Remote Control/PT-REMOTE/Product-Photo-PT-REMOTE-Cutout-Angle-Left-New.png",
+      "status": "verify-current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "producer-4k",
+      "name": "Producer 4K bundle",
+      "category": "bundles",
+      "description": "A coordinated multicamera package centered on Move 4K cameras and SuperJoy control. Confirm lens choice, camera color and the exact bill of materials for the room.",
+      "features": [
+        "Three Move 4K camera package",
+        "SuperJoy control",
+        "20X / 30X package options; confirm exact contents"
+      ],
+      "variants": [
+        "PT20X4K-PRODUCER-SJOY",
+        "PT30X-4K-PRODUCER-SJOY"
+      ],
+      "image": "/assets/brands/ptzoptics/producer-4k.webp",
+      "imageAlt": "Manufacturer image of the 20X Producer 4K bundle",
+      "source": "multi-product-assets: Multi-Product Assets/Images/Bundles/Producer 4K Bundle/PT20X4K-PRODUCER-SJOY/Product-Photo-PT20X4K-PRODUCER-SJOY-Cutout-Front.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/bundles"
+    },
+    {
+      "id": "producer-se",
+      "name": "Producer SE bundle",
+      "category": "bundles",
+      "description": "A Full HD production package built around Move SE cameras and PT Joy G4 control. Scope the positions, zoom ranges and cable routes before finalizing the package.",
+      "features": [
+        "Move SE camera package",
+        "PT Joy G4 control",
+        "Room-specific configuration"
+      ],
+      "variants": [
+        "PT20XSE-PRODUCER-JOY4"
+      ],
+      "image": "/assets/brands/ptzoptics/producer-se.webp",
+      "imageAlt": "Producer SE bundle manufacturer product image",
+      "source": "multi-product-assets: Multi-Product Assets/Images/Bundles/Producer SE Bundle/PT20XSE-PRODUCER-JOY4/Product-Photo-PT20XSE-PRODUCER-JOY4-Cutout-Front.jpg",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "action-bundle",
+      "name": "Action 4K bundle",
+      "category": "bundles",
+      "description": "A mixed-camera 4K package for sports and live coverage, combining a Move 4K PTZ camera, two Studio 4K fixed cameras and a SuperJoy controller. Confirm the exact bill of materials for the venue.",
+      "features": [
+        "Move 4K PTZ plus two Studio 4K cameras",
+        "SuperJoy centralized control",
+        "Confirm exact bundle configuration"
+      ],
+      "variants": [
+        "PT12X4K-ACTION-SJOY"
+      ],
+      "image": "/assets/brands/ptzoptics/action-bundle.webp",
+      "imageAlt": "Action 4K bundle manufacturer product image",
+      "source": "multi-product-assets: Multi-Product Assets/Images/Bundles/Action Bundle/PT12X4K-ACTION-SJOY/Studio-4K-12X-Bundle.png",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/bundles"
+    },
+    {
+      "id": "huddlecam-10xa",
+      "name": "HuddleCamHD 10XA",
+      "category": "cameras",
+      "description": "An earlier USB PTZ camera represented in the manufacturer library. Confirm exact model identity and the appropriate supported replacement for an installed system.",
+      "features": [
+        "Optical-zoom USB camera",
+        "Room-camera reference",
+        "Replacement review required"
+      ],
+      "variants": [
+        "HC10XA-BK",
+        "HC10XA-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/huddlecam-10xa.webp",
+      "imageAlt": "HuddleCamHD 10XA manufacturer product image",
+      "source": "Recovered complete local ZIP record: HuddleCamHD/Product Resources by SKU/HC10XA-WH/Product-Photo-HC10XA-WH-Cutout-Angle-Left.png",
+      "status": "verify-current",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "db9-extension",
+      "name": "DB9 serial extension cables",
+      "category": "accessories",
+      "description": "Serial cable extenders for supported VISCA/control connections over a planned room cable route. Match connector type, distance and installation requirements.",
+      "features": [
+        "25, 50, 75 and 100-foot lengths",
+        "DB9 male-to-female connections",
+        "Serial-control extension"
+      ],
+      "variants": [
+        "DB9M-F-25",
+        "DB9M-F-50",
+        "DB9M-F-75",
+        "DB9M-F-100"
+      ],
+      "image": "/assets/brands/ptzoptics/db9-extension.webp",
+      "imageAlt": "DB9 serial extension cables manufacturer product image",
+      "source": "PTZOptics-HuddleCamHD-Catalog-2025.pdf, page 22",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "visca-cascade",
+      "name": "VISCA cascade cables",
+      "category": "accessories",
+      "description": "Cables for daisy-chaining supported cameras in serial-control installations. Confirm connector style, wiring and the complete control path.",
+      "features": [
+        "25, 50, 75 and 100-foot lengths",
+        "8-pin mini-DIN male-to-male",
+        "Supported serial camera systems"
+      ],
+      "variants": [
+        "VISCA-25",
+        "VISCA-50",
+        "VISCA-75",
+        "VISCA-100"
+      ],
+      "image": "/assets/brands/ptzoptics/visca-cascade.webp",
+      "imageAlt": "VISCA cascade cables manufacturer product image",
+      "source": "PTZOptics-HuddleCamHD-Catalog-2025.pdf, page 23",
+      "status": "current",
+      "manufacturerUrl": "https://ptzoptics.com/"
+    },
+    {
+      "id": "mobile-apps-legacy",
+      "name": "Earlier PTZ Control apps",
+      "category": "software",
+      "description": "Earlier PTZ Control applications represented in the supplied library help identify an installed workflow. Discuss a supported current replacement before deployment.",
+      "features": [
+        "Historical mobile applications",
+        "Version-specific camera support",
+        "Confirm current app-store availability"
+      ],
+      "variants": [
+        "PTZ Control (iOS)",
+        "PTZ Control 2 (iOS)",
+        "PTZ Control PRO (iOS)"
+      ],
+      "image": "/assets/brands/ptzoptics/mobile-apps-legacy.webp",
+      "imageAlt": "Earlier PTZ Control apps manufacturer product image",
+      "source": "software: Software/Mobile Apps/iOS/PTZ Control 2/App Icons/PTZOptics-PTZ-Control-2-iOS-app-Icon.png",
+      "status": "legacy",
+      "manufacturerUrl": "https://docs.ptzoptics.com/apps/downloads/"
+    },
+    {
+      "id": "minitrack-4k-pro",
+      "name": "MiniTrack 4K Pro",
+      "category": "cameras",
+      "description": "A compact electronic-PTZ webcam with automatic framing and tracking, included as a legacy reference for existing remote-work and meeting setups.",
+      "features": [
+        "4K at 30 fps",
+        "Automatic tracking and framing",
+        "USB 3.0 connection"
+      ],
+      "variants": [
+        "HC-MT-4KPRO"
+      ],
+      "image": "/assets/brands/ptzoptics/minitrack-4k-pro.webp",
+      "imageAlt": "MiniTrack 4K Pro manufacturer product image",
+      "source": "Recovered complete local ZIP record: HuddleCamHD/Product Resources by SKU/HC-MT-4KPRO/Product-Photo-HC-MT-4KPRO-Cutout-Front-Angle-Left.png",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "huddlecam-pro",
+      "name": "HuddleCamHD Pro",
+      "category": "cameras",
+      "description": "A legacy electronic-PTZ meeting camera with USB and HDMI connections. Confirm output-specific frame rates and current replacement choices.",
+      "features": [
+        "4K imaging area with electronic PTZ",
+        "USB and HDMI connections",
+        "Automatic framing"
+      ],
+      "variants": [
+        "HC-EPTZ-USB"
+      ],
+      "image": "/assets/brands/ptzoptics/huddlecam-pro.webp",
+      "imageAlt": "HuddleCamHD Pro manufacturer product image",
+      "source": "Recovered complete local ZIP record: HuddleCamHD/Product Resources by SKU/HC-EPTZ-USB/Product-Photo-HC-EPTZ-USB-Cutout-Angle-Left.png",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "huddlecam-pro-ip",
+      "name": "HuddleCamHD Pro IP",
+      "category": "cameras",
+      "description": "A legacy networked electronic-PTZ camera for room capture, included for installed-system identification and replacement planning.",
+      "features": [
+        "4K30 over NDI HX2",
+        "Electronic pan, tilt and zoom",
+        "Networked room capture"
+      ],
+      "variants": [
+        "HC-EPTZ-NDI"
+      ],
+      "image": "/assets/brands/ptzoptics/huddlecam-pro-ip.webp",
+      "imageAlt": "HuddleCamHD Pro IP manufacturer product image",
+      "source": "Recovered complete local ZIP record: HuddleCamHD/Product Resources by SKU/HC-EPTZ-NDI/Product-Photo-HC-EPTZ-NDI-Cutout-Angle-Left.png",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "webcam-104",
+      "name": "HuddleCamHD Webcam 104",
+      "category": "cameras",
+      "description": "A legacy wide-angle USB webcam for portable conferencing and smaller meeting rooms. Its wide view includes more of the space.",
+      "features": [
+        "1080p at 30 fps",
+        "104-degree field of view",
+        "USB power and microphones"
+      ],
+      "variants": [
+        "HC-WEBCAM-104-v2"
+      ],
+      "image": "/assets/brands/ptzoptics/webcam-104.webp",
+      "imageAlt": "HuddleCamHD Webcam 104 manufacturer product image",
+      "source": "Recovered complete local ZIP record: HuddleCamHD/Product Resources by SKU/HC-WEBCAM-104-v2/Product-Photo-HC-WEBCAM-104-v2-Cutout-Angle-Left.png",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "huddlepair",
+      "name": "HuddlePair",
+      "category": "accessories",
+      "description": "A legacy webcam and speakerphone package for portable conferencing. Identify the installed components and room connections when planning replacement.",
+      "features": [
+        "Camera and speakerphone package",
+        "Portable conferencing setup",
+        "Existing-system reference"
+      ],
+      "variants": [
+        "HC-HUDDLEPAIR"
+      ],
+      "image": "/assets/brands/ptzoptics/huddlepair.webp",
+      "imageAlt": "HuddlePair manufacturer product image",
+      "source": "Recovered complete local ZIP record: HuddleCamHD/Product Resources by SKU/HC-HUDDLEPAIR/Product-Photo-HC-HUDDLEPAIR-Cutout-Angle-Left-B.png",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "huddleshare",
+      "name": "HuddleShare",
+      "category": "accessories",
+      "description": "A legacy wireless presentation device for collaboration rooms. Review display, laptop and network needs against a supported replacement.",
+      "features": [
+        "Wireless presentation workflow",
+        "Existing conference-room reference",
+        "Replacement compatibility review"
+      ],
+      "variants": [
+        "HC-HUDDLESHARE"
+      ],
+      "image": "/assets/brands/ptzoptics/huddleshare.webp",
+      "imageAlt": "HuddleShare manufacturer product image",
+      "source": "Recovered complete local ZIP record: HuddleCamHD/Product Resources by SKU/HC-HUDDLESHARE/Product-Photo-HC-HUDDLESHARE-Cutout-Angle-Left.png",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "huddlecam-20x",
+      "name": "HuddleCamHD 20X USB",
+      "category": "cameras",
+      "description": "A legacy USB PTZ camera for existing video-conferencing installations. Match control, connections and mounting when evaluating replacement hardware.",
+      "features": [
+        "20X optical zoom family",
+        "USB conferencing application",
+        "Legacy installation reference"
+      ],
+      "variants": [
+        "HC20X-GY-G2"
+      ],
+      "image": "/assets/brands/ptzoptics/huddlecam-20x.webp",
+      "imageAlt": "HuddleCamHD 20X USB manufacturer product image",
+      "source": "Recovered complete local ZIP record: HuddleCamHD/Product Resources by SKU/HC20X-GY-G2/Product-Photo-HC20X-GY-G2-Cutout-Angle-Left.png",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "studio-pro",
+      "name": "Studio Pro",
+      "category": "cameras",
+      "description": "An earlier all-in-one content camera with optical zoom, microphone array and an included LED panel. The supplied catalog marks this model end of life; discuss current Studio alternatives.",
+      "features": [
+        "1080p at up to 60 fps",
+        "12X optical zoom",
+        "Portrait/landscape orientation"
+      ],
+      "variants": [
+        "PT-STUDIOPRO"
+      ],
+      "image": "/assets/brands/ptzoptics/studio-pro.webp",
+      "imageAlt": "Studio Pro manufacturer product image",
+      "source": "PTZOptics-HuddleCamHD-Catalog-2025.pdf, page 10, Studio Pro image",
+      "status": "legacy",
+      "manufacturerUrl": "https://docs.ptzoptics.com/"
+    },
+    {
+      "id": "huddlecam-go",
+      "name": "HuddleCamHD Go",
+      "category": "cameras",
+      "description": "An all-in-one legacy conferencing unit combining camera, microphone and speaker over USB. Included to support identification and replacement of existing room equipment.",
+      "features": [
+        "1080p30 capture",
+        "110-degree field of view",
+        "Camera, microphone and speaker"
+      ],
+      "variants": [
+        "HC-GO-BK",
+        "HC-GO-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/huddlecam-go.webp",
+      "imageAlt": "HuddleCamHD Go manufacturer data-sheet product photograph",
+      "source": "HC-GO-BK manufacturer data sheet, page 1; complete recovered local ZIP record",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "huddlepod-air2-duo",
+      "name": "HuddlePod Air2 Duo",
+      "category": "accessories",
+      "description": "A legacy wireless conferencing-audio package with two speakerphone pods and a receiver. Assess current audio coverage and replacement options for the room.",
+      "features": [
+        "Two wireless chat pods",
+        "USB receiver",
+        "Full-duplex conferencing audio"
+      ],
+      "variants": [
+        "HC-HPAIR2-DUO"
+      ],
+      "image": "/assets/brands/ptzoptics/huddlepod-air2-duo.webp",
+      "imageAlt": "HuddlePod Air2 Duo manufacturer data-sheet product photograph",
+      "source": "HC-HPAIR2-DUO manufacturer data sheet, page 1; complete recovered local ZIP record",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "huddlecam-10x-g3",
+      "name": "HuddleCamHD 10X G3",
+      "category": "cameras",
+      "description": "A legacy optical-zoom USB conferencing camera for installed meeting systems. Review USB bandwidth and control compatibility before selecting a replacement.",
+      "features": [
+        "10X optical zoom",
+        "1080p at up to 30 fps",
+        "USB 3.0 and serial control"
+      ],
+      "variants": [
+        "HC10X-GY-G3",
+        "HC10X-WH-G3"
+      ],
+      "image": "/assets/brands/ptzoptics/huddlecam-10x-g3.webp",
+      "imageAlt": "HuddleCamHD 10X G3 manufacturer data-sheet product photograph",
+      "source": "HC10X-GY-G3 manufacturer data sheet, page 1; complete recovered local ZIP record",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "huddlecam-10x-usb2",
+      "name": "HuddleCamHD 10X USB2",
+      "category": "cameras",
+      "description": "A legacy USB 2.0 optical-zoom camera for meeting rooms. Confirm the existing room connections, camera placement and current supported replacement.",
+      "features": [
+        "10X optical zoom",
+        "1080p at up to 30 fps",
+        "USB 2.0 connection"
+      ],
+      "variants": [
+        "HC10X-USB2-BK",
+        "HC10X-USB2-WH"
+      ],
+      "image": "/assets/brands/ptzoptics/huddlecam-10x-usb2.webp",
+      "imageAlt": "HuddleCamHD 10X USB2 manufacturer data-sheet product photograph",
+      "source": "HC10X-USB2-BK manufacturer data sheet, page 1; complete recovered local ZIP record",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    },
+    {
+      "id": "huddleview",
+      "name": "HuddleCamHD HuddleView",
+      "category": "cameras",
+      "description": "An earlier automatic-framing camera combining a reference lens with an optical-zoom main camera. Included for legacy-room identification and replacement planning.",
+      "features": [
+        "12X optical zoom",
+        "Motion and facial framing",
+        "1080p60 SDI/IP capture"
+      ],
+      "variants": [
+        "HC12X-HUDDLEVIEW"
+      ],
+      "image": "/assets/brands/ptzoptics/huddleview.webp",
+      "imageAlt": "HuddleCamHD HuddleView manufacturer data-sheet product photograph",
+      "source": "HC12X-HUDDLEVIEW manufacturer data sheet, page 1; complete recovered local ZIP record",
+      "status": "legacy",
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+    }
+  ]
+}

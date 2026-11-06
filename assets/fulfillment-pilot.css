@@ -1,0 +1,2 @@
+@import url('/assets/cart-checkout.css');
+main>label{display:block;font-weight:600;margin:20px 0 8px}#pilot-id{box-sizing:border-box;width:100%;max-width:650px;padding:12px;margin:10px 0 16px;border:1px solid #b8cadb;border-radius:6px;font:inherit}#pilot-status,#pilot-reference,#pilot-reason{overflow-wrap:anywhere}#pilot-message-list article{border-top:1px solid #d7e2ed;padding:16px 0}#pilot-message-list p{white-space:pre-wrap}button:disabled{opacity:.55;cursor:not-allowed}

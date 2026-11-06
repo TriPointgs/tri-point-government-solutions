@@ -163,6 +163,10 @@ class Handler(BaseHTTPRequestHandler):
         if not hmac.compare_digest(self.headers.get("Authorization", ""), "Bearer " + TOKEN):
             return self.respond(401, {"error": "Unauthorized"})
         route = urlsplit(self.path)
+        from catalog_inventory import handle_catalog_read
+        inventory = handle_catalog_read(route.path, parse_qs(route.query, keep_blank_values=True), DB, category_where)
+        if inventory is not None:
+            return self.respond(*inventory)
         if route.path == "/health":
             return self.respond(200, {"status": "ready", "filterVersion": ENGINE_VERSION})
         if route.path != "/search":
@@ -180,6 +184,7 @@ class Handler(BaseHTTPRequestHandler):
             or not re.fullmatch(r"\d{1,4}", page) or int(page) > 1000
             or any(ord(char) < 32 or ord(char) == 127 for char in query + maker)):
             return self.respond(400, {"error": "Invalid catalog search"})
+        exact = exact == "1"
         if not query and not maker:
             return self.respond(200, {"items": [], "hasMore": False, "filterVersion": ENGINE_VERSION,
                                      "category": category, "exact": exact,
