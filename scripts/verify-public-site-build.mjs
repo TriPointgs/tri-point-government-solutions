@@ -10,6 +10,19 @@ assert.match(contact,/id="brand-inquiry-selection"/);assert.match(contact,/priva
 const options=JSON.parse(fs.readFileSync('dist/assets/quote-options.json','utf8'));assert.ok(options.length>40);assert.ok(options.every(o=>o.image.startsWith('/assets/')&&!o.manufacturerUrl));
 for(const p of ['dist/assets/quote-selection.js','dist/assets/quote-marketplace.js','dist/assets/contact.css','dist/assets/contact-admin.js','dist/assets/experience.js'])assert.ok(fs.existsSync(p));
 for(const brand of ['ptzoptics','wasabi']){const html=fs.readFileSync('dist/solutions/'+brand+'.html','utf8');assert.match(html,/data-product-card/);assert.match(html,/id="portfolio"/);assert.match(html,/id="brand-compare-dialog"/);assert.doesNotMatch(html,/Add to cart|Buy now|SubmitPO|authorized reseller/i);assert.ok(home.includes('href="/solutions/'+brand+'"'));assert.match(html,/href="\/contact\?manufacturer=/);}
+const arctic=fs.readFileSync('dist/solutions/arctic-wolf.html','utf8');
+assert.ok(home.includes('href="/solutions/arctic-wolf"'));
+assert.match(contact,/value="Arctic Wolf"/);
+assert.match(arctic,/id="brand-category-filters"/);
+assert.equal((arctic.match(/data-product-card /g)||[]).length,6);
+assert.doesNotMatch(arctic,/data-compare|Add to cart|Buy now|SubmitPO|checkout-session/);
+const arcticOptions=options.filter(option=>option.brand==='Arctic Wolf');
+assert.equal(arcticOptions.length,6);
+for(const option of arcticOptions){
+ assert.ok(fs.existsSync('dist'+option.image),option.image);
+ const query=new URLSearchParams({manufacturer:option.brand,product:option.name});
+ assert.ok(arctic.includes('/contact?'+query.toString().replaceAll('&','&amp;')),option.name);
+}
 const config=JSON.parse(fs.readFileSync('vercel.json','utf8'));assert.ok(config.rewrites.some(r=>r.source==='/api/contact'&&r.destination==='/api/intake?channel=quote'));assert.ok(config.rewrites.some(r=>r.source==='/admin/inquiries'&&r.destination.includes('view=admin-page')));
 assert.equal(fs.readdirSync('api').filter(p=>p.endsWith('.js')).length,12,'Retain the existing serverless function count');
 console.log('PASS quote marketplace, multi-item request form, privacy, routing and inactive checkout boundary checks');

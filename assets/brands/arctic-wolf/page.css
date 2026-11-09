@@ -1,0 +1,177 @@
+html body[data-experience] .brand-arctic-wolf {
+  --brand-accent: #0059b2;
+  --brand-dark: #121c42;
+  --brand-line: #d6e2ef;
+  --brand-text: #405775;
+  background: #f7f9fd;
+  font-family: Lato, Arial, sans-serif;
+}
+
+.brand-arctic-wolf .brand-hero {
+  min-height: 520px;
+  grid-template-columns: 1.05fr 1fr;
+  border: 1px solid #233660;
+}
+
+.brand-arctic-wolf .brand-hero-copy {
+  padding: 48px;
+}
+
+.aw-hero-logo {
+  display: block;
+  width: 160px;
+  height: auto;
+  margin: 0 0 30px;
+}
+
+.brand-arctic-wolf .brand-hero-copy > p {
+  color: #d5e4f5;
+  max-width: 42ch;
+}
+
+.brand-arctic-wolf .brand-hero-media {
+  min-height: 390px;
+  background: #10274c;
+}
+
+.brand-arctic-wolf .brand-hero-media > img {
+  min-height: 0;
+  object-fit: cover;
+}
+
+.brand-arctic-wolf .brand-hero-media figcaption {
+  padding: 24px 30px;
+  background: linear-gradient(0deg, #101b3cf5, #101b3c00);
+}
+
+.brand-arctic-wolf .brand-button {
+  background: #e0edff;
+  color: #121c42;
+}
+
+.brand-arctic-wolf .brand-button:hover {
+  background: #fff;
+}
+
+html body[data-experience] .brand-arctic-wolf #brand-category-filters button {
+  -webkit-text-fill-color: currentColor !important;
+  transition: none;
+}
+
+.aw-partner,
+.aw-resources {
+  display: grid;
+  align-items: center;
+  gap: 32px;
+  padding: 27px 32px;
+  background: #fff;
+  border: 1px solid var(--brand-line);
+  border-radius: 9px;
+}
+
+.aw-partner {
+  grid-template-columns: 240px minmax(0, 1fr);
+  margin-top: 18px;
+}
+
+.aw-partner img {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 10px;
+}
+
+.aw-partner h2,
+.aw-resources h2 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+}
+
+.aw-partner p:last-child {
+  max-width: 65ch;
+  margin: 0;
+}
+
+.brand-arctic-wolf .brand-product-image {
+  height: 166px;
+  padding: 0;
+  background: #eaf2fd;
+}
+
+.brand-arctic-wolf .brand-product-image img {
+  object-fit: cover;
+}
+
+.brand-arctic-wolf .brand-product-description,
+.brand-arctic-wolf .brand-features {
+  font-size: 14px;
+}
+
+.brand-arctic-wolf .brand-quote {
+  font-size: 13px;
+  min-height: 44px;
+}
+
+.brand-arctic-wolf .brand-planning .brand-eyebrow,
+.brand-arctic-wolf .brand-planning li::before {
+  color: #b5d5ff;
+}
+
+.aw-resources {
+  grid-template-columns: minmax(0, .7fr) minmax(0, 1fr);
+  margin: 0 0 70px;
+}
+
+.aw-resources ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.aw-resources a {
+  color: #0059b2;
+  text-underline-offset: .2em;
+}
+
+.brand-arctic-wolf section[id],
+.brand-arctic-wolf .brand-product-details {
+  scroll-margin-top: 155px;
+}
+
+@media (max-width: 860px) {
+  .brand-arctic-wolf .brand-hero-copy { padding: 34px 28px; }
+  .aw-partner { grid-template-columns: 195px minmax(0, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .brand-arctic-wolf .brand-hero {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+  }
+  .brand-arctic-wolf .brand-hero-copy { padding: 32px 24px; }
+  .brand-arctic-wolf .brand-hero-media { min-height: 310px; }
+  .brand-arctic-wolf .brand-hero-media figcaption { padding: 18px 24px; }
+  .aw-partner,
+  .aw-resources {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 15px;
+    padding: 20px;
+  }
+  .aw-partner img { max-width: 235px; }
+}
+
+@media (max-width: 480px) {
+  .brand-arctic-wolf #brand-category-filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  html body[data-experience] .brand-arctic-wolf #brand-category-filters button {
+    min-width: 0;
+    min-height: 44px;
+    white-space: normal;
+    line-height: 1.25;
+  }
+}

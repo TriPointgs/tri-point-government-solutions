@@ -1,6 +1,7 @@
 import {injectBrandHomeBadges} from '../lib/brand-home.mjs';
 import {wasabiPage} from '../lib/wasabi-page.mjs';
 import {ptzopticsPage} from '../lib/ptzoptics-page.mjs';
+import {arcticWolfPage} from '../lib/arctic-wolf-page.mjs';
 import {contactPage} from '../lib/contact-page.mjs';
 import {quoteMarketplace} from '../lib/quote-marketplace.mjs';
 // Production-safe visual rollout: keep the current public routes and behaviors while reusing
@@ -33,7 +34,16 @@ const contactFile=path.join(out,'contact.html');
 fs.writeFileSync(path.join(out,'marketplace.html'),quoteMarketplace());
 fs.writeFileSync(contactFile,contactPage());
 const quoteOptions=[];
-for(const slug of ['wasabi','ptzoptics']){const catalog=JSON.parse(fs.readFileSync(`content/${slug}/catalog.json`,'utf8'));for(const p of catalog.products.filter(p=>p.status!=='legacy'))quoteOptions.push({brand:catalog.brand,name:p.name,description:catalog.brand+' · '+p.name,category:p.category,image:p.image});}
+for(const slug of ['wasabi','ptzoptics','arctic-wolf']){
+ const catalog=JSON.parse(fs.readFileSync(`content/${slug}/catalog.json`,'utf8'));
+ const brand=catalog.brand||catalog.page.name;
+ for(const product of catalog.products.filter(product=>product.status!=='legacy')){
+  quoteOptions.push({
+   brand,name:product.name,description:brand+' · '+product.name,
+   category:slug==='arctic-wolf'?'Networking & security':product.category,image:product.image
+  });
+ }
+}
 fs.writeFileSync(path.join(out,'assets','quote-options.json'),JSON.stringify(quoteOptions));
 const adminFile=path.join(out,'contractors','admin.html');fs.writeFileSync(adminFile,fs.readFileSync(adminFile,'utf8').replace('<div class="toolbar">','<div class="toolbar"><a class="button secondary" href="/admin/inquiries">Website quote requests</a>'));
 const privacyFile=path.join(out,'privacy.html'),privacySection='<section id="website-inquiries"><h2>Website quote requests and inquiries</h2><p>When you submit a website request, we collect the contact and organization details, interests, selected items and quantities, project details, delivery location, dates, references, and review preferences you provide. We use these details to review and respond to your request, not to place an order or enroll you in marketing.</p><p>Requests are stored privately with our hosting provider and are accessible to authorized Tri-Point staff. A separate internal email alert contains a request reference and a link to the private workspace; it excludes your contact details and submitted project content. Our email provider processes that alert. This form does not send an automatic customer confirmation email.</p><p>We retain requests while needed for review, follow-up, and legitimate business recordkeeping. To request access, correction or deletion, contact info@tripointgs.com from the email used on your request. We may verify your authority. Product selections stay in this browser tab to carry between pages; contact details and project messages are not saved in browser storage. Do not submit payment details, passwords, tax IDs, exemption documents, or sensitive procurement information here. Exemption-review requests do not grant tax-exempt status.</p></section>';
@@ -41,5 +51,6 @@ fs.writeFileSync(privacyFile,fs.readFileSync(privacyFile,'utf8').replace('</arti
 fs.mkdirSync(path.join(out,'solutions'),{recursive:true});
 fs.writeFileSync(path.join(out,'solutions','wasabi.html'),wasabiPage());
 fs.writeFileSync(path.join(out,'solutions','ptzoptics.html'),ptzopticsPage());
+fs.writeFileSync(path.join(out,'solutions','arctic-wolf.html'),arcticWolfPage());
 const siteMap=path.join(out,'sitemap.xml');if(!preview&&fs.existsSync(siteMap)){const xml=fs.readFileSync(siteMap,'utf8');if(!xml.includes('https://tripointgs.com/marketplace'))fs.writeFileSync(siteMap,xml.replace('</urlset>','<url><loc>https://tripointgs.com/marketplace</loc></url><url><loc>https://tripointgs.com/contact</loc></url></urlset>'));}
 console.log('Public site: quote marketplace and private request form published; checkout/PO features remain unpublished.');

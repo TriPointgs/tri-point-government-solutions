@@ -1,3 +1,5 @@
+import {createHash} from 'node:crypto';
+import {arcticWolfPage} from '../lib/arctic-wolf-page.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -14,4 +16,28 @@ for(const brand of ['wasabi','ptzoptics']){
 }
 test('catalog renderer escapes supplied text and query values',()=>{
  const html=brandSolutionsPage('wasabi',{heroImage:'/assets/test.webp',products:[{id:'test',name:'<script>alert(1)</script>',description:'<img onerror=alert(1)>',category:'object-storage',features:[],variants:[],image:'/assets/test.webp',imageAlt:'<svg onload=alert(1)>',manufacturerUrl:'https://wasabi.com/'}]});assert.doesNotMatch(html,/<script>alert|<img onerror|<svg onload/);assert.match(html,/&lt;script&gt;/);
+});
+
+test('Arctic Wolf renders six sourced service inquiries with the intact Bronze artwork',()=>{
+ const catalog=JSON.parse(fs.readFileSync('content/arctic-wolf/catalog.json','utf8'));
+ const html=arcticWolfPage();
+ const links=[...html.matchAll(/href="(\/contact[^"]+)"/g)].map(match=>new URL(match[1].replaceAll('&amp;','&'),'https://example.invalid'));
+ const ids=new Set(catalog.products.map(service=>service.id));
+ assert.equal(ids.size,6);
+ assert.equal((html.match(/<h1\b/g)||[]).length,1);
+ assert.equal((html.match(/data-product-card /g)||[]).length,6);
+ assert.match(html,/<meta name="robots" content="noindex, follow">/);
+ assert.match(html,/alt="Arctic Wolf Bronze Pack Partner"/);
+ assert.doesNotMatch(html,/data-compare|brand-compare-dialog|Buy now|checkout-session|payment_intent|EMEA Bronze|Gold Pack Partner|Silver Pack Partner/);
+ const badge=fs.readFileSync('.'+catalog.partnerBadge);
+ assert.equal(createHash('sha256').update(badge).digest('hex'),'77652f72a0367a4d385366bccd107e5a4cc267d4ccdb8f8057a2b2d1805f0a24');
+ for(const service of catalog.products){
+  assert.equal(service.offeringType,'service-family');
+  assert.deepEqual(service.variants,[]);
+  assert.equal(service.manufacturerUrl,service.source.url);
+  assert.match(service.source.checkedOn,/^\d{4}-\d{2}-\d{2}$/);
+  assert.match(service.manufacturerUrl,/^https:\/\/(?:docs\.)?arcticwolf\.com\//);
+  assert.ok(service.imageAlt.length>10&&fs.statSync('.'+service.image).size>100);
+  assert.ok(links.some(url=>url.searchParams.get('manufacturer')==='Arctic Wolf'&&url.searchParams.get('product')===service.name),service.name);
+ }
 });
