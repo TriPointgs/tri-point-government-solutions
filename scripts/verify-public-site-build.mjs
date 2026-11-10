@@ -12,6 +12,10 @@ for(const p of ['dist/assets/quote-selection.js','dist/assets/quote-marketplace.
 for(const brand of ['ptzoptics','wasabi']){const html=fs.readFileSync('dist/solutions/'+brand+'.html','utf8');assert.match(html,/data-product-card/);assert.match(html,/id="portfolio"/);assert.match(html,/id="brand-compare-dialog"/);assert.doesNotMatch(html,/Add to cart|Buy now|SubmitPO|authorized reseller/i);assert.ok(home.includes('href="/solutions/'+brand+'"'));assert.match(html,/href="\/contact\?manufacturer=/);}
 const arctic=fs.readFileSync('dist/solutions/arctic-wolf.html','utf8');
 assert.ok(home.includes('href="/solutions/arctic-wolf"'));
+assert.match(home,/id="fortinet-solutions"[\s\S]+id="arctic-wolf-solutions"[\s\S]+id="contact"/);
+assert.match(home,/href="\/solutions\/arctic-wolf">Explore Arctic Wolf solutions<\/a>/);
+assert.match(home,/src="\/assets\/brands\/arctic-wolf\/bronze-pack-partner\.png" alt="Arctic Wolf Bronze Pack Partner"/);
+assert.ok(fs.existsSync('dist/assets/brands/arctic-wolf/home.css'));
 assert.match(contact,/value="Arctic Wolf"/);
 assert.match(arctic,/id="brand-category-filters"/);
 assert.equal((arctic.match(/data-product-card /g)||[]).length,6);

@@ -1,7 +1,7 @@
 import {injectBrandHomeBadges} from '../lib/brand-home.mjs';
 import {wasabiPage} from '../lib/wasabi-page.mjs';
 import {ptzopticsPage} from '../lib/ptzoptics-page.mjs';
-import {arcticWolfPage} from '../lib/arctic-wolf-page.mjs';
+import {arcticWolfPage,injectArcticWolfHome} from '../lib/arctic-wolf-page.mjs';
 import {contactPage} from '../lib/contact-page.mjs';
 import {quoteMarketplace} from '../lib/quote-marketplace.mjs';
 // Production-safe visual rollout: keep the current public routes and behaviors while reusing
@@ -28,7 +28,8 @@ for(const filename of scan(out)){
  if(!html.includes('experience-header')||!html.includes('experience-footer'))throw Error('Sitewide design did not apply to '+route);
  fs.writeFileSync(filename,html);
 }
-const homeFile=path.join(out,'index.html');fs.writeFileSync(homeFile,injectBrandHomeBadges(fs.readFileSync(homeFile,'utf8')));
+const homeFile=path.join(out,'index.html');
+fs.writeFileSync(homeFile,injectArcticWolfHome(injectBrandHomeBadges(fs.readFileSync(homeFile,'utf8'))));
 const contactFile=path.join(out,'contact.html');
 // Publish the reviewed request-first marketplace; supplier checkout remains separate.
 fs.writeFileSync(path.join(out,'marketplace.html'),quoteMarketplace());
