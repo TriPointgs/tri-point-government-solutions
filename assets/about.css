@@ -1,3 +1,25 @@
+.about-company {
+  max-width: 78ch;
+  margin-bottom: 32px;
+}
+
+.about-company h3 {
+  margin: 24px 0 8px;
+}
+
+.about-company p,
+.about-company ul {
+  margin: 0;
+}
+
+.about-company ul {
+  padding-inline-start: 1.25em;
+}
+
+.about-company li + li {
+  margin-top: 6px;
+}
+
 .founder-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
