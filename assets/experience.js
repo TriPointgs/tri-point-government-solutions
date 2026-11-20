@@ -1,4 +1,11 @@
 (()=>{
+ if(location.pathname==='/'){
+  const forwardAboutLink=()=>{
+   if(location.hash==='#about')location.replace('/about'+location.search);
+  };
+  forwardAboutLink();
+  addEventListener('hashchange',forwardAboutLink);
+ }
  const toggle=document.querySelector('.experience-menu-toggle'),nav=document.querySelector('#experience-nav');
  if(toggle&&nav){
   toggle.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close navigation':'Open navigation');nav.classList.toggle('is-open',open);});

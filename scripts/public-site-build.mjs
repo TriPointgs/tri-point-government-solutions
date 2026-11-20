@@ -54,5 +54,10 @@ fs.mkdirSync(path.join(out,'solutions'),{recursive:true});
 fs.writeFileSync(path.join(out,'solutions','wasabi.html'),wasabiPage());
 fs.writeFileSync(path.join(out,'solutions','ptzoptics.html'),ptzopticsPage());
 fs.writeFileSync(path.join(out,'solutions','arctic-wolf.html'),arcticWolfPage());
-const siteMap=path.join(out,'sitemap.xml');if(!preview&&fs.existsSync(siteMap)){const xml=fs.readFileSync(siteMap,'utf8');if(!xml.includes('https://tripointgs.com/marketplace'))fs.writeFileSync(siteMap,xml.replace('</urlset>','<url><loc>https://tripointgs.com/marketplace</loc></url><url><loc>https://tripointgs.com/contact</loc></url></urlset>'));}
+const siteMap=path.join(out,'sitemap.xml');
+if(!preview&&fs.existsSync(siteMap)){
+ const xml=fs.readFileSync(siteMap,'utf8');
+ const entries=['/marketplace','/contact','/about'].map(route=>`<url><loc>https://tripointgs.com${route}</loc></url>`).filter(entry=>!xml.includes(entry));
+ fs.writeFileSync(siteMap,xml.replace('</urlset>',entries.join('')+'</urlset>'));
+}
 console.log('Public site: quote marketplace and private request form published; checkout/PO features remain unpublished.');
