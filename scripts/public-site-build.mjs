@@ -4,6 +4,7 @@ import {ptzopticsPage} from '../lib/ptzoptics-page.mjs';
 import {arcticWolfPage,injectArcticWolfHome} from '../lib/arctic-wolf-page.mjs';
 import {contactPage} from '../lib/contact-page.mjs';
 import {quoteMarketplace} from '../lib/quote-marketplace.mjs';
+import {marketplaceCustomerConfig} from '../lib/marketplace-customer-auth.mjs';
 // Production-safe visual rollout: keep the current public routes and behaviors while reusing
 // the approved new-site visual shell. The marketplace is static, not the private shop pilot.
 import fs from 'node:fs';
@@ -32,7 +33,7 @@ const homeFile=path.join(out,'index.html');
 fs.writeFileSync(homeFile,injectArcticWolfHome(injectBrandHomeBadges(fs.readFileSync(homeFile,'utf8'))));
 const contactFile=path.join(out,'contact.html');
 // Publish the reviewed request-first marketplace; supplier checkout remains separate.
-fs.writeFileSync(path.join(out,'marketplace.html'),quoteMarketplace());
+fs.writeFileSync(path.join(out,'marketplace.html'),quoteMarketplace({customerSignInEnabled:Boolean(marketplaceCustomerConfig())}));
 fs.writeFileSync(contactFile,contactPage());
 const quoteOptions=[];
 for(const slug of ['wasabi','ptzoptics','arctic-wolf']){
