@@ -61,3 +61,7 @@ if(!preview&&fs.existsSync(siteMap)){
  fs.writeFileSync(siteMap,xml.replace('</urlset>',entries.join('')+'</urlset>'));
 }
 console.log('Public site: quote marketplace and private request form published; checkout/PO features remain unpublished.');
+
+// Keep Google's Search Console ownership challenge available at the domain root.
+const searchConsoleVerificationFile='googlec0d270305482d6e6.html';
+fs.copyFileSync(searchConsoleVerificationFile,path.join(out,searchConsoleVerificationFile));
