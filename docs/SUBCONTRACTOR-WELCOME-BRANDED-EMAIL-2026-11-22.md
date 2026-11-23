@@ -9,7 +9,7 @@
 
 ## Delivery boundaries and verification
 - No welcome email was sent during the logo/template work. This is a content/template change only.
-- Production had TP_SUBCONTRACTOR_WELCOME_ENABLED=false and TP_SUBCONTRACTOR_WELCOME_APPROVED=false at the time of the change; keep both off. Resend sending domain remains separately verified.
+- The earlier logo-only changes kept both welcome flags off. The owner subsequently approved the final preview and activation on November 23: both Production flags are now true and the live application reports welcomeEmailEnabled=true. See SUBCONTRACTOR-WELCOME-ACTIVATION-2026-11-22.md for the current checkpoint; do not restore the historical disabled state.
 - TP_SUBCONTRACTOR_WELCOME_API_KEY appears as a sensitive Production variable in Vercel, but the value was not retrieved, displayed, copied, or tested here. Mere presence does not establish credential correctness or enable delivery.
 - Prior November 22 visual checks at 390px and 720px concerned the earlier logo/header. Current tests verify the exact new owner PNG hash/dimensions, dark header, HTML/plain-text signature, HTML injection escaping, and the proposed provider payload. Those checks are not inbox-rendering certification.
 - Do not claim inbox delivery from browser, build, or provider configuration checks. A controlled provider/mailbox test requires separate approval and reconciliation; only then consider enabling automatic notices.
@@ -21,7 +21,7 @@
 - Next action: verify the deployed commit, then separately arrange any controlled email delivery check. No email was sent by this correction.
 
 ## Rollback and next action
-Use the previous production commit for rollback. Before an actual email send: confirm the final HTML preview and exact sender, independently verify the production key's restricted access, test with an approved mailbox through the real application, reconcile delivery/authentication, then explicitly authorize enabling both Production flags. Never send or backfill messages to actual subcontractors as part of this template-only change.
+The owner has approved the final appearance and enabled automatic welcome emails for their subsequent application approvals. Activation is verified in SUBCONTRACTOR-WELCOME-ACTIVATION-2026-11-22.md. The owner will approve the selected application; do not approve applications or backfill messages on their behalf. To disable sending, set both welcome flags to false and redeploy; reverting only template source does not undo environment configuration.
 
 ## November 23 final title approval
 The owner reviewed the single requested preview email, confirmed the design looks good, and requested only the title change to `Co-Founder | CEO`. Both HTML and plain text now use that exact title. The standalone preview was independently reported delivered and found in the intended inbox; it does not establish application-level delivery or authorize automatic applicant mail. No new email or delivery-setting change is part of this title correction. Rollback: `3f7d9806826d8c5e8e96c1eede0c6e673384471e`.
