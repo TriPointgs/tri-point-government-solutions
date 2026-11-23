@@ -79,6 +79,7 @@ test('exactly one provider attempt follows durable claim; duplicate attempt is b
  assert.equal(s.record.welcomeNotice.providerId,'synthetic-resend-id');
  assert.deepEqual(JSON.parse(request.init.body).to,['contractor@example.org']);
  assert.equal(request.init.headers['Idempotency-Key'],'tp-network-welcome-'+id);
+ assert.deepEqual(JSON.parse(request.init.body).reply_to,['info@tripointgs.com']);
  await assert.rejects(dispatchWelcomeOnce(s,id,{env,fetcher:async()=>{sends++}}),/not awaiting/);
  assert.equal(sends,1);
 });
@@ -99,4 +100,19 @@ test('store version conflict stops status update before any notice',async()=>{
  await saveDecision(s,id,'approve',{expectedStatus:'reviewed',confirmed:true});
  await assert.rejects(saveDecision(s,id,'approve',{expectedStatus:'reviewed',confirmed:true}),/changed/);
  assert.equal(s.writes.length,1);
+});
+
+test('a failed durable claim readback prevents any external email request',async()=>{
+ const s=store();await saveDecision(s,id,'approve',{expectedStatus:'reviewed',confirmed:true});
+ const env={VERCEL_ENV:'production',TP_SUBCONTRACTOR_WELCOME_ENABLED:'true',TP_SUBCONTRACTOR_WELCOME_APPROVED:'true',TP_SUBCONTRACTOR_WELCOME_API_KEY:'synthetic',TP_SUBCONTRACTOR_WELCOME_FROM:'network@send.tripointgs.com'};
+ let sends=0;
+ const originalRead=s.readProfile;let reads=0;
+ s.readProfile=async (...args)=>{
+  const r=await originalRead(...args);
+  if(++reads===2)r.record.welcomeNotice.state='held';
+  return r;
+ };
+ await assert.rejects(dispatchWelcomeOnce(s,id,{env,fetcher:async()=>{sends++;return {ok:true,json:async()=>({id:'fake'})}}}),/could not be verified/);
+ assert.equal(sends,0);
+ assert.equal(s.record.welcomeNotice.state,'attempted');
 });
