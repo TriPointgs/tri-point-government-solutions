@@ -80,7 +80,7 @@ test('exactly one provider attempt follows durable claim; duplicate attempt is b
  assert.deepEqual(JSON.parse(request.init.body).to,['contractor@example.org']);
  assert.equal(request.init.headers['Idempotency-Key'],'tp-network-welcome-'+id);
  assert.deepEqual(JSON.parse(request.init.body).reply_to,['info@tripointgs.com']);
- assert.match(JSON.parse(request.init.body).html,/subcontractor-welcome-logo-white\.png/);
+ assert.match(JSON.parse(request.init.body).html,/subcontractor-welcome-logo-transparent\.png/);
  assert.match(JSON.parse(request.init.body).text,/Adriel Lorenzo/);
  await assert.rejects(dispatchWelcomeOnce(s,id,{env,fetcher:async()=>{sends++}}),/not awaiting/);
  assert.equal(sends,1);
