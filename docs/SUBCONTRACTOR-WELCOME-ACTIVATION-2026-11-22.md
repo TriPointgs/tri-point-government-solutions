@@ -1,34 +1,27 @@
-# Tri-Point subcontractor welcome-email activation — preparation checkpoint (2026-11-22)
+# Tri-Point subcontractor welcome emails — live checkpoint (November 23, 2026)
 
-## Request and release boundary
-The owner requested preparation for activating automatic welcome emails. The separate review/approval flow is already published. This checkpoint **does not activate** real applicant delivery; the reviewed template, controlled test, and dedicated key remain prerequisites. There is no authorization here to send to an unselected real subcontractor or to backfill mail to previously approved profiles.
+## Current verified state
+The owner approved the latest delivered preview and explicitly authorized automatic welcome emails when they approve applications. This supersedes earlier preparation instructions to keep welcome sending disabled or obtain another template approval.
 
-## Verified platform facts
-- The connected Resend inventory shows send.tripointgs.com **verified**, sending enabled, with click/open tracking disabled.
-- A separate Tri-Point transactional key exists for other website workflows, but the dedicated subcontractor-welcome key is absent. Do not repurpose keys from another workflow or business.
-- The Production settings were created and independently must be checked after deployment:
-  - TP_SUBCONTRACTOR_WELCOME_FROM = network@send.tripointgs.com **proposed, awaiting owner confirmation**
-  - TP_SUBCONTRACTOR_WELCOME_ENABLED = false
-  - TP_SUBCONTRACTOR_WELCOME_APPROVED = false
-  - TP_SUBCONTRACTOR_WELCOME_API_KEY = **absent**
-- The sender domain has not been tested from the proposed network address. Do not claim actual sender mailbox delivery.
-- This is separate from the general new-application notification to Tri-Point and separate from customer order emails.
+- Production TP_SUBCONTRACTOR_WELCOME_ENABLED and TP_SUBCONTRACTOR_WELCOME_APPROVED were each set to true and independently read back as true.
+- TP_SUBCONTRACTOR_WELCOME_FROM remains network@send.tripointgs.com; reply-to remains info@tripointgs.com.
+- The dedicated TP_SUBCONTRACTOR_WELCOME_API_KEY is present as a sensitive Production variable. Its secret was not read, decrypted, copied or changed.
+- Redeployment dpl_4Dutra7rQDHaV13gyj4XfQ7X3WJK independently reported READY, Production, source ddfc83ae26de35bba8273185d54c733919fc448b, tripointgs.com/www aliases, and no alias error. This retained the newer public indexing work.
+- An authenticated, read-only GET of the live /api/notifications returned welcomeEmailEnabled=true. No application decision or send operation was invoked during activation.
 
-## Safe code hardening
-- A dedicated reply_to address of info@tripointgs.com is applied, so the sending-only subdomain does not need an inbound mailbox.
-- An exact private-record reread confirms the exclusive attempted state after durable compare-and-swap and **before** the Resend POST. If it cannot be verified, no send is attempted and no automatic retry occurs.
-- The existing feature requires Production plus both explicit flags, a validated domain sender and its own dedicated API key, and then uses the saved application email only for an approved company.
-- Approval does not mean certification, verified qualifications, a contract award or guaranteed work. Repeated or ambiguous email sends are not retried.
+## Approved appearance and test evidence
+The current welcome email uses the exact latest uploaded transparent logo on a white panel within the navy/gold header, with Adriel Lorenzo and Co-Founder | CEO below. See SUBCONTRACTOR-WELCOME-BRANDED-EMAIL-2026-11-22.md for exact asset and source checks.
 
-## Verification
-Code review and full clean production-mode build completed: 311 automated tests passed, zero failures; protected HTML routes and inactive checkout boundaries passed. No live Resend welcome email, real subcontractor approval, Production credential change, supplier order or payment occurred during testing. Record the deployment status only after inspecting Vercel against the exact commit.
+The standalone preview was sent to the owner's selected test mailbox, independently reported delivered by Resend, and found in the inbox by its exact RFC message reference. The owner then approved it. Private recipient/message identifiers remain in the authorized mail systems, outside this public repository.
 
-## Required next steps
-1. Owner confirms the proposed network sender and the actual welcome message text (review in /contractors/admin).
-2. Create in Resend a **dedicated Sending Access** key restricted to the verified Tri-Point sending domain. Secret is shown once; store it directly in Vercel Production under TP_SUBCONTRACTOR_WELCOME_API_KEY as a sensitive/Secret value. Do not paste it in chat, GitHub or email.
-3. Run one explicitly approved controlled delivery to the owner/test mailbox; check sender authentication, provider receipt and inbox message. This is different from a real app-linked approval test.
-4. Run a protected application-level end-to-end test using an owner-approved synthetic recipient/order (no real subcontractor), proving persisted one-shot state and correct real provider payload.
-5. After evidence and final owner consent, turn on both flags with a deliberate new production deployment. Future real approvals then send automatically. Previously held notices require individual review and sending; no bulk backfill.
+That preview used the connected provider tool, not the deployed application's dedicated credential. The activation flag and runtime response establish that the application is enabled; they do not establish a completed application-linked provider send or credential correctness. Do not invent a successful applicant delivery.
 
-## Rollback
-Preserve the previous production commit for rollback. Do not modify unrelated website, authentication, commerce, marketing or supplier integrations.
+## Current user action and scope
+The owner will approve the selected application through /contractors/admin. For an application under review, the existing confirmed approval saves approved status and then triggers one welcome-email attempt. The existing workflow requires network consent and a valid applicant email. This activation does not approve any application, create test records, backfill held notices, send to existing applicants, or enable unrelated marketplace/customer email flows.
+
+A pre-provider conditional claim and readback protect the one-attempt workflow; provider idempotency is additional protection. Approval is not certification, verified qualifications, a subcontract award, or guaranteed work. Uncertain outcomes require reconciliation, not an automatic resend. A later held-welcome action is separately scoped to one reviewed record.
+
+## Rollback and remaining verification
+To disable future welcome attempts, set both welcome flags to false and deploy again. Source rollback alone does not undo Production environment changes. The immediate prior deployment is dpl_BAvpmjhgPurfdpgALxktEx1SRova at the same source commit, before the flag activation; an environment rollback must still be deliberate.
+
+Remaining evidence: the owner's first actual application approval, saved welcome state/provider reference, and recipient delivery. Do not approve or send an application merely to collect that evidence without the owner's specific instruction. No new email was sent by this activation.
