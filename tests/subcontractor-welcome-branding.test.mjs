@@ -13,7 +13,7 @@ test('uploaded owner white logo is reproduced exactly and PNG is a properly size
  assert.equal(png.readUInt32BE(20),307);
  assert.ok(png.length>=5000 && png.length<70000,'png asset should contain visible text but remain lightweight');
 });
-test('HTML welcome is branded, accessible and has the requested Founder/CEO signoff',()=>{
+test('HTML welcome is branded, accessible and has the requested Co-Founder/CEO signoff',()=>{
  const m=welcomeEmail(reviewed);
  assert.equal(m.to,reviewed.email);
  assert.equal(m.subject,'Welcome to the Tri-Point subcontractor network');
@@ -23,11 +23,11 @@ test('HTML welcome is branded, accessible and has the requested Founder/CEO sign
  assert.match(m.html,/<td bgcolor="#0b1f33"[^>]*background:#0b1f33;[^>]*><img/);
  assert.match(m.html,/Welcome to the Network/);
  assert.match(m.html,/Adriel Lorenzo/);
- assert.match(m.html,/Founder \| CEO/);
+ assert.match(m.html,/<strong>Adriel Lorenzo<\/strong><br><span[^>]*>Co-Founder \| CEO<\/span>/);
  assert.match(m.html,/not a subcontract/);
  assert.match(m.html,/guarantee of work/);
  assert.match(m.html,/https:\/\/tripointgs.com\/login/);
- assert.match(m.text,/Adriel Lorenzo\nFounder \| CEO/);
+ assert.match(m.text,/Adriel Lorenzo\nCo-Founder \| CEO/);
  assert.match(m.text,/company, Sample Field Services LLC/);
  assert.doesNotMatch(m.html,/PRIVATE_ONLY|<script|<style\b|<iframe/i);
  assert.doesNotMatch(m.text,/PRIVATE_ONLY/);
