@@ -19,9 +19,18 @@ The existing October 30 checkpoint documents a successful dedicated UAT OAuth an
 UAT USD confirmation remains unset. No PO, actual checkout payment, refund, mail or supplier-status reconciliation was executed in this continuation. Local synthetic test transport responses are not actual TD or Stripe transaction proof. A READY deployment alone is not launch readiness.
 
 ## Validation and deployment
-The full local `npm run build` passed: 1,433 tests, 1,423 passed, zero failed, ten optional hosted tests skipped. All JavaScript syntax, static build, internal-link/SEO, public-boundary, partner-page, address, blog and final theme checks passed. These tests use synthetic transports; no hosted storage diagnostic or actual provider transaction was executed. `node scripts/verify-checkout.mjs` also passed all three complete rounds (serial and two deterministic randomized orders): each had 1,433 tests, 1,423 passes, zero failures and ten optional hosted skips. Private deployment verification is pending.
+The full local `npm run build` passed: 1,433 tests, 1,423 passed, zero failed, ten optional hosted tests skipped. All JavaScript syntax, static build, internal-link/SEO, public-boundary, partner-page, address, blog and final theme checks passed. These tests use synthetic transports; no hosted storage diagnostic or actual provider transaction was executed. `node scripts/verify-checkout.mjs` also passed all three complete rounds (serial and two deterministic randomized orders): each had 1,433 tests, 1,423 passes, zero failures and ten optional hosted skips. The saved code commit is `68628185dfb124ef5c05021f6c9a478cc846ea5d`, with verified source tree `cfbdae923ae5f1f2517d481692687e966c4b64e6`. The remote tree matched the staged tested source exactly. GitHub branch movement was independently read back; main remained `7dfdb3c67b2cd51562aa3da19ad0629397474c9b`.
 
 Preview-only branch settings were saved and independently read back: `TP_MARKETPLACE_TD_SANDBOX_ONLY=true`, `TP_TD_UAT_SUBMIT_ENABLED=false`, `TP_TD_UAT_PILOT_APPROVED=false`. `TP_TD_UAT_ACCOUNT_CURRENCY` remains absent. Production settings were not changed.
+
+## Verified private deployment
+Vercel deployment `dpl_8Z1oEvHL6R9gbKvW7X26pteLCnA2` independently reported READY from the saved code commit on `feature/td-product-controls`, with Preview target and the existing private branch alias. Vercel build logs independently reported the same 1,433-test / 1,423-pass / zero-failure / ten-skip result. Existing project protection remains enabled for previews. Draft PR 23 remains open, draft and unmerged; its base branch was not changed.
+
+Review URL: https://tri-point-government-solutions-bcstv3gji-tri-point.vercel.app/marketplace/account
+
+The signed-in Vercel browser session opened the protected page and reached the Clerk development test-account sign-in form. Deployed page DOM contains the Stripe TEST, TD SYNNEX sandbox/UAT and held-submission labels. No application account sign-in was performed, so authenticated configuration/UI and an actual product quote/payment were not verified in the browser. The held configuration and preserved saved-order recovery are covered by the local synthetic tests. Do not describe them as actual provider transaction evidence.
+
+This deployment checkpoint is a documentation-only follow-up to the verified code deployment; the code deployment above remains the review reference.
 
 ## Next action
 Review the private preparation screen. Obtain explicit TD UAT currency confirmation before enabling genuine pricing/payment progression. Keep submission held until separately authorized with provider-approved test destination/contact/service, nonphysical fulfillment assurance and existing exact-order controls satisfied. Reconcile any uncertain historical provider attempt rather than retrying it.
