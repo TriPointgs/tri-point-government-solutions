@@ -5,22 +5,23 @@ import {createHash} from 'node:crypto';
 import {welcomeEmail,welcomeEmailHtml,WELCOME_LOGO_URL,welcomeEmailSettings} from '../lib/subcontractor-approval.mjs';
 
 const reviewed={id:'f2a328dd-3473-4627-b9d0-69e98d970202',status:'reviewed',company:'Sample Field Services LLC',email:'contractor@example.org',consent:true,internalNotes:'PRIVATE_ONLY'};
-test('uploaded owner white logo is reproduced exactly and PNG is a properly sized email asset',()=>{
- const png=readFileSync('assets/subcontractor-welcome-logo-white.png');
- assert.equal(createHash('sha256').update(png).digest('hex'),'f2fe18a05639c296636fd85177adf058b9a8b8e846147e9f107637cc7d98d01d');
+test('uploaded owner transparent logo is reproduced exactly and PNG is a properly sized email asset',()=>{
+ const png=readFileSync('assets/subcontractor-welcome-logo-transparent.png');
+ assert.equal(createHash('sha256').update(png).digest('hex'),'60c816bfd858813f9af358cff0763ebf94f6fac16b103ead8e5951e02d56c431');
  assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
- assert.equal(png.readUInt32BE(16),1314);
- assert.equal(png.readUInt32BE(20),307);
+ assert.equal(png.readUInt32BE(16),2048);
+ assert.equal(png.readUInt32BE(20),414);
  assert.ok(png.length>=5000 && png.length<70000,'png asset should contain visible text but remain lightweight');
 });
 test('HTML welcome is branded, accessible and has the requested Co-Founder/CEO signoff',()=>{
  const m=welcomeEmail(reviewed);
  assert.equal(m.to,reviewed.email);
  assert.equal(m.subject,'Welcome to the Tri-Point subcontractor network');
- assert.equal(WELCOME_LOGO_URL,'https://tripointgs.com/assets/subcontractor-welcome-logo-white.png');
+ assert.equal(WELCOME_LOGO_URL,'https://tripointgs.com/assets/subcontractor-welcome-logo-transparent.png');
  assert.match(m.html,/<img[^>]+alt="Tri-Point Government Solutions LLC"/);
  assert.ok(m.html.includes('src="'+WELCOME_LOGO_URL+'"'));
- assert.match(m.html,/<td bgcolor="#0b1f33"[^>]*background:#0b1f33;[^>]*><img/);
+ assert.match(m.html,/<td bgcolor="#0b1f33"[^>]*background:#0b1f33;/);
+ assert.match(m.html,/<td bgcolor="#ffffff"[^>]*background:#ffffff;[^>]*><img/);
  assert.match(m.html,/Welcome to the Network/);
  assert.match(m.html,/Adriel Lorenzo/);
  assert.match(m.html,/<strong>Adriel Lorenzo<\/strong><br><span[^>]*>Co-Founder \| CEO<\/span>/);
