@@ -12,6 +12,26 @@ import path from 'node:path';
 import {applySiteExperience,homeHero} from '../lib/site-experience.mjs';
 const out='dist';
 const preview=process.env.VERCEL_ENV!=='production';
+const analyticsMeasurementId = 'G-J4BCEYLBCZ';
+const analyticsPanel = `<section id="analytics-choices" class="analytics-choices" aria-labelledby="analytics-heading" hidden>
+ <h2 id="analytics-heading">Website analytics</h2>
+ <p>Allow Google Analytics cookies to help us understand which pages visitors use. <a href="/privacy#website-analytics">Privacy notice</a></p>
+ <div class="analytics-actions">
+  <button type="button" class="experience-button" data-analytics-allow>Allow analytics</button>
+  <button type="button" class="experience-button outline" data-analytics-decline>Decline analytics</button>
+ </div>
+</section>`;
+function addAnalyticsPreferences(route, trackPage) {
+ const filename = path.join(out, route === '/' ? 'index.html' : `${route.slice(1)}.html`);
+ const html = fs.readFileSync(filename, 'utf8');
+ const footerLink = '<a href="/terms">Network terms</a>';
+ if (!html.includes(footerLink)) throw Error(`Analytics settings require the public footer on ${route}`);
+ const settings = '<button type="button" class="analytics-settings" data-analytics-settings>Analytics settings</button>';
+ const script = `<script defer src="/assets/site-analytics.js" data-measurement-id="${analyticsMeasurementId}" data-track-page="${trackPage}"></script>`;
+ fs.writeFileSync(filename, html.replace(footerLink, footerLink + settings)
+  .replace('</head>', script + '</head>')
+  .replace('</body>', analyticsPanel + '</body>'));
+}
 const solutionPages = {
  wasabi: wasabiPage,
  ptzoptics: ptzopticsPage,
@@ -70,7 +90,16 @@ if(!preview&&fs.existsSync(siteMap)){
  const xml=fs.readFileSync(siteMap,'utf8');
  const solutionRoutes = Object.keys(solutionPages).map(slug => `/solutions/${slug}`);
  const entries=['/marketplace','/contact','/about',...solutionRoutes].map(route=>`<url><loc>https://tripointgs.com${route}</loc></url>`).filter(entry=>!xml.includes(entry));
- fs.writeFileSync(siteMap,xml.replace('</urlset>',entries.join('')+'</urlset>'));
+ const publicSitemap = xml.replace('</urlset>', entries.join('') + '</urlset>');
+ fs.writeFileSync(siteMap, publicSitemap);
+
+ for (const [, route] of publicSitemap.matchAll(/<loc>https:\/\/tripointgs\.com(\/[^<]*)<\/loc>/g)) {
+  addAnalyticsPreferences(route, true);
+ }
+ const analyticsNotice = '<section id="website-analytics"><h2>Optional website analytics</h2><p>With your permission, Google Analytics uses cookies to measure visits to public pages and understand where visitors come from. Analytics uses page paths and referring domains. The website removes query parameters and fragments before sending page addresses. Use Analytics settings in the footer to change your choice. <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from sites that use its services</a>.</p></section>';
+ const privacy = fs.readFileSync(privacyFile, 'utf8');
+ fs.writeFileSync(privacyFile, privacy.replace('</article>', analyticsNotice + '</article>'));
+ addAnalyticsPreferences('/privacy', false);
 }
 console.log('Public site: quote marketplace and private request form published; checkout/PO features remain unpublished.');
 
