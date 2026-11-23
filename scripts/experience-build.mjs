@@ -5,18 +5,36 @@ import {contactPage} from '../lib/contact-page.mjs';
 import assert from 'node:assert/strict';
 import {orderLabPage} from '../lib/order-lab-page.mjs';
 import fs from 'node:fs';
-import {applySiteExperience,homeHero,marketplacePage} from '../lib/site-experience.mjs';
+import {applySiteExperience,arcticWolfLocalPreview,homeHero,marketplacePage} from '../lib/site-experience.mjs';
 const preview=process.env.VERCEL_ENV!=='production';
+const arcticWolfPreview=arcticWolfLocalPreview();
+const arcticWolfOutput='dist/solutions/arctic-wolf.html';
+const arcticWolfAssets='dist/assets/brands/arctic-wolf';
+const arcticWolfReference=/arctic(?:-|%20| )wolf/i;
 fs.mkdirSync('dist/solutions',{recursive:true});
 fs.writeFileSync('dist/solutions/wasabi.html',wasabiPage());
 fs.writeFileSync('dist/solutions/ptzoptics.html',ptzopticsPage());
+if(arcticWolfPreview){
+ const {arcticWolfPage,injectArcticWolfHome}=await import('../lib/arctic-wolf-page.mjs');
+ const html=arcticWolfPage();
+ assert.match(html,/<meta name="robots" content="noindex, follow">/);
+ fs.writeFileSync(arcticWolfOutput,html);
+ const homepage='dist/index.html';
+ fs.writeFileSync(homepage,injectArcticWolfHome(fs.readFileSync(homepage,'utf8')));
+}else{
+ fs.rmSync(arcticWolfOutput,{force:true});
+ fs.rmSync(arcticWolfAssets,{recursive:true,force:true});
+}
 fs.writeFileSync('dist/contact.html',contactPage());
 const quoteOptions=[];
-for(const slug of ['wasabi','ptzoptics']){
+const quoteCatalogs=['wasabi','ptzoptics'];
+if(arcticWolfPreview)quoteCatalogs.push('arctic-wolf');
+for(const slug of quoteCatalogs){
  const catalog=JSON.parse(fs.readFileSync(`content/${slug}/catalog.json`,'utf8'));
+ const brand=slug==='arctic-wolf'?catalog.page.name:catalog.brand;
  for(const product of catalog.products.filter(product=>product.status!=='legacy')){
   if(!product.name||!product.image?.startsWith('/assets/'))continue;
-  quoteOptions.push({brand:catalog.brand,name:product.name,description:catalog.brand+' · '+product.name,category:product.category,image:product.image});
+  quoteOptions.push({brand,name:product.name,description:brand+' · '+product.name,category:slug==='arctic-wolf'?'Networking & security':product.category,image:product.image});
  }
 }
 fs.writeFileSync('dist/assets/quote-options.json',JSON.stringify(quoteOptions));
@@ -45,6 +63,7 @@ const dynamic=new Set(['/admin/stripe-checkout','/admin/fulfillment','/admin/lau
 const htmlPages=fs.readdirSync('dist',{recursive:true}).map(p=>p.replaceAll('\\','/')).filter(p=>p.endsWith('.html'));
 for(const page of htmlPages){
  const html=fs.readFileSync('dist/'+page,'utf8');
+ if(!arcticWolfPreview)assert.ok(!arcticWolfReference.test(html),'Local Arctic Wolf reference: '+page);
  assert.equal((html.match(/<h1\b/g)||[]).length,1,'One primary heading: '+page);
  assert.equal((html.match(/class="experience-header"/g)||[]).length,1,'Shared header: '+page);
  assert.match(html,/id="main"/,'Skip-link destination missing: '+page);
@@ -53,6 +72,11 @@ for(const page of htmlPages){
   assert.ok(fs.existsSync('dist'+(target==='/'?'/index.html':target))||fs.existsSync('dist'+target+'.html'),'Missing final link: '+target+' in '+page);
  }
  if(!page.startsWith('contractors/admin')&&!page.startsWith('preview/'))assert.doesNotMatch(html,/href="\/(learn|government-contracts)(?:\/|")|href="\/solutions\/zoom/,'Retired or gated public navigation: '+page);
+}
+assert.ok(!arcticWolfReference.test(fs.readFileSync('dist/sitemap.xml','utf8')),'Local Arctic Wolf entry in sitemap');
+if(!arcticWolfPreview){
+ assert.ok(!fs.existsSync(arcticWolfOutput)&&!fs.existsSync(arcticWolfAssets),'Local Arctic Wolf output was exposed');
+ assert.ok(!arcticWolfReference.test(JSON.stringify(quoteOptions)),'Local Arctic Wolf quote choices were exposed');
 }
 if(!preview){assert.ok(!fs.existsSync('dist/preview/orders.html'));assert.ok(!fs.existsSync('dist/assets/order-lab-core.mjs'));assert.ok(!fs.existsSync('dist/assets/order-lab.js'));}
 console.log(`Final experience validation passed for ${htmlPages.length} HTML pages. Simulation build: ${preview}.`);

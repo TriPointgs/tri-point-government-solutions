@@ -51,8 +51,97 @@ const lines=value=>value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
 function percentBps(value){if(!/^\d{1,3}(?:\.\d{1,2})?$/.test(String(value)))throw Error('Use a markup percentage with at most two decimal places.');const n=Math.round(Number(value)*100);if(n>10000)throw Error('Markup must be between 0 and 100%.');return n;}
 function overrideLines(value){const result=Object.create(null);for(const line of lines(value)){const at=line.lastIndexOf('=');if(at<=0)throw Error('Overrides use name=percent, one per line.');const key=line.slice(0,at).trim();if(Object.hasOwn(result,key))throw Error('Duplicate override: '+key);result[key]=percentBps(line.slice(at+1).trim());}return result;}
 rulesForm.addEventListener('submit',e=>{e.preventDefault();run(async()=>{const d=new FormData(rulesForm),policy={};for(const k of ['excludedManufacturers','excludedParts','excludedKeywords'])policy[k]=lines(String(d.get(k)||''));policy.excludedCategories=d.getAll('excludedCategories');policy.hideAccessories=d.has('hideAccessories');policy.newOnly=d.has('newOnly');const pricingPolicy={...loadedPolicy,defaultMarkupBps:percentBps(d.get('defaultMarkup')),minimumGrossProfitCents:Math.round(Number(d.get('minimumProfit'))*100)};for(const k of ['categoryMarkups','manufacturerMarkups','skuMarkups'])pricingPolicy[k]=overrideLines(String(d.get(k)||''));const r=await request({}, {action:'rules',policy,pricingPolicy,revision});revision=r.revision;await loadSelection(true);message(r.message);});});
-function openReview(p){reviewing=p;const f=$('product-review-form');f.elements.category.value=p.category;f.elements.categoryConfirmed.checked=p.categoryConfirmed;f.elements.condition.value=p.condition;f.elements.resaleConfirmed.checked=p.review.resaleConfirmed;f.elements.contentConfirmed.checked=p.review.contentConfirmed;f.elements.evidence.value=p.review.evidence;$('review-product-title').textContent=p.manufacturer+' · '+p.mfgPart+' · '+p.description;$('review-error').textContent='';$('product-review-dialog').showModal();}
-$('product-review-form').addEventListener('submit',e=>{e.preventDefault();run(async()=>{const f=new FormData(e.target),patch={category:f.get('category'),condition:f.get('condition'),categoryConfirmed:f.has('categoryConfirmed'),resaleConfirmed:f.has('resaleConfirmed'),contentConfirmed:f.has('contentConfirmed'),evidence:f.get('evidence')};try{const r=await request({}, {action:'review',id:reviewing.id,patch,revision});revision=r.revision;$('product-review-dialog').close();await loadSelection();message(r.message);}catch(error){$('review-error').textContent=error.message;throw error;}});});
+const reviewForm=$('product-review-form');
+function updatePricingReviewFields(){
+ const {advertisingReview,mapAmount,mapEvidence,checkoutPriceEnabled,checkoutPriceAmount,checkoutPriceDate,checkoutPriceEvidence,
+  supplierPromotionEnabled,supplierPromotionReference,supplierPromotionCost,supplierPromotionDate,supplierPromotionEvidence}=reviewForm.elements;
+ mapAmount.disabled=advertisingReview.value!=='map';
+ mapAmount.required=!mapAmount.disabled;
+ mapEvidence.required=advertisingReview.value!=='unreviewed';
+ mapEvidence.minLength=mapEvidence.required?8:0;
+ const fixed=checkoutPriceEnabled.checked;
+ checkoutPriceAmount.disabled=!fixed;
+ checkoutPriceAmount.required=fixed;
+ checkoutPriceDate.disabled=!fixed;
+ checkoutPriceEvidence.disabled=!fixed;
+ checkoutPriceEvidence.required=fixed;
+ const promotion=supplierPromotionEnabled.checked;
+ for(const field of [supplierPromotionReference,supplierPromotionCost,supplierPromotionDate,supplierPromotionEvidence]){
+  field.disabled=!promotion;
+  field.required=promotion;
+ }
+}
+function fixedCheckoutPrice(formData){
+ if(!formData.has('checkoutPriceEnabled'))return null;
+ return {unitPriceCents:Math.round(Number(formData.get('checkoutPriceAmount'))*100),
+  validThrough:formData.get('checkoutPriceDate')||null,evidence:formData.get('checkoutPriceEvidence')};
+}
+function supplierPromotionReview(formData){
+ if(!formData.has('supplierPromotionEnabled'))return null;
+ return {reference:formData.get('supplierPromotionReference'),
+  expectedUnitCostCents:Math.round(Number(formData.get('supplierPromotionCost'))*100),
+  validThrough:formData.get('supplierPromotionDate'),evidence:formData.get('supplierPromotionEvidence')};
+}
+function pricingReview(formData){
+ const advertisingReview=formData.get('advertisingReview');
+ return {advertisingReview,mapCents:advertisingReview==='map'?Math.round(Number(formData.get('mapAmount'))*100):null,
+  mapEvidence:formData.get('mapEvidence'),embargoed:formData.has('embargoed')};
+}
+function openReview(product){
+ const {elements}=reviewForm,pricing=product.commerce;
+ elements.category.value=product.category;
+ elements.categoryConfirmed.checked=product.categoryConfirmed;
+ elements.condition.value=product.condition;
+ elements.resaleConfirmed.checked=product.review.resaleConfirmed;
+ elements.contentConfirmed.checked=product.review.contentConfirmed;
+ elements.evidence.value=product.review.evidence;
+ elements.advertisingReview.value=['no-map','map'].includes(pricing?.advertisingReview)?pricing.advertisingReview:'unreviewed';
+ elements.mapAmount.value=Number.isSafeInteger(pricing?.mapCents)?(pricing.mapCents/100).toFixed(2):'';
+ elements.mapEvidence.value=pricing?.mapEvidence??'';
+ elements.embargoed.checked=pricing?.embargoed===true;
+ const checkoutPrice=pricing?.checkoutPrice;
+ elements.checkoutPriceEnabled.checked=checkoutPrice!=null;
+ elements.checkoutPriceAmount.value=Number.isSafeInteger(checkoutPrice?.unitPriceCents)?(checkoutPrice.unitPriceCents/100).toFixed(2):'';
+ elements.checkoutPriceDate.value=checkoutPrice?.validThrough??'';
+ elements.checkoutPriceEvidence.value=checkoutPrice?.evidence??'';
+ const supplierPromotion=pricing?.supplierPromotion;
+ elements.supplierPromotionEnabled.checked=supplierPromotion!=null;
+ elements.supplierPromotionReference.value=supplierPromotion?.reference??'';
+ elements.supplierPromotionCost.value=Number.isSafeInteger(supplierPromotion?.expectedUnitCostCents)?(supplierPromotion.expectedUnitCostCents/100).toFixed(2):'';
+ elements.supplierPromotionDate.value=supplierPromotion?.validThrough??'';
+ elements.supplierPromotionEvidence.value=supplierPromotion?.evidence??'';
+ updatePricingReviewFields();
+ const formData=new FormData(reviewForm);
+ reviewing={id:product.id,revision,pricing:pricingReview(formData),checkoutPrice:fixedCheckoutPrice(formData),supplierPromotion:supplierPromotionReview(formData)};
+ $('review-product-title').textContent=product.manufacturer+' · '+product.mfgPart+' · '+product.description;
+ $('review-error').textContent='';
+ $('product-review-dialog').showModal();
+}
+reviewForm.elements.advertisingReview.addEventListener('change',updatePricingReviewFields);
+reviewForm.elements.checkoutPriceEnabled.addEventListener('change',updatePricingReviewFields);
+reviewForm.elements.supplierPromotionEnabled.addEventListener('change',updatePricingReviewFields);
+reviewForm.addEventListener('submit',event=>{
+ event.preventDefault();
+ run(async()=>{
+  const formData=new FormData(reviewForm),pricing=pricingReview(formData);
+  const patch={category:formData.get('category'),condition:formData.get('condition'),categoryConfirmed:formData.has('categoryConfirmed'),
+   resaleConfirmed:formData.has('resaleConfirmed'),contentConfirmed:formData.has('contentConfirmed'),evidence:formData.get('evidence')};
+  if(Object.keys(pricing).some(key=>pricing[key]!==reviewing.pricing[key]))patch.commerce=pricing;
+  const checkoutPrice=fixedCheckoutPrice(formData);
+  if(JSON.stringify(checkoutPrice)!==JSON.stringify(reviewing.checkoutPrice))
+   patch.commerce={...patch.commerce,checkoutPrice};
+  const supplierPromotion=supplierPromotionReview(formData);
+  if(JSON.stringify(supplierPromotion)!==JSON.stringify(reviewing.supplierPromotion))
+   patch.commerce={...patch.commerce,supplierPromotion};
+  try{
+   const result=await request({}, {action:'review',id:reviewing.id,patch,revision:reviewing.revision});
+   revision=result.revision;
+   $('product-review-dialog').close();
+   await loadSelection();
+   message(result.message);
+  }catch(error){$('review-error').textContent=error.message;throw error;}
+ });
+});
 for(const b of document.querySelectorAll('[data-close-dialog]'))b.addEventListener('click',()=>$(b.dataset.closeDialog).close());
 renderSource();run(async()=>{const cfg=await request({view:'configuration'});showConnections(cfg);await loadSelection(true);});
 

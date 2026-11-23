@@ -1,0 +1,245 @@
+{
+  "presentation": "service-families",
+  "logo": "/assets/brands/arctic-wolf/arctic-wolf-white.png",
+  "partnerBadge": "/assets/brands/arctic-wolf/bronze-pack-partner.png",
+  "heroImage": "/assets/brands/arctic-wolf/security-signals.svg",
+  "heroAlt": "Illustration of network, endpoint and cloud signals converging for security review and response",
+  "page": {
+    "name": "Arctic Wolf",
+    "metaTitle": "Arctic Wolf Cybersecurity Solutions | Tri-Point",
+    "title": "Security operations built around your risk",
+    "intro": "Arctic Wolf’s Aurora platform brings together security signals, AI-assisted investigation and human expertise to help teams detect threats, prioritize risks and respond to incidents.",
+    "partnerIntro": "Tri-Point is an Arctic Wolf Bronze Pack Partner. Share your current tools, coverage gaps and procurement needs so we can help scope the right services for your organization.",
+    "useCaseTitle": "Security priorities vary by organization",
+    "useCaseIntro": "Start with the services, devices and data your organization needs to protect. Then identify where your team needs more visibility or response support.",
+    "useCases": [
+      {
+        "title": "State and local government",
+        "description": "Review monitoring for public services, shared infrastructure and distributed departments. Define who will receive alerts and who can act on them."
+      },
+      {
+        "title": "Education",
+        "description": "Plan coverage for campus networks, staff devices and cloud services. Consider training needs and how to handle incidents outside the school day."
+      },
+      {
+        "title": "Regulated organizations",
+        "description": "For financial and healthcare teams, review how monitoring and incident support fit your sensitive data, existing controls and reporting obligations."
+      }
+    ],
+    "catalogTitle": "Explore six service families",
+    "catalogIntro": "Start with the security gap you need to address. Each inquiry gives Tri-Point the service context for a more focused conversation.",
+    "scopeNote": "Features, integrations, licensing, coverage and availability depend on the selected services and your environment. Tri-Point confirms the proposed scope and commercial terms by quotation.",
+    "planningTitle": "Start with what you need to protect",
+    "planningIntro": "Share a high-level picture of your environment and what you need to improve. Tri-Point can help turn that into a scoped inquiry.",
+    "planning": [
+      {
+        "title": "Map your environment",
+        "description": "Identify the endpoints, cloud services, networks and tools you already use. Note the teams responsible for them."
+      },
+      {
+        "title": "Prioritize the gaps",
+        "description": "Decide whether you need stronger monitoring, endpoint protection, exposure management, training or incident response."
+      },
+      {
+        "title": "Confirm the scope",
+        "description": "Review supported integrations, deployment requirements, response responsibilities, licensing and timing before requesting a quote."
+      }
+    ],
+    "questions": [
+      {
+        "question": "Can Arctic Wolf work with the tools we already use?",
+        "answer": "Arctic Wolf publishes supported integrations for security data and response. Share the products and versions you use so we can confirm what the proposed service supports."
+      },
+      {
+        "question": "Which service provides around-the-clock monitoring?",
+        "answer": "Aurora Managed Detection and Response includes 24×7 monitoring. Confirm which data sources will be monitored and what actions Arctic Wolf and your team will each handle."
+      },
+      {
+        "question": "How does incident response coverage work?",
+        "answer": "Arctic Wolf offers incident response services and retainer options. Discuss readiness needs, the response terms, escalation contacts and any insurer requirements before selecting coverage."
+      },
+      {
+        "question": "What should I include in my inquiry?",
+        "answer": "Share your approximate device or user count, current security tools, priority concerns and procurement timeline. Keep credentials, logs and sensitive incident details out of the form."
+      }
+    ],
+    "resources": [
+      {
+        "title": "Aurora platform overview",
+        "url": "https://arcticwolf.com/aurora-platform/"
+      },
+      {
+        "title": "Arctic Wolf product documentation",
+        "url": "https://docs.arcticwolf.com/en"
+      },
+      {
+        "title": "State and local government cybersecurity",
+        "url": "https://arcticwolf.com/solutions/industries/government/"
+      },
+      {
+        "title": "Cybersecurity for education",
+        "url": "https://arcticwolf.com/solutions/industries/education/"
+      },
+      {
+        "title": "Financial services cybersecurity",
+        "url": "https://arcticwolf.com/solutions/industries/financial-services/"
+      },
+      {
+        "title": "Healthcare cybersecurity",
+        "url": "https://arcticwolf.com/solutions/industries/healthcare/"
+      }
+    ]
+  },
+  "products": [
+    {
+      "id": "managed-detection-response",
+      "name": "Aurora Managed Detection and Response",
+      "category": "monitoring",
+      "offeringType": "service-family",
+      "description": "Add around-the-clock threat monitoring and investigation across supported endpoints, networks and cloud services. Arctic Wolf’s security team helps interpret findings and coordinate the response.",
+      "features": [
+        "24×7 monitoring",
+        "Threat investigation and triage",
+        "Response coordination"
+      ],
+      "image": "/assets/brands/arctic-wolf/managed-detection-response.svg",
+      "imageAlt": "Signal trace passing through a detection and investigation grid",
+      "manufacturerUrl": "https://arcticwolf.com/solutions/managed-detection-and-response/",
+      "source": {
+        "publisher": "Arctic Wolf",
+        "url": "https://arcticwolf.com/solutions/managed-detection-and-response/",
+        "checkedOn": "2026-11-09"
+      },
+      "specs": {
+        "Scope to review": "Data sources, alert escalation and which response actions the teams will handle."
+      },
+      "variants": [],
+      "inquiryLabel": "Discuss managed detection"
+    },
+    {
+      "id": "endpoint-security",
+      "name": "Aurora Endpoint Security",
+      "category": "endpoint-security",
+      "offeringType": "service-family",
+      "description": "Protect supported devices with endpoint prevention, detection and response. Explore the coverage and management options that fit your device fleet and security team.",
+      "features": [
+        "Malware prevention",
+        "Endpoint detection and response",
+        "Managed options to review"
+      ],
+      "image": "/assets/brands/arctic-wolf/endpoint-security.svg",
+      "imageAlt": "Connected desktop and mobile devices around a central shield",
+      "manufacturerUrl": "https://arcticwolf.com/solutions/endpoint-security/",
+      "source": {
+        "publisher": "Arctic Wolf",
+        "url": "https://arcticwolf.com/solutions/endpoint-security/",
+        "checkedOn": "2026-11-09"
+      },
+      "specs": {
+        "Scope to review": "Device types, operating systems, existing endpoint tools and management responsibilities."
+      },
+      "variants": [],
+      "inquiryLabel": "Discuss endpoint security"
+    },
+    {
+      "id": "vulnerability-management",
+      "name": "Aurora Vulnerability Management",
+      "category": "exposure-management",
+      "offeringType": "service-family",
+      "description": "Identify vulnerabilities in your environment and prioritize which findings to fix. A consolidated risk view helps teams track remediation work across affected assets.",
+      "features": [
+        "Internal and external scanning options",
+        "Risk prioritization",
+        "Remediation tracking"
+      ],
+      "image": "/assets/brands/arctic-wolf/vulnerability-management.svg",
+      "imageAlt": "Three ranked rows representing vulnerability findings",
+      "manufacturerUrl": "https://docs.arcticwolf.com/en/aurora-vulnerability-management-aurora-vm/aurora-vulnerability-management",
+      "source": {
+        "publisher": "Arctic Wolf",
+        "url": "https://docs.arcticwolf.com/en/aurora-vulnerability-management-aurora-vm/aurora-vulnerability-management",
+        "checkedOn": "2026-11-09"
+      },
+      "specs": {
+        "Scope to review": "Assets to scan, scan methods and how findings reach the team responsible for remediation."
+      },
+      "variants": [],
+      "inquiryLabel": "Discuss vulnerability management"
+    },
+    {
+      "id": "attack-surface-management",
+      "name": "Aurora Attack Surface Management",
+      "category": "exposure-management",
+      "offeringType": "service-family",
+      "description": "Discover internet-facing assets and review what they expose. Use this view to investigate external risks across domains and services that may sit outside your usual inventory.",
+      "features": [
+        "External asset discovery",
+        "Visibility into exposed services",
+        "Findings for exposure review"
+      ],
+      "image": "/assets/brands/arctic-wolf/attack-surface-management.svg",
+      "imageAlt": "An external network with nodes surrounding a discovery boundary",
+      "manufacturerUrl": "https://docs.arcticwolf.com/en/aurora-attack-surface-management-aurora-asm/aurora-attack-surface-management",
+      "source": {
+        "publisher": "Arctic Wolf",
+        "url": "https://docs.arcticwolf.com/en/aurora-attack-surface-management-aurora-asm/aurora-attack-surface-management",
+        "checkedOn": "2026-11-09"
+      },
+      "specs": {
+        "Scope to review": "Domains, public services and responsibility for investigating and addressing findings."
+      },
+      "variants": [],
+      "inquiryLabel": "Discuss attack surface management"
+    },
+    {
+      "id": "security-awareness-training",
+      "name": "Aurora Security Awareness and Training",
+      "category": "workforce-training",
+      "offeringType": "service-family",
+      "description": "Help employees recognize and report common threats through short lessons and phishing simulations. Use reporting to identify where more training may help.",
+      "features": [
+        "Short awareness lessons",
+        "Phishing simulations",
+        "Training and reporting options"
+      ],
+      "image": "/assets/brands/arctic-wolf/security-awareness-training.svg",
+      "imageAlt": "A training panel showing a phishing message and a reporting action",
+      "manufacturerUrl": "https://arcticwolf.com/solutions/security-awareness-and-training/",
+      "source": {
+        "publisher": "Arctic Wolf",
+        "url": "https://arcticwolf.com/solutions/security-awareness-and-training/",
+        "checkedOn": "2026-11-09"
+      },
+      "specs": {
+        "Scope to review": "User groups, training cadence, simulation requirements and reporting needs."
+      },
+      "variants": [],
+      "inquiryLabel": "Discuss awareness training"
+    },
+    {
+      "id": "incident-response",
+      "name": "Aurora Incident Response Services",
+      "category": "incident-readiness",
+      "offeringType": "service-family",
+      "description": "Plan for specialist support during a cyber incident. Explore assistance with investigation, containment and recovery, as well as readiness work available through retainer options.",
+      "features": [
+        "Incident investigation",
+        "Containment and recovery support",
+        "Readiness and retainer options"
+      ],
+      "image": "/assets/brands/arctic-wolf/incident-response.svg",
+      "imageAlt": "A response timeline with investigation, containment and recovery milestones",
+      "manufacturerUrl": "https://arcticwolf.com/solutions/incident-response/",
+      "source": {
+        "publisher": "Arctic Wolf",
+        "url": "https://arcticwolf.com/solutions/incident-response/",
+        "checkedOn": "2026-11-09"
+      },
+      "specs": {
+        "Scope to review": "Escalation contacts, coverage terms, recovery responsibilities and insurer requirements."
+      },
+      "variants": [],
+      "inquiryLabel": "Discuss incident response"
+    }
+  ]
+}

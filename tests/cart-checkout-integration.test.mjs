@@ -3,6 +3,8 @@ import {cartPaymentFixture} from './cart-checkout-fixture.mjs';
 import {paymentOrderKey,paymentRecordKey} from '../lib/payment-verification-store.mjs';
 import {checkoutSessionKey} from '../lib/stripe-checkout-session.mjs';
 import {createPaymentVerificationService} from '../lib/payment-verification-service.mjs';
+import {DESKTOP_REQUIRED_FREIGHT} from '../lib/stripe-tax-quote.mjs';
+import {BUSINESS_ADDRESS} from '../lib/business-address.mjs';
 const opened=async t=>{const o=await t.finalize();return t.service.open(t.owner,{orderId:o.id,testConsent:true});};
 test('desktop pilot binds its exact part and one unit to a simulated Florida checkout',async()=>{
  const product={
@@ -13,7 +15,7 @@ test('desktop pilot binds its exact part and one unit to a simulated Florida che
   category:'desktops'
  };
  // All financial values and approvals come from the in-memory fixture.
- const t=await cartPaymentFixture({product,quantity:1});
+ const t=await cartPaymentFixture({product,quantity:1,address:{line1:BUSINESS_ADDRESS.streetAddress,line2:'',city:BUSINESS_ADDRESS.addressLocality,state:BUSINESS_ADDRESS.addressRegion,postalCode:BUSINESS_ADDRESS.postalCode,country:BUSINESS_ADDRESS.addressCountry}});
  const classification=t.policy().tax.products[0];
  classification.manufacturerPart='DIFFERENT-PART';
  await assert.rejects(t.finalize(),/exact product tax classification requires review/);
@@ -21,6 +23,10 @@ test('desktop pilot binds its exact part and one unit to a simulated Florida che
  assert.equal(t.counts.create,0);
 
  classification.manufacturerPart=product.mfgPart;
+ // The current finalizer requires owner-reviewed freight tax treatment for
+ // this exact Florida desktop scenario; the generic shipping approval alone
+ // does not silently classify freight as taxable.
+ t.policy().shipping.taxTreatment=DESKTOP_REQUIRED_FREIGHT;
  const order=await opened(t);
  assert.deepEqual(order.items,[{
   sku:product.sku,manufacturerPart:product.mfgPart,title:product.description,

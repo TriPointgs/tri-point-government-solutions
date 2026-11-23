@@ -1,5 +1,10 @@
 # Marketplace context index
 
+## Current continuation — November 23, 2026
+The owner authorized preparing the TD SYNNEX sandbox checkout and explicitly instructed: **Prepare checkout; hold TD submission.** Read `docs/TD-SANDBOX-CHECKOUT-2026-11-23.md` first for this workflow. Keep the existing private feature branch and draft PR 23 unmerged. Main/public purchasing is outside this continuation. The newer private-preview source was recovered from the November 20 deployment because its reported commit was absent from GitHub; the recovered files were verified against the deployment file hashes before editing. Older checkpoints below are historical and are not fresh provider evidence.
+
+This checkout uses only dedicated UAT supplier credentials and Stripe TEST mode. Production supplier observations and freight cannot qualify. UAT USD confirmation remains missing; production-account USD is not UAT evidence. Preparation must remain visibly held, with supplier submission disabled. Do not submit a PO, invent test contact/destination or nonphysical fulfillment assurance, send TD correspondence, or perform an actual payment merely to demonstrate preparation. Existing saved TEST payment recovery stays available.
+
 ## Stable workflow and boundaries
 Tri-Point Government Solutions; repository TriPointgs/tri-point-government-solutions. Continue scoped work on feature/td-product-controls / draft PR 23. Verify current refs and deployments before changes; do not infer success from an earlier assistant response. Keep main, production, unrelated branding and Wasabi work untouched unless separately authorized. Never store credentials/customer records in this public repository. Captured payment, not authorization alone, precedes any supplier-release design. Repeated whole-suite and differing browser tests are requested; never call test workers independent AI agents.
 

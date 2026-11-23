@@ -10,7 +10,28 @@ function lineCard(id){const card=el('section',undefined,'smart-line');card.inner
  const sel=card.querySelector('[name=product]');sel.replaceChildren(...context.products.map(p=>new Option(p.manufacturer+' · '+p.mfgPart+' · '+p.description,p.id)));if(id)sel.value=id;
  card.querySelector('.smart-remove').addEventListener('click',()=>{if($('smart-lines').children.length>1)card.remove();else message('Keep at least one product line.',true);});return card;}
 function showPolicy(){const f=$('smart-policy-form'),p=context.policy;f.elements.undercut.value=p.undercutBps/100;f.elements.margin.value=p.minMarginBps/100;f.elements.profit.value=p.minProfitCents/100;f.elements.cap.checked=p.capAtBaseMarkup;f.elements.confirmed.checked=p.settingsConfirmed;}
-export async function openSmartPricing(id){if(busy)return;$('smart-dialog').showModal();message('Loading saved products and scenario settings…');await run(async()=>{context=await api({view:'smart'});showPolicy();if(!context.products.length)throw Error('Import at least one product before making a scenario.');if(!$('smart-lines').children.length||id)$('smart-lines').replaceChildren(lineCard(id||context.products[0].id));message('Private planner ready. Proposed defaults and unreviewed inputs remain visibly held.');});}
+const cartCostForm=$('smart-cart-cost-form');
+const cartCostInputs=[...cartCostForm.querySelectorAll('input[type=number]')];
+function showCartCosts(){
+ const costs=context.cartDefaults;
+ for(const input of cartCostInputs)input.value=costs[input.name]===null?'':costs[input.name]/100;
+ cartCostForm.elements.confirmed.checked=costs.confirmed;
+ $('smart-cart-cost-status').textContent=costs.confirmed?'Reviewed costs are saved.':'Cart estimates still require reviewed costs.';
+}
+export async function openSmartPricing(id){
+ if(busy)return;
+ context=null;
+ $('smart-dialog').showModal();
+ message('Loading saved products and private pricing settings…');
+ await run(async()=>{
+  context=await api({view:'smart'});
+  showPolicy();
+  showCartCosts();
+  if(!context.products.length){message('Import a saved product to evaluate a scenario.');return;}
+  if(!$('smart-lines').children.length||id)$('smart-lines').replaceChildren(lineCard(id||context.products[0].id));
+  message('Private planner ready.');
+ });
+}
 function scenario(){const f=new FormData($('smart-scenario-form'));const lines=[...$('smart-lines').children].map(card=>{const get=n=>card.querySelector('[name='+n+']');return {id:get('product').value,quantity:Number(get('quantity').value),unitWeightMilliLb:toWeight(get('weight').value),weightConfirmed:get('weightReviewed').checked,advertisingReview:get('advertising').value,mapCents:toCents(get('map').value),mapEvidence:get('mapEvidence').value,embargoed:get('embargo').checked};});return {lines,destinationZip:String(f.get('zip')||''),oneSupplierOrder:f.has('oneOrder'),accountRuleApplicable:f.has('scope'),quotedFreightCents:toCents(f.get('freight')),quoteConfirmed:f.has('quoteConfirmed'),paymentFeeBps:toCents(f.get('paymentPercent')),paymentFixedCents:toCents(f.get('paymentFixed')),adminFeeBps:toCents(f.get('adminPercent')),reserveBps:toCents(f.get('reservePercent')),handlingCents:toCents(f.get('handling')),otherCostCents:toCents(f.get('otherCosts')),extraPaymentBaseCents:toCents(f.get('extraPaymentBase')),customerShippingCents:toCents(f.get('customerShipping')),costInputsConfirmed:f.has('costsConfirmed')};}
 function showResult(data){lastScenario=data;$('smart-result').hidden=false;const r=data.result,t=r.totals;
  $('smart-result-stats').replaceChildren(...[['Recommended order (pre-tax)',cash(r.recommendedOrderCents)],['TD acquisition subtotal',cash(r.tdSubtotalCents)],['Modeled supplier freight',cash(r.freight?.costCents)],['Contribution profit'+(r.totalsAreReferenceOnly?' (reference)':''),cash(t?.contributionProfitCents)],['Contribution margin',t?.contributionMarginBps===null||t?.contributionMarginBps===undefined?'—':(t.contributionMarginBps/100).toFixed(2)+'%'],['Status',r.status.replaceAll('-',' ')]].map(([label,value])=>{const d=el('div');d.append(el('span',label),el('strong',value));return d;}));
@@ -28,5 +49,23 @@ function showResult(data){lastScenario=data;$('smart-result').hidden=false;const
 $('smart-close').addEventListener('click',()=>$('smart-dialog').close());
 $('smart-add-line').addEventListener('click',()=>{if(!context)return;if($('smart-lines').children.length>=20){message('Maximum 20 lines per scenario.',true);return;}const used=new Set([...$('smart-lines').querySelectorAll('[name=product]')].map(x=>x.value));const next=context.products.find(x=>!used.has(x.id));if(!next){message('All saved products are already in this scenario.',true);return;}$('smart-lines').append(lineCard(next.id));});
 $('smart-policy-form').addEventListener('submit',e=>{e.preventDefault();run(async()=>{const f=new FormData(e.target),r=await api(null,{action:'smartPolicy',revision:context.revision,policy:{undercutBps:toCents(f.get('undercut')),minMarginBps:toCents(f.get('margin')),minProfitCents:toCents(f.get('profit')),capAtBaseMarkup:f.has('cap'),settingsConfirmed:f.has('confirmed')}});context.revision=r.revision;context.policy=r.policy;showPolicy();message(r.message);});});
+cartCostForm.addEventListener('input',event=>{
+ if(event.target.type==='number')cartCostForm.elements.confirmed.checked=false;
+ $('smart-cart-cost-status').textContent='These changes are unsaved.';
+});
+cartCostForm.addEventListener('submit',event=>{
+ event.preventDefault();
+ if(!context){message('Reopen the pricing workspace to load the saved settings.',true);return;}
+ run(async()=>{
+  const confirmed=cartCostForm.elements.confirmed.checked;
+  const cartDefaults=Object.fromEntries(cartCostInputs.map(input=>[input.name,toCents(input.value)]));
+  if(confirmed&&Object.values(cartDefaults).includes(null))throw Error('Enter a reviewed amount in each field before confirming.');
+  const saved=await api(null,{action:'smartCartDefaults',revision:context.revision,cartDefaults:{...cartDefaults,confirmed}});
+  context.revision=saved.revision;
+  context.cartDefaults=saved.cartDefaults;
+  showCartCosts();
+  message(saved.message);
+ });
+});
 $('smart-scenario-form').addEventListener('submit',e=>{e.preventDefault();run(async()=>{const r=await api(null,{action:'smartEvaluate',id:crypto.randomUUID(),revision:context.revision,scenario:scenario()});showResult(r);message('Private scenario calculated and saved. No public price or order was changed.');});});
 $('smart-load-form').addEventListener('submit',e=>{e.preventDefault();run(async()=>{const data=await api({view:'smart-case',id:$('smart-case-ref').value.trim()});showResult(data);message('Historical scenario loaded; no supplier or retailer requests were made.');});});

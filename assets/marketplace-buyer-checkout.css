@@ -1,0 +1,154 @@
+#buyer-cart, #buyer-checkout {
+  max-width: 48rem;
+  overflow-wrap: anywhere;
+}
+
+#buyer-cart button, #buyer-checkout button, #buyer-signin-actions button {
+  min-height: 44px;
+  margin: .25rem .35rem .25rem 0;
+  font: inherit;
+}
+
+#buyer-review-id {
+  width: min(100%, 28rem);
+  padding: .68rem .8rem;
+  border: 1px solid #a8bdce;
+  border-radius: .35rem;
+  background: #fff;
+  font: inherit;
+}
+
+#buyer-checkout {
+  padding: clamp(.8rem, 4vw, 1.5rem);
+  border: 1px solid #ccdce8;
+  border-radius: .65rem;
+  background: #fff;
+}
+
+#buyer-checkout [hidden] {
+  display: none;
+}
+
+#buyer-checkout h2 {
+  margin: 0;
+}
+
+#buyer-checkout-order {
+  margin: 1rem 0;
+  padding: clamp(.8rem, 4vw, 1.25rem);
+  border: 1px solid #ccdce8;
+  border-radius: .5rem;
+}
+
+#buyer-checkout-terms {
+  max-height: 20rem;
+  overflow: auto;
+  padding: 1rem;
+  border-radius: .35rem;
+  background: #f4f7fb;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+}
+
+.buyer-checkout-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  margin: .75rem 0;
+}
+
+.buyer-checkout-consent input {
+  margin-top: .3rem;
+  flex: 0 0 auto;
+}
+
+.buyer-checkout-totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: .35rem 0;
+  border-bottom: 1px solid #e1e9ef;
+}
+
+.buyer-checkout-totals > div:last-child {
+  font-weight: 700;
+}
+
+.buyer-checkout-totals dd {
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+#buyer-checkout-history-list {
+  margin: .5rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+#buyer-checkout-history-list li {
+  border-bottom: 1px solid #e1e9ef;
+  padding: .35rem 0;
+}
+
+#buyer-checkout button:focus-visible, #buyer-checkout summary:focus-visible,
+#buyer-checkout input:focus-visible, #buyer-review-id:focus-visible {
+  outline: 2px solid #1a527b;
+  outline-offset: 3px;
+}
+
+#buyer-delivery-estimate {
+  max-width: 48rem;
+}
+
+#buyer-delivery-form fieldset {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem 1rem;
+  min-width: 0;
+  margin: 0;
+  padding: clamp(.8rem, 4vw, 1.25rem);
+  border: 1px solid #ccdce8;
+  border-radius: .5rem;
+  background: #fff;
+}
+
+#buyer-delivery-form label {
+  display: grid;
+  align-content: start;
+  gap: .25rem;
+}
+
+#buyer-delivery-form label:nth-of-type(-n+2),
+#buyer-delivery-form button {
+  grid-column: 1 / -1;
+}
+
+#buyer-delivery-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: .55rem .7rem;
+  border: 1px solid #a8bdce;
+  border-radius: .35rem;
+  background: #fff;
+  font: inherit;
+}
+
+#buyer-delivery-form button {
+  justify-self: start;
+  min-height: 44px;
+  font: inherit;
+}
+
+#buyer-delivery-form :is(input, button):focus-visible {
+  outline: 2px solid #1a527b;
+  outline-offset: 3px;
+}
+
+@media (max-width: 36rem) {
+  #buyer-delivery-form fieldset {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

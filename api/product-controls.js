@@ -27,9 +27,9 @@ export function createProductControlsHandler({env=process.env,service=createProd
       }
       if(req.method!=='POST'){res.setHeader('Allow','GET, HEAD, POST');throw new HttpError(405,'Method not allowed.');}
       requireOrigin(req);const input=await body(req,32000);
-      const fields={import:['query','selections','revision'],rules:['policy','pricingPolicy','revision'],review:['id','patch','revision'],refresh:['productIds','revision'],marketSave:['id','revision','offer','destinationZip'],marketRemove:['id','revision','retailer','destinationZip'],marketSearch:['id','mode'],smartPolicy:['revision','policy'],smartEvaluate:['id','revision','scenario']};
+      const fields={import:['query','selections','revision'],rules:['policy','pricingPolicy','revision'],review:['id','patch','revision'],refresh:['productIds','revision'],marketSave:['id','revision','offer','destinationZip'],marketRemove:['id','revision','retailer','destinationZip'],marketSearch:['id','mode'],smartPolicy:['revision','policy'],smartCartDefaults:['revision','cartDefaults'],smartEvaluate:['id','revision','scenario']};
       if(!Object.hasOwn(fields,input.action)||Object.keys(input).some(k=>k!=='action'&&!fields[input.action].includes(k)))throw new HttpError(400,'Unsupported product action.');
-      if(input.action==='smartPolicy'||input.action==='smartEvaluate')await rate(req,'smart-pricing-write',30);
+      if(['smartPolicy','smartCartDefaults','smartEvaluate'].includes(input.action))await rate(req,'smart-pricing-write',30);
       if(input.action==='marketSearch')await rate(req,'serpapi-google-shopping',3);
       if(input.action==='marketSave'||input.action==='marketRemove')await rate(req,'retail-market-write',30);
       if(input.action==='refresh')await rate(req,'td-product-check',10);
