@@ -12,6 +12,18 @@ import path from 'node:path';
 import {applySiteExperience,homeHero} from '../lib/site-experience.mjs';
 const out='dist';
 const preview=process.env.VERCEL_ENV!=='production';
+const solutionPages = {
+ wasabi: wasabiPage,
+ ptzoptics: ptzopticsPage,
+ 'arctic-wolf': arcticWolfPage,
+};
+function publishPublicPage(route, html) {
+ const page = preview ? html : html.replace(
+  /<meta name="robots" content="noindex, (?:nofollow|follow)">/,
+  '<meta name="robots" content="index, follow">',
+ );
+ fs.writeFileSync(path.join(out, `${route.slice(1)}.html`), page);
+}
 const theme='@import url("/assets/marketplace-theme.css");\n';
 const styled=['blog.css','catalog.css','contact.css','experience.css','fortinet.css','lenovo.css','network.css','opportunities.css','zoom.css'];
 for(const name of styled){const f=path.join(out,'assets',name);if(!fs.existsSync(f))continue;const css=fs.readFileSync(f,'utf8');if(/@charset\b/i.test(css))throw Error('Unexpected charset in '+name);if(!css.startsWith(theme))fs.writeFileSync(f,theme+css);}
@@ -31,12 +43,11 @@ for(const filename of scan(out)){
 }
 const homeFile=path.join(out,'index.html');
 fs.writeFileSync(homeFile,injectArcticWolfHome(injectBrandHomeBadges(fs.readFileSync(homeFile,'utf8'))));
-const contactFile=path.join(out,'contact.html');
 // Publish the reviewed request-first marketplace; supplier checkout remains separate.
 fs.writeFileSync(path.join(out,'marketplace.html'),quoteMarketplace({customerSignInEnabled:Boolean(marketplaceCustomerConfig())}));
-fs.writeFileSync(contactFile,contactPage());
+publishPublicPage('/contact', contactPage());
 const quoteOptions=[];
-for(const slug of ['wasabi','ptzoptics','arctic-wolf']){
+for(const slug of Object.keys(solutionPages)){
  const catalog=JSON.parse(fs.readFileSync(`content/${slug}/catalog.json`,'utf8'));
  const brand=catalog.brand||catalog.page.name;
  for(const product of catalog.products.filter(product=>product.status!=='legacy')){
@@ -51,13 +62,14 @@ const adminFile=path.join(out,'contractors','admin.html');fs.writeFileSync(admin
 const privacyFile=path.join(out,'privacy.html'),privacySection='<section id="website-inquiries"><h2>Website quote requests and inquiries</h2><p>When you submit a website request, we collect the contact and organization details, interests, selected items and quantities, project details, delivery location, dates, references, and review preferences you provide. We use these details to review and respond to your request, not to place an order or enroll you in marketing.</p><p>Requests are stored privately with our hosting provider and are accessible to authorized Tri-Point staff. A separate internal email alert contains a request reference and a link to the private workspace; it excludes your contact details and submitted project content. Our email provider processes that alert. This form does not send an automatic customer confirmation email.</p><p>We retain requests while needed for review, follow-up, and legitimate business recordkeeping. To request access, correction or deletion, contact info@tripointgs.com from the email used on your request. We may verify your authority. Product selections stay in this browser tab to carry between pages; contact details and project messages are not saved in browser storage. Do not submit payment details, passwords, tax IDs, exemption documents, or sensitive procurement information here. Exemption-review requests do not grant tax-exempt status.</p></section>';
 fs.writeFileSync(privacyFile,fs.readFileSync(privacyFile,'utf8').replace('</article>',privacySection+'</article>'));
 fs.mkdirSync(path.join(out,'solutions'),{recursive:true});
-fs.writeFileSync(path.join(out,'solutions','wasabi.html'),wasabiPage());
-fs.writeFileSync(path.join(out,'solutions','ptzoptics.html'),ptzopticsPage());
-fs.writeFileSync(path.join(out,'solutions','arctic-wolf.html'),arcticWolfPage());
+for (const [slug, render] of Object.entries(solutionPages)) {
+ publishPublicPage(`/solutions/${slug}`, render());
+}
 const siteMap=path.join(out,'sitemap.xml');
 if(!preview&&fs.existsSync(siteMap)){
  const xml=fs.readFileSync(siteMap,'utf8');
- const entries=['/marketplace','/contact','/about'].map(route=>`<url><loc>https://tripointgs.com${route}</loc></url>`).filter(entry=>!xml.includes(entry));
+ const solutionRoutes = Object.keys(solutionPages).map(slug => `/solutions/${slug}`);
+ const entries=['/marketplace','/contact','/about',...solutionRoutes].map(route=>`<url><loc>https://tripointgs.com${route}</loc></url>`).filter(entry=>!xml.includes(entry));
  fs.writeFileSync(siteMap,xml.replace('</urlset>',entries.join('')+'</urlset>'));
 }
 console.log('Public site: quote marketplace and private request form published; checkout/PO features remain unpublished.');
