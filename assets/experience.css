@@ -10,3 +10,43 @@ body[data-experience] button.danger:not(.experience-menu-toggle):not(.experience
 body[data-experience] button.danger:not(.experience-menu-toggle):not(.experience-search button):not(.experience-remove):not(.order-action):hover{color:#fff!important;background:#8e2316!important}
 body[data-experience] .experience-brand{flex-basis:254px;height:66px}body[data-experience] .experience-brand img{width:254px;height:auto;mix-blend-mode:normal}body[data-experience] .experience-footer-brand{display:block;margin-bottom:17px}body[data-experience] .experience-footer-brand img{display:block;width:min(100%,260px);height:auto}.signup-environment-note{border:1px solid #dfd4b7;background:#fcf8ed;padding:15px;border-radius:8px;font-size:12px;margin-bottom:18px}
 @media(max-width:760px){body[data-experience] .experience-brand{flex:1;height:47px}body[data-experience] .experience-brand img{width:195px}body[data-experience] button.danger:not(.experience-menu-toggle):not(.experience-search button):not(.experience-remove):not(.order-action){margin:8px 0 0}}
+
+/* Public website analytics preferences */
+.analytics-choices {
+  position: fixed;
+  z-index: 60;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  width: min(25rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--xp-line);
+  border-radius: var(--xp-radius);
+  background: var(--xp-white);
+  color: var(--xp-ink);
+  box-shadow: 0 12px 40px rgb(11 31 51 / 18%);
+}
+
+.analytics-choices[hidden] { display: none; }
+.analytics-choices h2 { margin: 0; font-size: 1rem; }
+.analytics-choices p { margin: .4rem 0 .8rem; font-size: .875rem; }
+.analytics-choices a { color: var(--xp-blue); text-decoration: underline; }
+.analytics-choices .analytics-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.analytics-choices .analytics-actions button { min-height: 44px; }
+
+body[data-experience] .experience-footer-bottom button.analytics-settings:not(.experience-button) {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+  cursor: pointer;
+}
+
+.analytics-settings:focus-visible {
+  outline: 2px solid var(--xp-gold);
+  outline-offset: 4px;
+}
