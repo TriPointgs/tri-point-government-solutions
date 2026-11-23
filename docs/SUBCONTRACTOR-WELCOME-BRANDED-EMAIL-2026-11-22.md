@@ -4,7 +4,7 @@
 - The current exact owner-uploaded white PNG logo is preserved at assets/subcontractor-welcome-logo-white.png, 1314x307, SHA256 f2fe18a05639c296636fd85177adf058b9a8b8e846147e9f107637cc7d98d01d. This is the November 23 upload, copied without image modification.
 - The HTML email references https://tripointgs.com/assets/subcontractor-welcome-logo-white.png at the top of a dark navy header with a gold lower border. Inline background and bgcolor both specify navy; image alt text is white. PNG is used for email-client compatibility.
 - The original navy-lettered SVG/PNG assets remain available for existing uses. Plain text is retained for blocked images or text-only recipients.
-- Final owner-requested signature (November 23, 2026): **Adriel Lorenzo**, with **Founder | CEO** underneath in both HTML and plain text. Reply routing remains info@tripointgs.com.
+- Final owner-requested signature (November 23, 2026): **Adriel Lorenzo**, with **Co-Founder | CEO** underneath in both HTML and plain text. Reply routing remains info@tripointgs.com.
 - The welcome subject, application approval disclaimer and cautious own-profile instructions are retained. User-supplied company names are HTML-escaped. The email contains no external scripts, tracking pixels, marketing promises, private opportunity data or unrelated assets.
 
 ## Delivery boundaries and verification
@@ -22,3 +22,6 @@
 
 ## Rollback and next action
 Use the previous production commit for rollback. Before an actual email send: confirm the final HTML preview and exact sender, independently verify the production key's restricted access, test with an approved mailbox through the real application, reconcile delivery/authentication, then explicitly authorize enabling both Production flags. Never send or backfill messages to actual subcontractors as part of this template-only change.
+
+## November 23 final title approval
+The owner reviewed the single requested preview email, confirmed the design looks good, and requested only the title change to `Co-Founder | CEO`. Both HTML and plain text now use that exact title. The standalone preview was independently reported delivered and found in the intended inbox; it does not establish application-level delivery or authorize automatic applicant mail. No new email or delivery-setting change is part of this title correction. Rollback: `3f7d9806826d8c5e8e96c1eede0c6e673384471e`.
