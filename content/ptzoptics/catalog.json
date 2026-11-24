@@ -496,7 +496,14 @@
         "Resolution": "1080p60",
         "Zoom": "20X",
         "Best for": "Presenter tracking"
-      }
+      },
+      "pricedModels": [
+        {
+          "sku": "HC20X-SIMPLTRACK3",
+          "price": 1999,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "webcam-80",
@@ -624,28 +631,53 @@
       "imageAlt": "HC Joy G4 manufacturer product image",
       "source": "joysticks: Joysticks/HC-JOY-G4/Images/Photos/Product-Photo-HC-JOY-G4-Cutout-Angle-Left-A.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "HC-JOY-G4",
+          "price": 549,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "hive-studio",
       "name": "Hive Studio",
       "category": "software",
-      "description": "A shared workspace for remote camera control, production and collaboration. Review current Standard, Pro and Enterprise plans against camera compatibility and team size.",
+      "description": "Yearly Hive Studio licenses for remote camera control, production and collaboration. Choose Standard, Pro or Enterprise and confirm camera compatibility and plan scope for your team.",
       "features": [
         "Remote control and collaboration",
         "Switching and image tools",
         "Multiple licensing options"
       ],
       "variants": [
-        "PT-HIVE-STD-YR",
-        "PT-HIVE-PRO-YR",
-        "Enterprise - request configuration"
+        "PT-HIVE-D-STD-YR",
+        "PT-HIVE-D-PRO-YR",
+        "PT-HIVE-D-ENT-YR"
       ],
       "image": "/assets/brands/ptzoptics/hive-studio.webp",
       "imageAlt": "Hive Studio manufacturer product image",
       "source": "software: Software/Hive Studio/PT-HIVE-STD-YR/Hive-Camera-Switching.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/hive"
+      "manufacturerUrl": "https://ptzoptics.com/hive",
+      "pricedModels": [
+        {
+          "sku": "PT-HIVE-D-STD-YR",
+          "price": 569,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT-HIVE-D-PRO-YR",
+          "price": 1515,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT-HIVE-D-ENT-YR",
+          "price": 3000,
+          "priceBasis": "MAP"
+        }
+      ],
+      "priceTerm": "year"
     },
     {
       "id": "horizon",
@@ -703,7 +735,19 @@
       "imageAlt": "HCM-1 small wall mount manufacturer product image",
       "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/HCM-1-BK/Images/Photos/Product-Photo-HCM-1-BK-Cutout-Angle-Left.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "HCM-1-BK",
+          "price": 90,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "HCM-1-WH",
+          "price": 90,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "hcm-2",
@@ -723,7 +767,19 @@
       "imageAlt": "HCM-2 large wall mount manufacturer product image",
       "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/HCM-2-BK/Images/Photos/Product-Photo-HCM-2-BK-Cutout-Angle-Left.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "HCM-2-BK",
+          "price": 120,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "HCM-2-WH",
+          "price": 120,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "hcm-1c",
@@ -743,7 +799,19 @@
       "imageAlt": "HCM-1C small pole mount manufacturer product image",
       "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/HCM-1C-BK/Images/CGI 3D Renders/Transparent Background/HCM-1C-BK-Transparent-Background-Front-Left-Angle.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "HCM-1C-BK",
+          "price": 110,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "HCM-1C-WH",
+          "price": 110,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "hcm-2c",
@@ -763,7 +831,14 @@
       "imageAlt": "HCM-2C large pole mount manufacturer product image",
       "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/HCM-2C-BK/Images/CGI 3D Renders/Transparent Background/HCM-2C-BK-Transparent-Background-Front-Left-Angle.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "HCM-2C-WH",
+          "price": 140,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "pt-cm-1",
@@ -1088,7 +1163,14 @@
       "imageAlt": "HuddleCamHD 10XA manufacturer product image",
       "source": "Recovered complete local ZIP record: HuddleCamHD/Product Resources by SKU/HC10XA-WH/Product-Photo-HC10XA-WH-Cutout-Angle-Left.png",
       "status": "verify-current",
-      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
+      "manufacturerUrl": "https://huddlecamhd.com/legacy-products/",
+      "pricedModels": [
+        {
+          "sku": "HC10XA-WH",
+          "price": 659,
+          "priceBasis": "MSRP"
+        }
+      ]
     },
     {
       "id": "db9-extension",
