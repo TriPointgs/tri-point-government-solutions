@@ -15,7 +15,7 @@ const preview=process.env.VERCEL_ENV!=='production';
 const analyticsMeasurementId = 'G-J4BCEYLBCZ';
 const analyticsPanel = `<section id="analytics-choices" class="analytics-choices" aria-labelledby="analytics-heading" hidden>
  <h2 id="analytics-heading">Website analytics</h2>
- <p>Allow Google Analytics cookies to help us understand which pages visitors use. <a href="/privacy#website-analytics">Privacy notice</a></p>
+ <p>Allow Google Analytics cookies to help us understand visits, partner campaigns and completed quote requests. <a href="/privacy#website-analytics">Privacy notice</a></p>
  <div class="analytics-actions">
   <button type="button" class="experience-button" data-analytics-allow>Allow analytics</button>
   <button type="button" class="experience-button outline" data-analytics-decline>Decline analytics</button>
@@ -96,7 +96,7 @@ if(!preview&&fs.existsSync(siteMap)){
  for (const [, route] of publicSitemap.matchAll(/<loc>https:\/\/tripointgs\.com(\/[^<]*)<\/loc>/g)) {
   addAnalyticsPreferences(route, true);
  }
- const analyticsNotice = '<section id="website-analytics"><h2>Optional website analytics</h2><p>With your permission, Google Analytics uses cookies to measure visits to public pages and understand where visitors come from. Analytics uses page paths and referring domains. The website removes query parameters and fragments before sending page addresses. Use Analytics settings in the footer to change your choice. <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from sites that use its services</a>.</p></section>';
+ const analyticsNotice = '<section id="website-analytics"><h2>Optional website analytics</h2><p>With your permission, Google Analytics uses cookies to measure visits to public pages and understand where visitors come from. Analytics uses page paths and referring domains. The website removes query parameters and fragments before sending page addresses. For our published partner social links, we separately send the recognized platform, social medium and partner campaign name to measure campaign performance. We also record when a website quote request is successfully received, without sending your name, contact information, project details, product selections or request reference to Analytics. Use Analytics settings in the footer to change your choice. <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from sites that use its services</a>.</p></section>';
  const privacy = fs.readFileSync(privacyFile, 'utf8');
  fs.writeFileSync(privacyFile, privacy.replace('</article>', analyticsNotice + '</article>'));
  addAnalyticsPreferences('/privacy', false);
