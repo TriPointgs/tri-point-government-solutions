@@ -1,3 +1,4 @@
+import {catalogQuoteOptions} from '../lib/catalog-pricing.mjs';
 import {injectBrandHomeBadges} from '../lib/brand-home.mjs';
 import {wasabiPage} from '../lib/wasabi-page.mjs';
 import {ptzopticsPage} from '../lib/ptzoptics-page.mjs';
@@ -69,13 +70,7 @@ publishPublicPage('/contact', contactPage());
 const quoteOptions=[];
 for(const slug of Object.keys(solutionPages)){
  const catalog=JSON.parse(fs.readFileSync(`content/${slug}/catalog.json`,'utf8'));
- const brand=catalog.brand||catalog.page.name;
- for(const product of catalog.products.filter(product=>product.status!=='legacy')){
-  quoteOptions.push({
-   brand,name:product.name,description:brand+' · '+product.name,
-   category:slug==='arctic-wolf'?'Networking & security':product.category,image:product.image
-  });
- }
+ quoteOptions.push(...catalogQuoteOptions(catalog,slug));
 }
 fs.writeFileSync(path.join(out,'assets','quote-options.json'),JSON.stringify(quoteOptions));
 const adminFile=path.join(out,'contractors','admin.html');fs.writeFileSync(adminFile,fs.readFileSync(adminFile,'utf8').replace('<div class="toolbar">','<div class="toolbar"><a class="button secondary" href="/admin/inquiries">Website quote requests</a>'));

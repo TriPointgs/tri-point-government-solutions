@@ -14,3 +14,19 @@ html body[data-experience] .brand-page .brand-categories button[aria-pressed="tr
 html body[data-experience] #brand-category-filters button[aria-pressed="false"]{background:#fff!important;color:#375065!important;-webkit-text-fill-color:#375065!important;border:1px solid #c8d5df!important}
 html body[data-experience] #brand-category-filters button[aria-pressed="true"]{background:var(--brand-dark)!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border-color:var(--brand-dark)!important}
 .brand-usecases{grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr))}
+
+/* Exact-model prices from the approved PTZOptics customer price card. */
+.brand-ptzoptics .brand-pricing-note{padding:22px 24px;margin:0 0 24px;border-left:4px solid var(--brand-accent);background:#fff;border-radius:4px;color:var(--brand-dark)}
+.brand-ptzoptics .brand-pricing-note>strong{font-size:20px}
+.brand-ptzoptics .brand-pricing-note p{font-size:16px;line-height:1.65;margin:10px 0 0;max-width:920px}
+.brand-ptzoptics .brand-pricing-note p:last-child{font-size:14px;color:var(--brand-text)}
+.brand-ptzoptics .brand-product-price{font-size:16px;line-height:1.5;margin:0 0 18px;color:var(--brand-dark)}
+.brand-ptzoptics .brand-product-price strong{font-size:25px;letter-spacing:-.025em}
+.brand-ptzoptics .brand-product-price span{display:block;font-size:14px;color:var(--brand-text)}
+.brand-ptzoptics .brand-model-prices h4{font-size:16px;margin:5px 0 12px}
+.brand-ptzoptics .brand-model-prices ul{list-style:none;padding:0;margin:0 0 22px}
+.brand-ptzoptics .brand-model-prices li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:14px 0;border-top:1px solid var(--brand-line);font-size:16px}
+.brand-ptzoptics .brand-model-sku{grid-column:1/-1;font-size:14px;font-weight:650;overflow-wrap:anywhere;letter-spacing:.015em}
+.brand-ptzoptics .brand-model-prices a{font-size:14px;min-height:36px;display:inline-flex;align-items:center;justify-content:flex-end;text-underline-offset:3px}
+.brand-ptzoptics .brand-product-details summary{font-size:14px}
+.brand-ptzoptics .brand-comparison-grid .brand-model-prices{margin:20px 0}
