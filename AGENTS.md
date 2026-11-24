@@ -4,3 +4,17 @@ Preserve existing agency-facing capabilities and production content. Never fabri
 Delegation / token rule: start with the cheapest capable lower-tier models for bounded or mechanical work. Use mid-tier models for moderately complex implementation and analysis. Reserve premium/highest-tier models for lead architecture, security-critical judgment, conflict resolution, final review, and production-readiness decisions. Delegate independent work in parallel and request concise worker summaries. Do not claim delegation happened unless it actually did.
 
 Solicitation workflow: review full solicitation and pricing files; bid/no-bid assessment; compliance checklist; pricing/profitability; suppliers and incumbents; risks, questions, deadlines; practical award strategy. Profile matches are preliminary, not a substitute for that review. Evaluate prime and subcontractor requirements separately.
+
+## Agent skills
+
+### Issue tracker
+
+Keep project tickets in the local `.scratch/` directory. See [the tracker guide](docs/agents/issue-tracker.md).
+
+### Triage labels
+
+Use the five statuses in [the triage guide](docs/agents/triage-labels.md).
+
+### Domain docs
+
+Use the root glossary and decision records under `docs/adr/` as described in [the domain guide](docs/agents/domain.md).
