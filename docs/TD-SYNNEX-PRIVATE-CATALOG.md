@@ -32,3 +32,7 @@ Redeploy the website. Log in to Tri-Point administration and open `/admin/catalo
 - The Windows user must update `C:\TriPointPrivateCatalog\catalog_gateway.py` to v2 and restart **only** the local gateway process. This does not re-import or upload the SQLite database, and the existing bearer token remains valid.
 - Keep Tailscale Funnel bound to `127.0.0.1:8766`; do not expose FileZilla credentials, the SQLite file, raw supplier feed, or token.
 - Price fields 13/14 and quantities 10/11 remain unlabeled raw values; obtain official TD SYNNEX data dictionary and confirm live inventory/cost before quote generation.
+
+## Offline catalog contract test
+
+Run `npm run test:catalog-contract` with Node 24 and Python 3 (or set `PYTHON` to the Python executable). This exercises the website adapter and the Windows gateway GET handler together using a temporary synthetic SQLite database. It needs no network connection, private catalog, or supplier credentials.
