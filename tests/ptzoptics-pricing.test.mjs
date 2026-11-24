@@ -6,13 +6,13 @@ import {catalogQuoteOptions, modelQuoteName, formatCatalogPrice, pricedModels} f
 const catalog=JSON.parse(fs.readFileSync('content/ptzoptics/catalog.json','utf8'));
 const rows=catalog.products.flatMap(product=>pricedModels(product));
 
-test('November price card includes 78 unique, positive customer prices with the approved fallback',()=>{
- assert.equal(rows.length,78);
- assert.equal(new Set(rows.map(row=>row.sku)).size,78);
+test('November price card includes 91 unique, positive customer prices with the approved fallback',()=>{
+ assert.equal(rows.length,91);
+ assert.equal(new Set(rows.map(row=>row.sku)).size,91);
  assert.equal(catalog.pricingUpdatedAt,'2026-11-24');
  assert.equal(catalog.pricingCurrency,'USD');
- assert.equal(rows.filter(row=>row.priceBasis==='MAP').length,77);
- assert.deepEqual(rows.filter(row=>row.priceBasis==='MSRP'),[{sku:'PT-WEBCAM-80-V2',price:42,priceBasis:'MSRP'}]);
+ assert.equal(rows.filter(row=>row.priceBasis==='MAP').length,89);
+ assert.deepEqual(rows.filter(row=>row.priceBasis==='MSRP'),[{sku:'PT-WEBCAM-80-V2',price:42,priceBasis:'MSRP'},{sku:'HC10XA-WH',price:659,priceBasis:'MSRP'}]);
  for(const row of rows)assert.deepEqual(Object.keys(row).sort(),['price','priceBasis','sku']);
  assert.equal(rows.find(row=>row.sku==='PT30X4K-PRODUCER-SJOY').price,8732);
  assert.equal(rows.find(row=>row.sku==='PT12X-STUDIO-4K-GY-G3TAA').price,1369);
@@ -22,9 +22,12 @@ test('November price card includes 78 unique, positive customer prices with the 
 test('every priced model is searchable, rendered without JavaScript and linked to an exact-model quote',()=>{
  const html=ptzopticsPage();
  const options=catalogQuoteOptions(catalog,'ptzoptics');
- assert.equal((html.match(/data-priced-sku=/g)||[]).length,78);
- assert.match(html,/78 models with published prices/);
+ assert.equal((html.match(/data-priced-sku=/g)||[]).length,91);
+ assert.match(html,/91 models with published prices/);
  assert.match(html,/November 24, 2026/);
+ assert.match(html,/\$569.00 \/ year/);
+ assert.match(html,/\$1,515.00 \/ year/);
+ assert.match(html,/\$3,000.00 \/ year/);
  for(const product of catalog.products){
   for(const row of pricedModels(product)){
    assert.ok(product.variants.includes(row.sku));
