@@ -31,7 +31,14 @@
         "Resolution": "4K60",
         "Zoom": "20X",
         "Best for": "Broadcast and live production"
-      }
+      },
+      "pricedModels": [
+        {
+          "sku": "PT20X-RISE-4K-BK",
+          "price": 8999,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "move-4k",
@@ -50,7 +57,14 @@
         "PT20X-4K-RD-G3",
         "PT20X-4K-WH-G3",
         "PT30X-4K-GY-G3",
-        "PT30X-4K-WH-G3"
+        "PT30X-4K-WH-G3",
+        "PT12X-4K-GY-G3-TAA",
+        "PT12X-4K-WH-G3-TAA",
+        "PT20X-4K-GY-G3-TAA",
+        "PT20X-4K-RD-G3-TAA",
+        "PT20X-4K-WH-G3-TAA",
+        "PT30X-4K-GY-G3-TAA",
+        "PT30X-4K-WH-G3-TAA"
       ],
       "image": "/assets/brands/ptzoptics/move-4k.webp",
       "imageAlt": "Move 4K manufacturer product image",
@@ -61,7 +75,74 @@
         "Resolution": "4K60",
         "Zoom": "12X / 20X / 30X",
         "Best for": "Flexible live production"
-      }
+      },
+      "pricedModels": [
+        {
+          "sku": "PT12X-4K-GY-G3",
+          "price": 1999,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-4K-GY-G3-TAA",
+          "price": 2299,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-4K-WH-G3",
+          "price": 1999,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-4K-WH-G3-TAA",
+          "price": 2299,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-4K-GY-G3",
+          "price": 2349,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-4K-GY-G3-TAA",
+          "price": 2699,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-4K-RD-G3-TAA",
+          "price": 2699,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-4K-WH-G3",
+          "price": 2349,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-4K-WH-G3-TAA",
+          "price": 2699,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-4K-GY-G3",
+          "price": 2699,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-4K-GY-G3-TAA",
+          "price": 3099,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-4K-WH-G3",
+          "price": 2699,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-4K-WH-G3-TAA",
+          "price": 3099,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "move-se",
@@ -79,7 +160,13 @@
         "PT20X-SE-GY-G3",
         "PT20X-SE-WH-G3",
         "PT30X-SE-GY-G3",
-        "PT30X-SE-WH-G3"
+        "PT30X-SE-WH-G3",
+        "PT12X-SE-GY-G3-TAA",
+        "PT12X-SE-WH-G3-TAA",
+        "PT20X-SE-GY-G3-TAA",
+        "PT20X-SE-WH-G3-TAA",
+        "PT30X-SE-GY-G3-TAA",
+        "PT30X-SE-WH-G3-TAA"
       ],
       "image": "/assets/brands/ptzoptics/move-se.webp",
       "imageAlt": "Move SE manufacturer product image",
@@ -90,7 +177,69 @@
         "Resolution": "1080p60",
         "Zoom": "12X / 20X / 30X",
         "Best for": "Education and everyday streaming"
-      }
+      },
+      "pricedModels": [
+        {
+          "sku": "PT12X-SE-GY-G3",
+          "price": 1199,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-SE-GY-G3-TAA",
+          "price": 1379,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-SE-WH-G3",
+          "price": 1199,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-SE-WH-G3-TAA",
+          "price": 1379,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-SE-GY-G3",
+          "price": 1349,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-SE-GY-G3-TAA",
+          "price": 1549,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-SE-WH-G3",
+          "price": 1349,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-SE-WH-G3-TAA",
+          "price": 1549,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-SE-GY-G3",
+          "price": 1499,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-SE-GY-G3-TAA",
+          "price": 1719,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-SE-WH-G3",
+          "price": 1499,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-SE-WH-G3-TAA",
+          "price": 1719,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "link-4k",
@@ -108,7 +257,13 @@
         "PT20X-LINK-4K-GY",
         "PT20X-LINK-4K-WH",
         "PT30X-LINK-4K-GY",
-        "PT30X-LINK-4K-WH"
+        "PT30X-LINK-4K-WH",
+        "PT12X-LINK-4K-GY-TAA",
+        "PT12X-LINK-4K-WH-TAA",
+        "PT20X-LINK-4K-GY-TAA",
+        "PT20X-LINK-4K-WH-TAA",
+        "PT30X-LINK-4K-GY-TAA",
+        "PT30X-LINK-4K-WH-TAA"
       ],
       "image": "/assets/brands/ptzoptics/link-4k.webp",
       "imageAlt": "Link 4K manufacturer product image",
@@ -119,7 +274,69 @@
         "Resolution": "4K60; Dante up to 1080p60",
         "Zoom": "12X / 20X / 30X",
         "Best for": "Dante AV-H systems"
-      }
+      },
+      "pricedModels": [
+        {
+          "sku": "PT12X-LINK-4K-GY",
+          "price": 1999,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-LINK-4K-GY-TAA",
+          "price": 2299,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-LINK-4K-WH",
+          "price": 1999,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-LINK-4K-WH-TAA",
+          "price": 2299,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-LINK-4K-GY",
+          "price": 2349,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-LINK-4K-GY-TAA",
+          "price": 2699,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-LINK-4K-WH",
+          "price": 2349,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-LINK-4K-WH-TAA",
+          "price": 2699,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-LINK-4K-GY",
+          "price": 2699,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-LINK-4K-GY-TAA",
+          "price": 3099,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-LINK-4K-WH",
+          "price": 2699,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X-LINK-4K-WH-TAA",
+          "price": 3099,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "studio-4k",
@@ -135,7 +352,11 @@
         "PT12X-STUDIO-4K-GY-G3",
         "PT12X-STUDIO-4K-WH-G3",
         "PT20X-STUDIO-4K-GY-G3",
-        "PT20X-STUDIO-4K-WH-G3"
+        "PT20X-STUDIO-4K-WH-G3",
+        "PT12X-STUDIO-4K-GY-G3TAA",
+        "PT12X-STUDIO-4K-WH-G3TAA",
+        "PT20X-STUDIO-4K-GY-G3TAA",
+        "PT20X-STUDIO-4K-WH-G3TAA"
       ],
       "image": "/assets/brands/ptzoptics/studio-4k.webp",
       "imageAlt": "Studio 4K manufacturer product image",
@@ -146,7 +367,49 @@
         "Resolution": "4K60",
         "Zoom": "12X / 20X",
         "Best for": "Fixed production angles"
-      }
+      },
+      "pricedModels": [
+        {
+          "sku": "PT12X-STUDIO-4K-GY-G3TAA",
+          "price": 1369,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-STUDIO-4K-WH-G3TAA",
+          "price": 1369,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-STUDIO-4K-GY-G3TAA",
+          "price": 1549,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-STUDIO-4K-WH-G3TAA",
+          "price": 1549,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-STUDIO-4K-GY-G3",
+          "price": 1199,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-STUDIO-4K-WH-G3",
+          "price": 1199,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-STUDIO-4K-GY-G3",
+          "price": 1349,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-STUDIO-4K-WH-G3",
+          "price": 1349,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "studio-se",
@@ -162,7 +425,11 @@
         "PT12X-STUDIO-SE-GY-G3",
         "PT12X-STUDIO-SE-WH-G3",
         "PT20X-STUDIO-SE-GY-G3",
-        "PT20X-STUDIO-SE-WH-G3"
+        "PT20X-STUDIO-SE-WH-G3",
+        "PT12X-STUDIO-SE-GY-G3TAA",
+        "PT12X-STUDIO-SE-WH-G3TAA",
+        "PT20X-STUDIO-SE-GY-G3TAA",
+        "PT20X-STUDIO-SE-WH-G3TAA"
       ],
       "image": "/assets/brands/ptzoptics/studio-se.webp",
       "imageAlt": "Studio SE manufacturer product image",
@@ -173,7 +440,39 @@
         "Resolution": "1080p60",
         "Zoom": "12X / 20X",
         "Best for": "Fixed room capture"
-      }
+      },
+      "pricedModels": [
+        {
+          "sku": "PT12X-STUDIO-SE-GY-G3TAA",
+          "price": 1089,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-STUDIO-SE-WH-G3TAA",
+          "price": 1089,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-STUDIO-SE-GY-G3",
+          "price": 1149,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-STUDIO-SE-GY-G3TAA",
+          "price": 1299,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT20X-STUDIO-SE-WH-G3TAA",
+          "price": 1299,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT12X-STUDIO-SE-GY-G3",
+          "price": 949,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "simpltrack3",
@@ -210,7 +509,7 @@
         "USB power and built-in microphones"
       ],
       "variants": [
-        "PT-WEBCAM-80-v2"
+        "PT-WEBCAM-80-V2"
       ],
       "image": "/assets/brands/ptzoptics/webcam-80.webp",
       "imageAlt": "Webcam 80 manufacturer product image",
@@ -221,7 +520,14 @@
         "Resolution": "1080p30",
         "Zoom": "Electronic framing",
         "Best for": "Desktop video"
-      }
+      },
+      "pricedModels": [
+        {
+          "sku": "PT-WEBCAM-80-V2",
+          "price": 42,
+          "priceBasis": "MSRP"
+        }
+      ]
     },
     {
       "id": "superjoy",
@@ -240,7 +546,14 @@
       "imageAlt": "SuperJoy manufacturer product image",
       "source": "joysticks: Joysticks/PT-SUPERJOY-G1/Images/Photos/Product-Photo-PT-SUPERJOY-G1-Cutout-Angle-Left.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "PT-SUPERJOY-G1",
+          "price": 1299,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "pt-joy-g4",
@@ -259,7 +572,14 @@
       "imageAlt": "PT Joy G4 manufacturer product image",
       "source": "joysticks: Joysticks/PT-JOY-G4/Images/Photos/Product-Photo-PT-JOY-G4-Cutout-Angle-Left.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "PT-JOY-G4",
+          "price": 999,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "minijoy",
@@ -278,7 +598,14 @@
       "imageAlt": "MiniJoy manufacturer product image",
       "source": "joysticks: Joysticks/PT-MINIJOY-G1/Images/CGI 3D Renders/Dark Background/Product-Render-PT-MINIJOY-G1-Dark-Background-Angle-Left.png",
       "status": "verify-current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "PT-MINIJOY-G1",
+          "price": 849,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "hc-joy-g4",
@@ -456,7 +783,19 @@
       "imageAlt": "PT-CM-1 ceiling mount manufacturer product image",
       "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/PT-CM-1-BK/Images/Photos/Product-Photo-PT-CM-1-BK-Cutout-Angle-Left.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "PT-CM-1-BK",
+          "price": 75,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT-CM-1-WH",
+          "price": 75,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "pt-cm-3",
@@ -476,7 +815,19 @@
       "imageAlt": "PT-CM-3 ceiling mount manufacturer product image",
       "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/PT-CM-3-BK/Images/Photos/Product-Photo-PT-CM-3-BK-Cutout-Angle-Left.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "PT-CM-3-BK",
+          "price": 75,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT-CM-3-WH",
+          "price": 75,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "pt-pm-3",
@@ -496,7 +847,19 @@
       "imageAlt": "PT-PM-3 pole mount manufacturer product image",
       "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/PT-PM-3-BK/Images/CGI 3D Renders/Transparent Background/PT-PM-3-BK-Transparent-Background-Front-Left-Angle.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "PT-PM-3-BK",
+          "price": 140,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT-PM-3-WH",
+          "price": 140,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "pt-wm-3",
@@ -516,7 +879,19 @@
       "imageAlt": "PT-WM-3 wall mount manufacturer product image",
       "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Mounts/PT-WM-3-BK/Images/Photos/Product-Photo-PT-WM-3-BK-Cutout-Angle-Left.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "PT-WM-3-BK",
+          "price": 110,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT-WM-3-WH",
+          "price": 110,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "hdsdi-cables",
@@ -557,7 +932,14 @@
       "imageAlt": "PT-PSB-U camera power supply manufacturer product image",
       "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Power Supply/PT-PSB-U/Product-Photo-PT-PSB-U-Cutout-Angle-Left.png",
       "status": "verify-current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "PT-PSB-U",
+          "price": 55,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "pt-ps-boxcam-u",
@@ -595,7 +977,14 @@
       "imageAlt": "PTZOptics IR remote manufacturer product image",
       "source": "mounts-cables-and-accessories: Mounts, Cables and Accessories/Remote Control/PT-REMOTE/Product-Photo-PT-REMOTE-Cutout-Angle-Left-New.png",
       "status": "verify-current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "PT-REMOTE",
+          "price": 55,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "producer-4k",
@@ -609,13 +998,25 @@
       ],
       "variants": [
         "PT20X4K-PRODUCER-SJOY",
-        "PT30X-4K-PRODUCER-SJOY"
+        "PT30X4K-PRODUCER-SJOY"
       ],
       "image": "/assets/brands/ptzoptics/producer-4k.webp",
       "imageAlt": "Manufacturer image of the 20X Producer 4K bundle",
       "source": "multi-product-assets: Multi-Product Assets/Images/Bundles/Producer 4K Bundle/PT20X4K-PRODUCER-SJOY/Product-Photo-PT20X4K-PRODUCER-SJOY-Cutout-Front.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/bundles"
+      "manufacturerUrl": "https://ptzoptics.com/bundles",
+      "pricedModels": [
+        {
+          "sku": "PT20X4K-PRODUCER-SJOY",
+          "price": 7756,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "PT30X4K-PRODUCER-SJOY",
+          "price": 8732,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "producer-se",
@@ -634,7 +1035,14 @@
       "imageAlt": "Producer SE bundle manufacturer product image",
       "source": "multi-product-assets: Multi-Product Assets/Images/Bundles/Producer SE Bundle/PT20XSE-PRODUCER-JOY4/Product-Photo-PT20XSE-PRODUCER-JOY4-Cutout-Front.jpg",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "PT20XSE-PRODUCER-JOY4",
+          "price": 4743,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "action-bundle",
@@ -653,7 +1061,14 @@
       "imageAlt": "Action 4K bundle manufacturer product image",
       "source": "multi-product-assets: Multi-Product Assets/Images/Bundles/Action Bundle/PT12X4K-ACTION-SJOY/Studio-4K-12X-Bundle.png",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/bundles"
+      "manufacturerUrl": "https://ptzoptics.com/bundles",
+      "pricedModels": [
+        {
+          "sku": "PT12X4K-ACTION-SJOY",
+          "price": 5297,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "huddlecam-10xa",
@@ -695,7 +1110,29 @@
       "imageAlt": "DB9 serial extension cables manufacturer product image",
       "source": "PTZOptics-HuddleCamHD-Catalog-2025.pdf, page 22",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "DB9M-F-100",
+          "price": 125,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "DB9M-F-25",
+          "price": 59,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "DB9M-F-50",
+          "price": 80,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "DB9M-F-75",
+          "price": 105,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "visca-cascade",
@@ -717,7 +1154,29 @@
       "imageAlt": "VISCA cascade cables manufacturer product image",
       "source": "PTZOptics-HuddleCamHD-Catalog-2025.pdf, page 23",
       "status": "current",
-      "manufacturerUrl": "https://ptzoptics.com/"
+      "manufacturerUrl": "https://ptzoptics.com/",
+      "pricedModels": [
+        {
+          "sku": "VISCA-100",
+          "price": 119,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "VISCA-25",
+          "price": 50,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "VISCA-50",
+          "price": 75,
+          "priceBasis": "MAP"
+        },
+        {
+          "sku": "VISCA-75",
+          "price": 95,
+          "priceBasis": "MAP"
+        }
+      ]
     },
     {
       "id": "mobile-apps-legacy",
@@ -990,5 +1449,7 @@
       "status": "legacy",
       "manufacturerUrl": "https://huddlecamhd.com/legacy-products/"
     }
-  ]
+  ],
+  "pricingUpdatedAt": "2026-11-24",
+  "pricingCurrency": "USD"
 }
