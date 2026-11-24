@@ -1169,6 +1169,11 @@
           "sku": "HC10XA-WH",
           "price": 659,
           "priceBasis": "MSRP"
+        },
+        {
+          "sku": "HC10XA-BK",
+          "price": 709,
+          "priceBasis": "CUSTOM"
         }
       ]
     },
