@@ -35,3 +35,8 @@ jobs:
 
       - run: npm ci
       - run: npm test
+
+      - name: Install Chrome for browser tests
+        run: npx playwright-core install --with-deps chrome
+
+      - run: npm run test:browser
