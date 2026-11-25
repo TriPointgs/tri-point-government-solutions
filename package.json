@@ -10,7 +10,11 @@
     "build": "node scripts/check.mjs && node --test tests/*.test.mjs && node scripts/build.mjs && node scripts/public-boundary.mjs && node scripts/zoom-build.mjs && node scripts/lenovo-build.mjs && node scripts/fortinet-build.mjs && node scripts/check-address.mjs && node scripts/blog-build.mjs && node scripts/public-site-build.mjs && node scripts/verify-public-site-build.mjs",
     "test": "node --test tests/*.test.mjs tests/catalog-contract/*.test.mjs",
     "test:catalog-contract": "node --test tests/catalog-contract/search.test.mjs",
+    "test:browser": "node --test tests/browser/*.test.mjs",
     "preview": "node scripts/preview.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.62.1"
   },
   "dependencies": {
     "@clerk/backend": "3.31.1",
