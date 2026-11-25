@@ -174,12 +174,13 @@ class Handler(BaseHTTPRequestHandler):
         maker = args.get("maker", [""])[0].strip()
         page = args.get("page", ["0"])[0]
         category = args.get("category", ["all"])[0].strip().lower()
-        exact = args.get("exact", ["0"])[0]
+        exact_param = args.get("exact", ["0"])[0]
         if (len(query) > 100 or len(maker) > 80 or category not in CATEGORIES
-            or exact not in ("0", "1") or (exact == "1" and not query)
+            or exact_param not in ("0", "1") or (exact_param == "1" and not query)
             or not re.fullmatch(r"\d{1,4}", page) or int(page) > 1000
             or any(ord(char) < 32 or ord(char) == 127 for char in query + maker)):
             return self.respond(400, {"error": "Invalid catalog search"})
+        exact = exact_param == "1"
         if not query and not maker:
             return self.respond(200, {"items": [], "hasMore": False, "filterVersion": ENGINE_VERSION,
                                      "category": category, "exact": exact,

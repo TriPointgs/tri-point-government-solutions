@@ -1,0 +1,37 @@
+name: Website tests
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Verify SQLite FTS5
+        run: |
+          python3 - <<'PY'
+          import sqlite3
+          db = sqlite3.connect(":memory:")
+          db.execute("CREATE VIRTUAL TABLE catalog USING fts5(description)")
+          print(f"SQLite {sqlite3.sqlite_version} supports FTS5")
+          PY
+
+      - run: npm ci
+      - run: npm test

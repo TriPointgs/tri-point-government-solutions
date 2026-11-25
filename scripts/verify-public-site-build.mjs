@@ -8,7 +8,7 @@ for(const id of ['capabilities','contracting'])assert.ok(home.includes(`id="${id
 assert.match(contact,/id="contact-form"/);assert.match(contact,/name="manufacturers"/);assert.match(contact,/name="interests"/);assert.match(contact,/id="contact-submit"/);assert.match(contact,/src="\/assets\/contact.js"/);
 assert.match(contact,/id="brand-inquiry-selection"/);assert.match(contact,/privacy#website-inquiries/);assert.match(fs.readFileSync('dist/privacy.html','utf8'),/id="website-inquiries"/);
 const options=JSON.parse(fs.readFileSync('dist/assets/quote-options.json','utf8'));assert.ok(options.length>40);assert.ok(options.every(o=>o.image.startsWith('/assets/')&&!o.manufacturerUrl));
-for(const p of ['dist/assets/quote-selection.js','dist/assets/quote-marketplace.js','dist/assets/contact.css','dist/assets/contact-admin.js','dist/assets/experience.js'])assert.ok(fs.existsSync(p));
+for(const p of ['dist/assets/quote-item-limits.js','dist/assets/quote-selection.js','dist/assets/quote-marketplace.js','dist/assets/contact.css','dist/assets/contact-admin.js','dist/assets/experience.js'])assert.ok(fs.existsSync(p));
 for(const brand of ['ptzoptics','wasabi']){const html=fs.readFileSync('dist/solutions/'+brand+'.html','utf8');assert.match(html,/data-product-card/);assert.match(html,/id="portfolio"/);assert.match(html,/id="brand-compare-dialog"/);assert.doesNotMatch(html,/Add to cart|Buy now|SubmitPO|authorized reseller/i);assert.ok(home.includes('href="/solutions/'+brand+'"'));assert.match(html,/href="\/contact\?manufacturer=/);}
 const arctic=fs.readFileSync('dist/solutions/arctic-wolf.html','utf8');
 assert.ok(home.includes('href="/solutions/arctic-wolf"'));
