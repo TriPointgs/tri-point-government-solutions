@@ -1,0 +1,28 @@
+.arctic-home-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.24fr) minmax(0, .76fr);
+  align-items: center;
+  gap: 2.75rem;
+}
+
+.arctic-home-badge {
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 1px solid rgba(11, 31, 51, .12);
+  border-radius: 20px;
+  padding: clamp(16px, 2.8vw, 32px);
+}
+
+.arctic-home-badge img {
+  display: block;
+  width: min(100%, 400px);
+  height: auto;
+}
+
+@media (max-width: 800px) {
+  .arctic-home-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4rem;
+  }
+}

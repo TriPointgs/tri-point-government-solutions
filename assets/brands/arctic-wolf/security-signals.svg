@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 700" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="35" x2="704" y2="661" gradientUnits="userSpaceOnUse"><stop stop-color="#121c42"/><stop offset="1" stop-color="#0e4274"/></linearGradient>
+    <radialGradient id="core" cx="0" cy="0" r="1" gradientTransform="translate(468 329) scale(284)" gradientUnits="userSpaceOnUse"><stop stop-color="#2d7cd1" stop-opacity=".48"/><stop offset="1" stop-color="#2d7cd1" stop-opacity="0"/></radialGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0v32" stroke="#c0e3ff" stroke-opacity=".11"/></pattern>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h760v700H0z"/><path fill="url(#grid)" d="M0 0h760v700H0z"/><path fill="url(#core)" d="M0 0h760v700H0z"/>
+  <g stroke="#7cbbf5" stroke-opacity=".38"><circle cx="465" cy="330" r="164"/><circle cx="465" cy="330" r="125"/><circle cx="465" cy="330" r="88"/><path d="M465 166v328M301 330h328"/></g>
+  <path d="M126 191h142l87 76h57M126 329h266M126 468h142l87-78h57M536 330h95" stroke="#a8d3ff" stroke-width="2"/>
+  <g fill="#142c56" stroke="#578bc6" stroke-width="1.5"><rect x="92" y="158" width="139" height="66" rx="9"/><rect x="92" y="296" width="139" height="66" rx="9"/><rect x="92" y="435" width="139" height="66" rx="9"/></g>
+  <g fill="#d9ebff" font-family="Arial,sans-serif" font-size="13" letter-spacing="1.5"><text x="111" y="197">ENDPOINTS</text><text x="111" y="335">NETWORKS</text><text x="111" y="474">CLOUD</text></g>
+  <g fill="#9ed3ff"><circle cx="268" cy="191" r="5"/><circle cx="319" cy="329" r="5"/><circle cx="268" cy="468" r="5"/><circle cx="625" cy="330" r="5"/></g>
+  <path d="M465 251 543 294v71l-78 44-78-44v-71z" fill="#153a6d" stroke="#8dc8ff" stroke-width="2"/>
+  <path d="m465 273 57 32v50l-57 32-57-32v-50z" fill="#214e87" stroke="#89c2f4"/>
+  <path d="m428 334 16-12 15 13 19-28 13 18 15-10" stroke="#daefff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="465" cy="166" r="5" fill="#f6cf96"/><circle cx="549" cy="437" r="5" fill="#f6cf96"/>
+  <path d="M97 98h55m-55 8h32m520 434h-53m53 8h-28" stroke="#83b9ea" stroke-opacity=".72" stroke-linecap="round"/>
+</svg>

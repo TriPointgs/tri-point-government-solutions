@@ -1,0 +1,406 @@
+{
+  "brand": "Wasabi",
+  "verifiedOn": "2026-11-02",
+  "catalogScope": "Manufacturer products, services and named platform capabilities. Dell-delivered offerings and beta integrations are clearly identified.",
+  "heroImage": "/assets/brands/wasabi/storage-protection-hero.webp",
+  "heroAlt": "Wasabi illustration showing cloud data protected by access controls, identity verification and a security shield",
+  "logo": "/assets/brands/wasabi/wasabi-logo.webp",
+  "products": [
+    {
+      "id": "hot-cloud-storage",
+      "name": "Wasabi Hot Cloud Storage",
+      "category": "object-storage",
+      "description": "S3-compatible object storage for backups, archives, media libraries and application data, with immediate access rather than retrieval from a cold tier.",
+      "features": [
+        "S3-compatible workflows",
+        "Object Lock retention controls",
+        "Pay-as-you-go and reserved-capacity options"
+      ],
+      "variants": [
+        "Pay as You Go",
+        "Pay as You Go - Commit",
+        "Reserved Capacity Storage",
+        "Reserved Capacity Storage - Capped"
+      ],
+      "image": "/assets/brands/wasabi/hot-cloud-storage.webp",
+      "imageAlt": "Wasabi cloud-storage illustration",
+      "source": "Brand_Guidelines_2024_Draft_10.pdf, page 22; current product page",
+      "manufacturerUrl": "https://wasabi.com/cloud-object-storage",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "storage-product",
+      "inquiryLabel": "Request a storage quote"
+    },
+    {
+      "id": "wasabi-fire",
+      "name": "Wasabi Fire",
+      "category": "object-storage",
+      "description": "Low-latency cloud object storage designed for AI, media processing and interactive applications that need fast reads and writes.",
+      "features": [
+        "S3-compatible access",
+        "Latency-sensitive workloads",
+        "Pricing and availability by inquiry"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/wasabi-fire.webp",
+      "imageAlt": "Wasabi server illustration for low-latency storage",
+      "source": "Brand_Guidelines_2024_Draft_10.pdf, page 22; current Wasabi Fire page",
+      "manufacturerUrl": "https://wasabi.com/cloud-object-storage/wasabi-fire",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "storage-product",
+      "inquiryLabel": "Discuss availability"
+    },
+    {
+      "id": "ai-storage",
+      "name": "Wasabi AI Storage",
+      "category": "ai-workflows",
+      "description": "Keep training datasets, model checkpoints and artifacts in an S3-compatible object layer that connects to your chosen compute environment. This is a storage solution for AI workflows, rather than a separate storage SKU.",
+      "features": [
+        "Storage for datasets and model artifacts",
+        "S3-compatible access for AI tools",
+        "Retention and protection planning"
+      ],
+      "variants": [
+        "AI workflow solution"
+      ],
+      "image": "/assets/brands/wasabi/ai-storage.webp",
+      "imageAlt": "Wasabi AI-brain illustration for AI data and model storage",
+      "source": "Current Wasabi AI Storage solution page, checked November 2, 2026; Brand_Guidelines_2024_Draft_10.pdf, page 22",
+      "manufacturerUrl": "https://wasabi.com/solutions/ai",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "solution",
+      "inquiryLabel": "Discuss this solution"
+    },
+    {
+      "id": "cloud-nas",
+      "name": "Wasabi Cloud NAS",
+      "category": "file-workflows",
+      "description": "Extend existing file storage into the cloud while keeping a familiar file-based workflow for users and applications.",
+      "features": [
+        "Hybrid file storage",
+        "Offload selected data from local storage",
+        "Review operating-system and capacity requirements"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/cloud-nas.webp",
+      "imageAlt": "Wasabi file-server illustration",
+      "source": "Cloud Nas Data Sheet.pdf; Brand_Guidelines_2024_Draft_10.pdf, page 22",
+      "manufacturerUrl": "https://wasabi.com/cloud-object-storage/cloud-nas",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "storage-product",
+      "inquiryLabel": "Request a storage quote"
+    },
+    {
+      "id": "surveillance-cloud",
+      "name": "Wasabi Surveillance Cloud",
+      "category": "file-workflows",
+      "description": "Pair cloud-bridge software with object storage to extend the capacity of a compatible on-premises video management system.",
+      "features": [
+        "Retain surveillance recordings off site",
+        "Work with the existing VMS",
+        "Review camera count, bitrate and retention"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/surveillance-cloud.webp",
+      "imageAlt": "Wasabi surveillance-camera illustration",
+      "source": "2025 Wasabi for Video Surveillance Presentation.pdf; current product page; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/cloud-object-storage/surveillance-cloud",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "storage-product",
+      "inquiryLabel": "Request a storage quote"
+    },
+    {
+      "id": "covert-copy",
+      "name": "Covert Copy",
+      "category": "protection",
+      "description": "A built-in Wasabi protection capability for keeping a hidden recovery copy of selected data with tightly controlled access.",
+      "features": [
+        "Logically air-gapped copy",
+        "Immutable retention",
+        "Multi-User Authorization for recovery access"
+      ],
+      "variants": [
+        "Included platform capability"
+      ],
+      "image": "/assets/brands/wasabi/covert-copy.webp",
+      "imageAlt": "Wasabi recovery-vault illustration",
+      "source": "Covert-Copy-One-Pager.pdf; current manufacturer explanation; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/blog/data-protection/covert-copy-the-strongest-air-gap-you-ll-never-notice",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "platform-capability",
+      "inquiryLabel": "Discuss this capability"
+    },
+    {
+      "id": "object-replication",
+      "name": "Wasabi Object Replication",
+      "category": "protection",
+      "description": "Maintain additional copies of bucket data across Wasabi locations to support a recovery or data-placement plan.",
+      "features": [
+        "Bucket-to-bucket replication",
+        "Storage-region planning",
+        "Review versioning and policy compatibility"
+      ],
+      "variants": [
+        "Platform capability"
+      ],
+      "image": "/assets/brands/wasabi/object-replication.webp",
+      "imageAlt": "Wasabi replication-routing illustration",
+      "source": "Current manufacturer storage tools page; Brand_Guidelines_2024_Draft_10.pdf, page 22",
+      "manufacturerUrl": "https://wasabi.com/cloud-object-storage/object-replication",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "platform-capability",
+      "inquiryLabel": "Discuss this capability"
+    },
+    {
+      "id": "cloud-sync-manager",
+      "name": "Wasabi Cloud Sync Manager",
+      "category": "migration",
+      "description": "A managed migration service for moving object data from supported cloud or on-premises storage into Wasabi.",
+      "features": [
+        "Copy, sync and move workflows",
+        "Managed migration planning",
+        "Review source-provider retrieval costs"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/cloud-sync-manager.webp",
+      "imageAlt": "Wasabi cloud-transfer-folder illustration",
+      "source": "Current manufacturer page and docs.wasabi.com/wcsm-wasabi-cloud-sync-manager; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/cloud-object-storage/tools/cloud-sync-manager",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "service",
+      "inquiryLabel": "Discuss this service"
+    },
+    {
+      "id": "wasabi-ball",
+      "name": "Wasabi Ball Transfer Appliance",
+      "category": "migration",
+      "description": "Load a rented transfer appliance on your local network, then return it for data ingestion into Wasabi when online transfer is impractical.",
+      "features": [
+        "Physical bulk-data transfer",
+        "Encrypted data loading",
+        "Rental and regional availability by quote"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/wasabi-ball.webp",
+      "imageAlt": "Wasabi data-transfer-drive illustration",
+      "source": "Current manufacturer product page; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/cloud-object-storage/tools/data-transfer-appliance",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "service",
+      "inquiryLabel": "Discuss this service"
+    },
+    {
+      "id": "direct-connect",
+      "name": "Wasabi Direct Connect",
+      "category": "migration",
+      "description": "Connect a data center or supported cloud environment to Wasabi using private network connectivity instead of the public internet.",
+      "features": [
+        "Dedicated Direct Connect",
+        "Hosted Direct Connect",
+        "Wasabi Interconnect"
+      ],
+      "variants": [
+        "Dedicated",
+        "Hosted",
+        "Interconnect"
+      ],
+      "image": "/assets/brands/wasabi/direct-connect.webp",
+      "imageAlt": "Wasabi network-connectivity illustration",
+      "source": "Current manufacturer Direct Connect page; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/cloud-object-storage/tools/direct-connect",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "service",
+      "inquiryLabel": "Discuss this service"
+    },
+    {
+      "id": "account-control-manager",
+      "name": "Wasabi Account Control Manager",
+      "category": "management",
+      "description": "Manage multiple Wasabi accounts from a central platform, with account provisioning, usage visibility and billing workflows.",
+      "features": [
+        "Multi-tier account management",
+        "Central usage visibility",
+        "Account lifecycle controls"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/account-control-manager.webp",
+      "imageAlt": "Wasabi account-management-dashboard illustration",
+      "source": "Wasabi Account Control Manager Data Sheet.pdf; current product page; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/cloud-object-storage/tools/account-control-manager",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "management-tool",
+      "inquiryLabel": "Discuss this tool"
+    },
+    {
+      "id": "custom-cloud-console",
+      "name": "Custom Cloud Console",
+      "category": "management",
+      "description": "A white-label storage console for eligible Wasabi Account Control Manager deployments, giving end customers a branded interface for their storage.",
+      "features": [
+        "Customer-facing branding",
+        "Bucket and object access",
+        "Requires WACM and onboarding review"
+      ],
+      "variants": [
+        "WACM capability"
+      ],
+      "image": "/assets/brands/wasabi/custom-cloud-console.webp",
+      "imageAlt": "Wasabi browser-console illustration",
+      "source": "Wasabi Account Control Manager Data Sheet.pdf, page 3; current CCC documentation; brand illustration",
+      "manufacturerUrl": "https://docs.wasabi.com/docs/custom-cloud-console-getting-started",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "platform-capability",
+      "inquiryLabel": "Discuss this capability"
+    },
+    {
+      "id": "account-control-api",
+      "name": "Wasabi Account Control API",
+      "category": "management",
+      "description": "Connect your own provisioning and service-management software to supported Wasabi account operations through an API.",
+      "features": [
+        "Programmatic account operations",
+        "Automation for managed services",
+        "Application development required"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/account-control-api.webp",
+      "imageAlt": "Wasabi API-and-gear illustration",
+      "source": "Current product terms: Account Control Manager and API; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/product-terms",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "management-tool",
+      "inquiryLabel": "Discuss this tool"
+    },
+    {
+      "id": "dell-objectscale",
+      "name": "Wasabi with Dell ObjectScale",
+      "category": "object-storage",
+      "description": "A Dell-delivered storage offering with capped reserved capacity. Contract scope and purchase route are confirmed with Dell.",
+      "features": [
+        "Reserved capacity",
+        "Capacity cap",
+        "Delivered through Dell"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/dell-objectscale.webp",
+      "imageAlt": "Wasabi object-storage database illustration",
+      "source": "Current product terms: Wasabi with Dell ObjectScale; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/product-terms",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "dell-delivered-offering",
+      "inquiryLabel": "Discuss Dell sourcing"
+    },
+    {
+      "id": "surveillance-dell-objectscale",
+      "name": "Wasabi Surveillance Cloud with Dell ObjectScale",
+      "category": "file-workflows",
+      "description": "Combine the Surveillance Cloud bridge with the Dell ObjectScale offering for video retention. Available through Dell.",
+      "features": [
+        "VMS integration review",
+        "Capped reserved capacity",
+        "Dell purchase route"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/surveillance-dell-objectscale.webp",
+      "imageAlt": "Wasabi video-camera illustration for surveillance storage",
+      "source": "Current product terms: Wasabi Surveillance Cloud with Dell ObjectScale; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/product-terms",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "dell-delivered-offering",
+      "inquiryLabel": "Discuss Dell sourcing"
+    },
+    {
+      "id": "cloud-nas-dell-objectscale",
+      "name": "Wasabi Cloud NAS with Dell ObjectScale",
+      "category": "file-workflows",
+      "description": "Combine Cloud NAS file-gateway software with the Dell ObjectScale storage offering. Available through Dell.",
+      "features": [
+        "File-gateway workflow",
+        "Capped reserved capacity",
+        "Dell purchase route"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/cloud-nas-dell-objectscale.webp",
+      "imageAlt": "Wasabi file-archive illustration",
+      "source": "Current product terms: Wasabi Cloud NAS with Dell ObjectScale; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/product-terms",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "dell-delivered-offering",
+      "inquiryLabel": "Discuss Dell sourcing"
+    },
+    {
+      "id": "wasabi-explorer",
+      "name": "Wasabi Explorer",
+      "category": "management",
+      "description": "Browse and manage Wasabi storage with an S3 client. Review the supported client version and system requirements before installing.",
+      "features": [
+        "Storage-client utility",
+        "Bucket and object management",
+        "Manufacturer download and documentation"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/wasabi-explorer.webp",
+      "imageAlt": "Wasabi search-and-browse illustration",
+      "source": "Current Wasabi Explorer documentation; brand illustration",
+      "manufacturerUrl": "https://docs.wasabi.com/docs/Wasabi-Explorer",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "management-tool",
+      "inquiryLabel": "Discuss this tool"
+    },
+    {
+      "id": "premium-support",
+      "name": "Wasabi Premium Support",
+      "category": "management",
+      "description": "Select a manufacturer support plan for your Wasabi deployment when your operational requirements extend beyond basic support.",
+      "features": [
+        "Manufacturer support service",
+        "Plan-specific coverage",
+        "Confirm service scope in the quote"
+      ],
+      "variants": [],
+      "image": "/assets/brands/wasabi/premium-support.webp",
+      "imageAlt": "Wasabi information-and-support illustration",
+      "source": "Current manufacturer support page; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/support",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "service",
+      "inquiryLabel": "Discuss this service"
+    },
+    {
+      "id": "wasabi-mcp",
+      "name": "Wasabi MCP (beta)",
+      "category": "ai-workflows",
+      "description": "Connect compatible AI agents to Wasabi storage through the manufacturer's beta Model Context Protocol integration.",
+      "features": [
+        "AI-agent storage access",
+        "MCP-compatible tools",
+        "Beta availability and security review"
+      ],
+      "variants": [
+        "Beta integration"
+      ],
+      "image": "/assets/brands/wasabi/wasabi-mcp.webp",
+      "imageAlt": "Wasabi puzzle-piece illustration for the MCP beta integration",
+      "source": "Current Wasabi AI Storage page lists Wasabi MCP as beta; brand illustration",
+      "manufacturerUrl": "https://wasabi.com/solutions/ai",
+      "imageType": "manufacturer-illustration",
+      "offeringType": "beta-integration",
+      "inquiryLabel": "Discuss beta availability"
+    }
+  ],
+  "commercialNote": "Configuration, compatibility, regional availability and commercial terms are confirmed per quote. No storage account or subscription is activated by an inquiry.",
+  "pricingNote": "Storage minimums, minimum storage duration and egress-policy conditions vary by offering and pricing model. Review the applicable Wasabi terms before ordering.",
+  "sourceLinks": [
+    {
+      "title": "Wasabi product and service terms",
+      "url": "https://wasabi.com/product-terms"
+    },
+    {
+      "title": "Wasabi storage tools",
+      "url": "https://wasabi.com/cloud-object-storage/tools"
+    },
+    {
+      "title": "Wasabi documentation",
+      "url": "https://docs.wasabi.com/"
+    }
+  ]
+}

@@ -21,7 +21,7 @@ if(!preview){
  sitemap=sitemap.replace('</urlset>',loc+'</urlset>');
  fs.writeFileSync(sitemapPath,sitemap);
 }
-const allPages=fs.readdirSync(dist,{recursive:true}).filter(f=>f.endsWith('.html')&&f!=='blog.html'&&!f.startsWith('blog/'));
+const allPages=fs.readdirSync(dist,{recursive:true}).map(f=>f.replaceAll('\\','/')).filter(f=>f.endsWith('.html')&&f!=='blog.html'&&!f.startsWith('blog/'));
 for(const name of allPages){
  const location=dist+'/'+name;let html=fs.readFileSync(location,'utf8');
  const marker='<div class="nav-links">';
@@ -38,7 +38,7 @@ assert.equal((page.match(/<h1\b/g)||[]).length,1);
 assert.doesNotMatch(sitemap,/\/solutions\/zoom/);
 const allArticles=fs.readdirSync('dist/blog').filter(f=>f.endsWith('.html')&&f!=='index.html');
 assert.equal(allArticles.length,posts.length,'Draft articles must never be published');
-for(const file of fs.readdirSync(dist,{recursive:true}).filter(f=>f.endsWith('.html'))){
+for(const file of fs.readdirSync(dist,{recursive:true}).map(f=>f.replaceAll('\\','/')).filter(f=>f.endsWith('.html'))){
  const html=fs.readFileSync(dist+'/'+file,'utf8');
  for(const match of html.matchAll(/(?:href|src)="(\/[^"#?]*)(?:[?#][^"]*)?"/g)){
   const relative=match[1];

@@ -1,0 +1,127 @@
+import {retailerUrl} from '../lib/market-price.mjs';
+import {HttpError} from '../lib/model.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';
+import {createShoppingCollector,normalizeShopping,normalizeExactWebListings,researchAvailabilitySignal,ShoppingResearchError} from '../lib/serpapi-shopping.mjs';
+import {createProductControlsHandler} from '../api/product-controls.js';
+import {sign} from '../lib/security.mjs';
+const product={id:'TD-14790211',manufacturer:'LENOVO',mfgPart:'21KCS4S600',description:'ThinkPad X1 Carbon Gen 12'};
+const row=(extra={})=>({title:'Lenovo ThinkPad X1 Carbon Gen 12 21KCS4S600',source:'Newegg',price:'$1,599.99',extracted_price:1599.99,product_link:'https://www.google.com/shopping/product/123?foo=secret',...extra});
+const response=data=>new Response(JSON.stringify(data),{status:200,headers:{'content-type':'application/json'}});
+const config={VERCEL_ENV:'preview',TP_SERPAPI_KEY:'synthetic-super-secret-serpapi-key'};
+const now=Date.parse('2026-10-20T03:00:00.000Z');
+const norm=data=>normalizeShopping(data,product,{checkedAt:new Date(now).toISOString()});
+test('normalizer strips provider metadata, tracking parameters and unknown fields',()=>{const r=norm({search_metadata:{json_endpoint:'https://serpapi.com/?api_key=SENSITIVE'},shopping_results:[row({api_key:'SENSITIVE',serpapi_product_api:'https://serpapi.com/?api_key=SENSITIVE'})]});assert.equal(r.candidates.length,1);assert.equal(r.candidates[0].priceCents,159999);assert.equal(r.candidates[0].googleProductLink,'https://www.google.com/shopping/product/123');assert.doesNotMatch(JSON.stringify(r),/SENSITIVE|serpapi_product_api|json_endpoint|foo=secret/);});
+test('exact part must have token boundaries, not partial substrings',()=>{const r=norm({shopping_results:[row({title:'Lenovo 21KCS4S6000'}),row({title:'Lenovo (21KCS4S600), model'}),row({title:'Lenovo X1 Carbon',snippet:'Part number 21KCS4S600'})]});assert.deepEqual(r.candidates.map(c=>c.exactPartVisible),[false,true,true]);});
+test('strict title match yields only an indicative, unverified average',()=>{const r=norm({shopping_results:[row({source:'Newegg',extracted_price:1500}),row({source:'Walmart',extracted_price:1600,product_link:'https://www.google.com/shopping/product/222'})]});assert.equal(r.preliminaryAverageCents,155000);assert.equal(r.preliminarySourceCount,2);assert.ok(r.candidates.every(c=>c.eligibleForVerifiedAverage===false&&c.reviewed===false));});
+test('Google multi-seller listing, used items, installments and missing prices cannot enter the indicative average',()=>{const r=norm({shopping_results:[row({multiple_sources:true}),row({source:'Walmart',second_hand_condition:'Refurbished'}),row({source:'Amazon',installment:{price:'$59/month'}}),row({source:'B&H',extracted_price:undefined})]});assert.equal(r.preliminaryAverageCents,null);assert.equal(r.preliminarySourceCount,0);});
+test('duplicate store labels do not inflate the provisional source count',()=>{const r=norm({shopping_results:[row({source:'Newegg'}),row({source:'NEWEGG'}),row({source:'Walmart',product_link:'https://www.google.com/shopping/product/222'})]});assert.equal(r.preliminarySourceCount,2);});
+test('provider errors cannot echo customer input or secret information',()=>{for(const d of [{error:'SECRET_API_KEY'},{search_metadata:{status:'Error'},shopping_results:[]}])assert.throws(()=>norm(d),e=>e.code==='provider_error'&&!e.message.includes('SECRET'));});
+test('unusable or non-google product URLs cannot be opened through the research result',()=>{const r=norm({shopping_results:[row({product_link:'https://evil.invalid/visit?api_key=SENSITIVE'}),row({product_link:'http://www.google.com/shopping/product/123'})]});assert.equal(r.candidates[0].googleProductLink,null);assert.equal(r.candidates[1].googleProductLink,null);});
+test('missing results on reported success is empty, otherwise an error',()=>{assert.equal(norm({search_metadata:{status:'Success'}}).candidates.length,0);assert.throws(()=>norm({}),e=>e.code==='missing_results');});
+test('server collector uses only saved exact part and one fixed SerpApi endpoint',async()=>{let calls=[];const c=createShoppingCollector({env:config,clock:()=>now,fetcher:async(url,opts)=>{calls.push({url,opts});return response({shopping_results:[row()]});}});const r=await c.search(product);assert.equal(calls.length,1);const u=new URL(calls[0].url);assert.equal(u.origin,'https://serpapi.com');assert.equal(u.pathname,'/search.json');assert.equal(u.searchParams.get('engine'),'google_shopping');assert.equal(u.searchParams.get('q'),'"21KCS4S600" LENOVO');assert.equal(u.searchParams.get('gl'),'us');assert.equal(u.searchParams.get('api_key'),config.TP_SERPAPI_KEY);assert.equal(calls[0].opts.method,'GET');assert.equal(calls[0].opts.redirect,'error');assert.doesNotMatch(JSON.stringify(r),/synthetic-super-secret/);});
+test('configured status reveals no key or credential fragment',()=>{const s=createShoppingCollector({env:config}).status();assert.equal(s.configured,true);assert.equal(s.queriesPerTrigger,1);assert.doesNotMatch(JSON.stringify(s),/synthetic-super-secret/);});
+test('production gate and missing key do not consume provider requests',async()=>{let calls=0;for(const env of [{VERCEL_ENV:'production',TP_SERPAPI_KEY:'synthetic-super-secret-serpapi-key'},{VERCEL_ENV:'preview'}]){const c=createShoppingCollector({env,fetcher:async()=>{calls++;}});await assert.rejects(c.search(product),e=>e.status===503);}assert.equal(calls,0);});
+test('invalid saved ID or unqueryable part fails before provider contact',async()=>{let calls=0;const c=createShoppingCollector({env:config,fetcher:async()=>{calls++;}});await assert.rejects(c.search({...product,id:'other'}),e=>e.status===400);await assert.rejects(c.search({...product,mfgPart:'<script>'}),e=>e.status===400);assert.equal(calls,0);});
+test('errors and quota exhaustion are sanitized; no retries',async()=>{for(const [status,code]of [[401,'invalid_credentials'],[429,'credits_or_rate'],[500,'provider_http']]){let calls=0;const c=createShoppingCollector({env:config,fetcher:async()=>{calls++;return new Response(JSON.stringify({error:'synthetic-super-secret-serpapi-key'}),{status,headers:{'content-type':'application/json'}});}});await assert.rejects(c.search(product),e=>e.code===code&&!e.message.includes('synthetic-super-secret'));assert.equal(calls,1);}});
+test('no unlimited body sizes, non-JSON, malformed JSON or oversized result collections',async()=>{for(const [res,code]of [[new Response('plain',{headers:{'content-type':'text/html'}}),'content_type'],[new Response('{',{headers:{'content-type':'application/json'}}),'invalid_json'],[new Response('{}',{headers:{'content-type':'application/json','content-length':'700001'}}),'response_size']]){const c=createShoppingCollector({env:config,fetcher:async()=>res});await assert.rejects(c.search(product),e=>e.code===code);}assert.throws(()=>norm({shopping_results:Array(301).fill(row())}),e=>e.code==='oversized_results');});
+process.env.TP_SESSION_SECRET='synthetic-serpapi-session-unit-test-secret';process.env.NODE_ENV='test';
+const admin=()=>sign({type:'admin',at:Date.now()});
+async function route({url='/api/product-controls',method='POST',token,origin='https://tripointgs.com',body={action:'marketSearch',id:product.id},env={VERCEL_ENV:'preview'},rate=async()=>{}}={}){let called=0,resBody='';const service={marketSearch:async()=>{called++;return {candidates:[],preliminaryAverageCents:null}},shoppingStatus:()=>({configured:true})};const handler=createProductControlsHandler({env,service,rate}),res={headers:{},setHeader(k,v){this.headers[k]=v;},end(t=''){resBody=t;}};await handler({method,url,headers:{...(token?{cookie:'__Host-tp_admin='+token}:{}),...(origin?{origin}:{}),...(body?{'content-type':'application/json'}:{})},body},res);return {status:res.statusCode,called,body:resBody};}
+test('shopping research requires staff session and same-site POST',async()=>{for(const token of [undefined,sign({type:'contractor',at:Date.now()})]){const r=await route({token});assert.equal(r.status,401);assert.equal(r.called,0);}assert.equal((await route({token:admin(),origin:'https://evil.test'})).status,403);});
+test('production and nonapproved action cannot access research',async()=>{assert.equal((await route({token:admin(),env:{VERCEL_ENV:'production'}})).status,503);const r=await route({token:admin(),body:{action:'marketSearch',id:product.id,price:1}});assert.equal(r.status,400);assert.equal(r.called,0);});
+test('shopping status cannot leak secret configuration or call provider',async()=>{const r=await route({url:'/api/product-controls?view=shopping-status',method:'GET',token:admin(),body:undefined});assert.equal(r.status,200);assert.equal(r.called,0);});
+test('rate limiting happens before provider usage',async()=>{const r=await route({token:admin(),rate:async()=>{throw new HttpError(429,'Wait');}});assert.equal(r.status,429);assert.equal(r.called,0);});
+
+test('foreign and undisclosed currencies are never included in provisional US dollar calculation',()=>{const r=norm({shopping_results:[row({source:'Newegg',price:'£1,599.99'}),row({source:'Walmart',price:'CA$1,499.99'})]});assert.equal(r.preliminaryAverageCents,null);assert.equal(r.preliminarySourceCount,0);});
+
+test('exact-part organic search returns recognized retailer pages but no price benchmark',()=>{
+ const rows=[{title:'ThinkPad X1 Carbon (21KCS4S600)',link:'https://www.staples.com/product_24691889?utm_source=ad',snippet:'Lenovo 21KCS4S600 at Staples'},{title:'Lenovo X1 Carbon 21KCS4S600',link:'https://www.newegg.com/lenovo-laptop/p/1TS-000E-1E2Y4',snippet:'Manufacturer 21KCS4S600'},{title:'Other ThinkPad',link:'https://example.org/product',snippet:'not the requested model'}];
+ const r=normalizeExactWebListings({organic_results:rows},product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(r.mode,'exact_web');assert.equal(r.exactTitleMatches,2);assert.equal(r.preliminaryAverageCents,null);
+ assert.equal(r.candidates[0].vendorLink,'https://www.staples.com/product_24691889');
+ assert.equal(r.candidates[1].vendorLink,'https://www.newegg.com/lenovo-laptop/p/1TS-000E-1E2Y4');
+ assert.equal(r.candidates[2].vendorLink,null);
+});
+test('exact web search uses Google organic engine only once and returns no key',async()=>{
+ let calls=0;const c=createShoppingCollector({env:config,clock:()=>now,fetcher:async url=>{calls++;const u=new URL(url);assert.equal(u.searchParams.get('engine'),'google');assert.equal(u.searchParams.get('q'),'"21KCS4S600" LENOVO');return response({organic_results:[{title:'21KCS4S600 laptop',link:'https://www.staples.com/product_24691889',snippet:'Part 21KCS4S600'}]});}});
+ const r=await c.search(product,{mode:'exact_web'});assert.equal(calls,1);assert.equal(r.mode,'exact_web');assert.doesNotMatch(JSON.stringify(r),/synthetic-super-secret/);
+});
+test('unsupported search modes never spend a credit',async()=>{let n=0;const c=createShoppingCollector({env:config,fetcher:async()=>{n++}});await assert.rejects(c.search(product,{mode:'unrestricted_web'}),e=>e.status===400);assert.equal(n,0)});
+test('Google product IDs provide safe research link when product_link missing',()=>{
+ const r=norm({shopping_results:[row({product_link:undefined,product_id:'123456789012345'})]});
+ assert.match(r.candidates[0].googleProductLink,/^https:\/\/www\.google\.com\/search\?udm=28/);
+ assert.doesNotMatch(r.candidates[0].googleProductLink,/api_key/);
+ assert.equal(norm({shopping_results:[row({product_link:undefined,product_id:'foo'})]}).candidates[0].googleProductLink,null);
+});
+test('web search does not infer item prices from snippets',()=>{
+ const r=normalizeExactWebListings({organic_results:[{title:'21KCS4S600',snippet:'Price $1,849.99',link:'https://www.staples.com/product_24691889'}]},product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(r.candidates[0].priceCents,null);assert.equal(r.preliminaryAverageCents,null);assert.equal(r.candidates[0].eligibleForVerifiedAverage,false);
+});
+
+test('a unique US-dollar search snippet becomes a price hint, never a verified offer',()=>{
+ const listings=[{title:'THINKPAD X1 CARBON GEN 12 (21KCS4S600)',link:'https://www.shi.com/product/51037510/THINKPAD-X1-CARBON-GEN-12',snippet:'Mfr Part #: 21KCS4S600 ; Price: $1,551.00 ; Product Type Other.'},
+  {title:'THINKPAD X1 CARBON GEN 12 21KCS4S600',link:'https://petrocore.invalid/product',snippet:'21KCS4S600 $1,550.99. Excludes tax. Available to order, supplied to order.'}];
+ const d=normalizeExactWebListings({organic_results:listings},product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(d.preliminaryAverageCents,null);
+ assert.equal(d.candidates[0].priceHintCents,155100);
+ assert.equal(d.candidates[1].priceHintCents,155099);
+ assert.equal(d.candidates[0].priceCents,null);
+ assert.equal(d.candidates[1].priceCents,null);
+ assert.equal(d.candidates[0].vendorLink,'https://www.shi.com/product/51037510/THINKPAD-X1-CARBON-GEN-12');
+ assert.equal(d.candidates[1].vendorLink,null);
+ assert.match(d.candidates[1].researchLink,/^https:\/\/www\.google\.com\/search\?q=/);
+ assert.ok(d.candidates.every(x=>x.reviewed===false&&x.eligibleForVerifiedAverage===false));
+});
+test('ambiguous promotional or multiple dollar prices are never guessed as a price hint',()=>{
+ const rows=[{title:'Lenovo 21KCS4S600',snippet:'Save $-1,634.34 on price',link:'https://example.org/one'},
+ {title:'21KCS4S600',snippet:'$10,841.60 $10,841.60 $12,149.92',link:'https://example.org/two'},
+ {title:'21KCS4S600',snippet:'Monthly installment $89.99 per month',link:'https://example.org/three'},
+ {title:'21KCS4S600',snippet:'New model $1,551.00 or open box $1,099.00',link:'https://example.org/four'}];
+ const d=normalizeExactWebListings({organic_results:rows},product,{checkedAt:new Date(now).toISOString()});
+ assert.ok(d.candidates.every(x=>x.priceHintCents===null));
+});
+test('only supported USD rich extensions become a snippet price hint, not a verified offer',()=>{
+ const rows=[{title:'21KCS4S600',snippet:'Exact MPN',rich_snippet:{bottom:{detected_extensions:{price:1551,currency:'$'}}}},
+ {title:'21KCS4S600',snippet:'Exact MPN',rich_snippet:{bottom:{detected_extensions:{price:1551,currency:'GBP'}}}}];
+ const d=normalizeExactWebListings({organic_results:rows},product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(d.candidates[0].priceHintCents,155100);
+ assert.equal(d.candidates[1].priceHintCents,null);
+});
+test('SHI and Staples product pages allowed for manual review, not search or untrusted domains',()=>{
+ assert.equal(retailerUrl('shi','https://www.shi.com/product/51037510/THINKPAD-X1-CARBON-GEN-12?utm_campaign=ad'),'https://www.shi.com/product/51037510/THINKPAD-X1-CARBON-GEN-12');
+ assert.equal(retailerUrl('staples','https://www.staples.com/product_24691889'),'https://www.staples.com/product_24691889');
+ assert.throws(()=>retailerUrl('shi','https://www.shi.com/search?q=MPN'),e=>e.status===400);
+ assert.throws(()=>retailerUrl('staples','https://www.staples.com.evil.invalid/product_123'),e=>e.status===400);
+});
+
+test('search evidence distinguishes backorders, unavailable, and supplier-order language',()=>{
+ const examples=[
+ ['Lenovo 21KCS4S600','SHI - $1,551.00 Backorder Stock: 0','backorder_or_zero'],
+ ['Lenovo 21KCS4S600','In stock 0 remaining, backordered','backorder_or_zero'],
+ ['Lenovo 21KCS4S600','New. Out of Stock. Notify when available.','out_of_stock'],
+ ['Lenovo 21KCS4S600','Price: $1,550.99. Available to order. Supplied to order.','supplier_order'],
+ ['Lenovo 21KCS4S600','Manufacturer Drop Ship.','supplier_order'],
+ ['Lenovo 21KCS4S600','New factory sealed. 656 in stock.','in_stock_claim'],
+ ['Lenovo 21KCS4S600','Price $1,749.99. Add to cart.','unknown'],
+ ];
+ for(const [title,snippet,wanted] of examples)assert.equal(researchAvailabilitySignal(title,snippet).status,wanted,snippet);
+});
+test('exact web research exposes stock signals without approving snippet price as sellable',()=>{
+ const data={organic_results:[
+ {title:'THINKPAD X1 CARBON GEN 12 | Overview Specs',snippet:'Mfr Part #: 21KCS4S600 Price: $1,551.00 Backorder Stock: 0',link:'https://www.shi.com/product/51037510/THINKPAD-X1-CARBON-GEN-12'},
+ {title:'THINKPAD X1 CARBON GEN 12 | 21KCS4S600',snippet:'$1,550.99. Available to order. Supplied to order',link:'https://example.invalid/abc'}
+ ]};
+ const r=normalizeExactWebListings(data,product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(r.priceHintCount,2);
+ assert.equal(r.candidates[0].availabilitySignal.status,'backorder_or_zero');
+ assert.equal(r.candidates[1].availabilitySignal.status,'supplier_order');
+ assert.equal(r.candidates[0].priceHintCents,155100);
+ assert.equal(r.candidates[1].priceHintCents,155099);
+ assert.equal(r.preliminaryAverageCents,null);
+ assert.ok(r.candidates.every(x=>x.eligibleForVerifiedAverage===false&&x.reviewed===false));
+});
+test('unknown stock never becomes an in-stock claim from an add-to-cart button',()=>{
+ const result=normalizeExactWebListings({organic_results:[{title:'21KCS4S600',snippet:'Add to Cart. Price $1,749.99',link:'https://www.newegg.com/lenovo/p/123'}]},product,{checkedAt:new Date(now).toISOString()});
+ assert.equal(result.candidates[0].availabilitySignal.status,'unknown');
+ assert.equal(result.candidates[0].priceCents,null);
+});

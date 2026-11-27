@@ -53,7 +53,7 @@ export function transformPage(input,route){
 export function applyBoundary(root='dist'){
  const output=path.resolve(root);assert.equal(path.basename(output),'dist','Only generated dist output may be changed');
  for(const retired of RETIRED){fs.rmSync(path.join(output,retired),{recursive:true,force:true});fs.rmSync(path.join(output,retired+'.html'),{force:true});}
- const files=fs.readdirSync(output,{recursive:true}).filter(f=>f.endsWith('.html'));
+ const files=fs.readdirSync(output,{recursive:true}).map(f=>f.replaceAll('\\','/')).filter(f=>f.endsWith('.html'));
  for(const file of files){const route=file==='index.html'?'/':'/'+file.slice(0,-5);const p=path.join(output,file);fs.writeFileSync(p,transformPage(fs.readFileSync(p,'utf8'),route));}
  const origin='https://tripointgs.com';
  fs.writeFileSync(path.join(output,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+origin+'/</loc></url><url><loc>'+origin+'/contractors</loc></url></urlset>');

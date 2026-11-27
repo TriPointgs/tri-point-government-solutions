@@ -19,15 +19,23 @@ const {createCommerceHandler}=await import('../api/commerce.js');
 const {createOrderLabService,createMemoryOrderRepository}=await import('../lib/commerce-service.mjs');
 const syntheticProducts=Array.from({length:55},(_,i)=>({manufacturer:'SYNTHETIC LENOVO',description:'SYNTHETIC ThinkPad notebook '+(i+1),mfgPart:'DEMO-TP-'+String(i+1).padStart(3,'0'),supplierSku:'DEMO-'+(i+1),distributorId:'DEMO-ID-'+(i+1),productFamily:'SYNTHETIC TPP',rawField13:null,rawField14:null,rawField10:null,rawField11:null}));
 const catalog=createCatalogHandler({search:async(q)=>{let products=syntheticProducts.filter(p=>(!q.maker||p.manufacturer.toLowerCase().includes(q.maker.toLowerCase()))&&(!q.q||(q.exact?[p.mfgPart,p.supplierSku,p.distributorId].includes(q.q.toUpperCase()):[p.description,p.mfgPart].join(' ').toLowerCase().includes(q.q.toLowerCase())))&&['all','laptops'].includes(q.category));return {items:products.slice(q.page*50,q.page*50+50),hasMore:products.length>q.page*50+50,priceVerified:false,stockVerified:false,filterVersion:2,category:q.category,exact:q.exact,totalRecords:55};}});
-const commerce=createCommerceHandler({env:{VERCEL_ENV:'preview'},service:createOrderLabService({repository:createMemoryOrderRepository()})});
+const {previewOrderTracking}=await import('./preview-order-tracking.mjs');
+const commerce=createCommerceHandler({env:{VERCEL_ENV:'preview'},service:createOrderLabService({repository:createMemoryOrderRepository()}),trackingHandler:previewOrderTracking});
 const {default:contact}=await import('../api/contact.js');
-const routes={'/api/contact':contact,'/api/catalog':catalog,'/api/commerce':commerce,'/api/zoom-page':zoomPage,'/api/zoom-quotes':zoomQuotes,'/api/zoom-sales':zoomSales,'/api/contractor-auth':contractorAuth,'/api/contractor-profile':contractorProfile,'/api/notifications':notifications,'/api/admin':admin,'/api/intake':intake,'/api/opportunities':opportunities};const root=resolve('dist');
+const {previewProductControls,previewShop}=await import('./preview-products.mjs');
+const routes={'/api/shop':previewShop,'/api/product-controls':previewProductControls,'/api/contact':contact,'/api/catalog':catalog,'/api/commerce':commerce,'/api/zoom-page':zoomPage,'/api/zoom-quotes':zoomQuotes,'/api/zoom-sales':zoomSales,'/api/contractor-auth':contractorAuth,'/api/contractor-profile':contractorProfile,'/api/notifications':notifications,'/api/admin':admin,'/api/intake':intake,'/api/opportunities':opportunities};const root=resolve('dist');
 createServer(async(req,res)=>{
  const pathname=new URL(req.url,'http://localhost:3000').pathname;
  res.setHeader('Cache-Control','private, no-store');
  if(pathname==='/solutions/zoom'||pathname==='/solutions/zoom/quote'||pathname==='/contractors/admin/zoom'){const q=new URL(req.url,'http://localhost:3000').searchParams;q.set('view',pathname==='/contractors/admin/zoom'?'admin':pathname.endsWith('/quote')?'quote':'marketing');req.url='/api/zoom-page?'+q;return zoomPage(req,res);}
  if(pathname==='/admin/catalog'){req.url='/api/catalog?view=page';return catalog(req,res);}
  if(pathname==='/admin/inquiries'){req.url='/api/contact?view=admin-page';return contact(req,res);}
+ if(pathname==='/admin/fulfillment'){req.url='/api/commerce?mode=tracking&view=page';return commerce(req,res);}
+ if(pathname==='/admin/launch'){req.url='/api/shop?view=launch-page';return previewShop(req,res);}
+ const productMatch=pathname.match(/^\/shop-preview\/product\/([1-9]\d{0,11})(?:\/([a-z0-9-]{1,125}))?$/);if(productMatch){req.url='/api/shop?'+new URLSearchParams({view:'product-page',sku:productMatch[1],...(productMatch[2]?{slug:productMatch[2]}:{})});return previewShop(req,res);}
+ const categoryMatch=pathname.match(/^\/shop-preview\/category\/([a-z]+)$/);if(categoryMatch){req.url='/api/shop?'+new URLSearchParams({view:'category-page',category:categoryMatch[1]});return previewShop(req,res);}
+ if(pathname==='/shop-preview'){req.url='/api/shop?view=page';return previewShop(req,res);}
+ if(pathname==='/admin/products'){req.url='/api/product-controls?view=page';return previewProductControls(req,res);}
  if(pathname==='/admin/orders'){req.url='/api/commerce?view=page';return commerce(req,res);}
  if(pathname==='/learn'||pathname.startsWith('/learn/')||pathname==='/government-contracts'||pathname.startsWith('/government-contracts/')){res.statusCode=410;return res.end('Resource retired.');}
  if(routes[pathname])return routes[pathname](req,res);

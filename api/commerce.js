@@ -1,12 +1,16 @@
+import {createStripeSandboxHandler} from '../lib/stripe-sandbox-handler.mjs';
+import {createOrderTrackingHandler} from '../lib/order-tracking-handler.mjs';
 import {requireAdmin,requireOrigin,body,send,fail} from '../lib/security.mjs';
 import {HttpError} from '../lib/model.mjs';
 import {OrderError} from '../lib/commerce-order.mjs';
 import {createOrderLabService} from '../lib/commerce-service.mjs';
 import {createPreviewOrderRepository} from '../lib/commerce-store.mjs';
 import {orderLabPage} from '../lib/order-lab-page.mjs';
-export function createCommerceHandler({env=process.env,service=createOrderLabService({repository:createPreviewOrderRepository(env)})}={}){
+export function createCommerceHandler({env=process.env,service=createOrderLabService({repository:createPreviewOrderRepository(env)}),trackingHandler=createOrderTrackingHandler({env}),sandboxHandler=createStripeSandboxHandler({env})}={}){
  return async(req,res)=>{
   const params=new URL(req.url,'https://tripointgs.com').searchParams,page=params.get('view')==='page';
+  if(params.get('mode')==='tracking')return trackingHandler(req,res);
+  if(params.get('mode')==='stripe-test')return sandboxHandler(req,res);
   res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Robots-Tag','noindex, nofollow');
   try{
    requireAdmin(req);

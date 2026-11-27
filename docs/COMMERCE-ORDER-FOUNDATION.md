@@ -1,8 +1,10 @@
 # Order management foundation — simulation release
 
+> Updated October 22, 2026: the active simulation now requires full captured payment BEFORE supplier submission. Authorization-only release and capture-after-supplier-acceptance have been superseded. See PAID-FIRST-PAYMENT-VERIFICATION-2026-10-22.md for the test-only server verification implementation and live-release boundaries.
+
 ## What this change implements
 
-The new order domain separates website receipt, payment authorization, manual sourcing approval, supplier submission intent, supplier acceptance, captured payment, package shipment, package delivery, and notification preparation. It preserves an immutable selling-price snapshot and applies versioned state transitions.
+The new order domain separates website receipt, payment authorization, manual sourcing approval, captured payment, supplier submission intent, supplier acceptance, package shipment, package delivery, and notification preparation. It preserves an immutable selling-price snapshot and applies versioned state transitions.
 
 The browser lab at `/preview/orders` is compiled only for non-production builds. It contains fixed fictional products and an `example.invalid` buyer. It can demonstrate the entire lifecycle, partial shipments, a high-value hold, supplier rejection, and an uncertain supplier response. It never calls a payment provider, TD SYNNEX, or an email transport. Its export is a customer-safe simulation record, not a real invoice.
 
@@ -25,7 +27,7 @@ No module here sends a supplier purchase order, captures money, sends email, fab
 
 The simulated supplier submission gets one stable PO reference. If its result is uncertain, the order moves to `reconciliation_required`. A second submission cannot start. A confirmed existing-PO acceptance can resolve the uncertainty; other outcomes remain for staff review rather than triggering blind retries.
 
-Payment authorization is not described as a paid receipt. Supplier acceptance is not described as shipment. Delivery is package-specific, and delivering one package does not complete a split order. Shipped quantities cannot exceed ordered quantities. An unpaid/unsubmitted simulation draft can be cancelled; refunds and real supplier cancellations are not implemented.
+Payment authorization is not described as a paid receipt. Supplier acceptance is not described as shipment. Delivery is package-specific, and delivering one package does not complete a split order. Shipped quantities cannot exceed ordered quantities. An unpaid/unsubmitted simulation draft can be cancelled; real refunds and real supplier cancellations are not implemented. The lab can now explicitly simulate a verified full refund after rejection or a paid-order hold; it never moves real money.
 
 Customer projections omit acquisition cost, product gross profit, supplier references, internal review notes, and event fingerprints. The customer notification previews contain only selling prices and appropriate order/shipment details.
 
