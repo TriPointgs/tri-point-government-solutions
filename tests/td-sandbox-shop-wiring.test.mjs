@@ -154,26 +154,44 @@ test('sandbox hides a stored production quote and rejects a pre-sandbox prepared
   await assert.rejects(sandbox.finalizationSource(owner, requestId), error => error.status === 409);
 });
 
-test('account sandbox wiring injects the dedicated UAT reader and disables Lenovo mock delivery/pricing', async () => {
-  const encodedIssuer = Buffer.from('sandbox.clerk.accounts.dev$').toString('base64').replace(/=+$/, '');
+test('shared, account and scenario carts use the UAT reader and suppress account pricing overrides', async () => {
   const host = 'tri-point-government-solutions-preview-tri-point.vercel.app';
-  const env = { ...sandboxEnv, VERCEL_URL: host, TP_BUYER_AUTH_PREVIEW_ENABLED: 'true',
-    TP_MARKETPLACE_ACCOUNT_TEST_CHECKOUT_ENABLED: 'true', TP_MARKETPLACE_LENOVO_TEST_DELIVERY_ENABLED: 'true',
-    TP_MARKETPLACE_LENOVO_TEST_COSTS: '{}', CLERK_SECRET_KEY: 'sk_test_1234567890123456',
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_' + encodedIssuer };
-  let injected;
-  const handler = createShopHandler({ env, rate: async () => {}, service: {}, makeBuyerShop: options => {
-    injected = options;
-    return {};
-  }});
-  const res = { headers: {}, setHeader(k, v) { this.headers[k] = v; }, end(value = '') { this.body = value; } };
-  await handler({ method: 'GET', url: '/api/shop?view=marketplace-buyer-sign-in',
-    headers: { host, 'user-agent': 'test' } }, res);
-  assert.equal(res.statusCode, 200);
-  assert.equal(injected.supplierEnvironment, 'uat', JSON.stringify(injected));
-  assert.equal(injected.settings, undefined);
-  assert.equal(injected.env.TP_MARKETPLACE_LENOVO_TEST_DELIVERY_ENABLED, 'false');
-  assert.equal(injected.td.configuration().supplierEnvironment, 'uat');
-  assert.equal(injected.td.configuration().productionSupplierPricingEnabled, false);
-  assert.equal(injected.td.configuration().enabled, true);
+  const issuer = Buffer.from('sandbox.clerk.accounts.dev$').toString('base64').replace(/=+$/, '');
+  const scenario = {
+    approvedAt: '2026-11-23T12:00:00Z', expiresAt: '2026-11-23T13:00:00Z',
+    products: ['12345', '23456'].map(sku => ({ sku, manufacturerPart: 'PART-' + sku, quantity: 1, taxCode: 'txcd_12345678' })),
+    address: { line1: '123 Example Street', city: 'Example', state: 'GA', postalCode: '30301', country: 'US' },
+  };
+
+  for (const withScenario of [false, true]) {
+    const env = { ...sandboxEnv, VERCEL_URL: host, TP_BUYER_AUTH_PREVIEW_ENABLED: 'true',
+      TP_MARKETPLACE_ACCOUNT_TEST_CHECKOUT_ENABLED: 'true', TP_MARKETPLACE_LENOVO_TEST_DELIVERY_ENABLED: 'true',
+      TP_MARKETPLACE_LENOVO_TEST_COSTS: '{}', CLERK_SECRET_KEY: 'sk_test_1234567890123456',
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_' + issuer,
+      ...(withScenario ? { TP_MARKETPLACE_CART_TEST_SCENARIO: JSON.stringify(scenario) } : {}) };
+    const calls = [];
+    const handler = createShopHandler({ env, rate: async () => {}, makeBuyerShop: options => {
+      calls.push(options);
+      return {};
+    }});
+    if (withScenario) assert.equal(calls.length, 1, 'prepare the scenario only when a buyer opens the account');
+    const res = { setHeader() {}, end() {} };
+    await handler({ method: 'GET', url: '/api/shop?view=marketplace-buyer-sign-in',
+      headers: { host, 'user-agent': 'test' } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(calls.length, 2);
+    const [shared, buyer] = calls;
+    assert.equal(shared.td, buyer.td);
+    assert.equal(shared.cartTestScenario, undefined);
+    assert.deepEqual(buyer.cartTestScenario?.products, withScenario ? scenario.products : undefined);
+    assert.equal(buyer.env.TP_MARKETPLACE_LENOVO_TEST_DELIVERY_ENABLED, 'false');
+    for (const options of calls) {
+      assert.equal(options.supplierEnvironment, 'uat');
+      assert.equal(options.settings, undefined);
+      const config = options.td.configuration();
+      assert.equal(config.enabled, true);
+      assert.equal(config.productionSupplierPricingEnabled, false);
+      assert.equal(config.supplierSubmissionEnabled, false);
+    }
+  }
 });

@@ -17,22 +17,38 @@ const COOKIE='__Host-tp_shop_preview';
 function cartSession(req,res){const value=String(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);const p=verify(value,'shop-preview',86400000);if(p&&typeof p.id==='string'&&/^[0-9a-f-]{36}$/.test(p.id))return p.id;const id=randomUUID();res.setHeader('Set-Cookie',COOKIE+'='+sign({type:'shop-preview',id,at:Date.now()})+'; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=86400');return id;}
 export function createShopHandler({env=process.env,service,makeBuyerShop=createShopService,rate=limit,imageRate=rate===limit?createImageRequestBudget({env}):async(req,action)=>rate(req,'image-'+action,action==='provider'?60:240)}={}){
  const tdSandboxOnly=env.TP_MARKETPLACE_TD_SANDBOX_ONLY==='true';
- let uatReadonly;
- const uatTd={lookup:(...args)=>{uatReadonly??=createTdSandboxReadonly({env});return uatReadonly.lookup(...args);},freight:(...args)=>{uatReadonly??=createTdSandboxReadonly({env});return uatReadonly.freight(...args);},configuration:()=>tdSandboxCheckoutConfiguration(env)};
- const sharedService=service||(tdSandboxOnly?makeBuyerShop({env,td:uatTd,supplierEnvironment:'uat'}):createShopService({env}));
- const checkout=createCartCheckoutHandler({env,rate,service:createCartCheckoutService({env,shop:sharedService})});
  const accountTestPreview=env.TP_MARKETPLACE_ACCOUNT_TEST_CHECKOUT_ENABLED==='true'&&buyerPreviewConfig(env);
  const multiCart=Boolean(accountTestPreview&&env.TP_MARKETPLACE_CART_TEST_SCENARIO);
- const lenovoPricingEnabled=!tdSandboxOnly&&accountTestPreview&&!multiCart&&Object.hasOwn(env,'TP_MARKETPLACE_LENOVO_TEST_COSTS');
  const buyerEnv=tdSandboxOnly?{...env,TP_MARKETPLACE_LENOVO_TEST_DELIVERY_ENABLED:'false'}:env;
- const buyerShop=tdSandboxOnly?makeBuyerShop({env:buyerEnv,td:uatTd,supplierEnvironment:'uat'}):lenovoPricingEnabled?makeBuyerShop({env,settings:createLenovoTestPricingReader({env})}):service;
- let buyerAuth=multiCart?null:createMarketplaceBuyerAuthHandler({env:buyerEnv,rate,shop:buyerShop});
- const buyerHandler=()=>{
-  if(buyerAuth)return buyerAuth;
-  const cartTestScenario=marketplaceCartTestScenario(env);
-  const shop=tdSandboxOnly?makeBuyerShop({env:buyerEnv,td:uatTd,supplierEnvironment:'uat',cartTestScenario}):makeBuyerShop({env,cartTestScenario,settings:createLenovoTestPricingReader({env,multiCart:true})});
-  return buyerAuth=createMarketplaceBuyerAuthHandler({env:buyerEnv,rate,shop});
+ let uatReadonly;
+ const uatReader=()=>uatReadonly??=createTdSandboxReadonly({env});
+ const uatTd={
+  lookup:(...args)=>uatReader().lookup(...args),
+  freight:(...args)=>uatReader().freight(...args),
+  configuration:()=>tdSandboxCheckoutConfiguration(env)
  };
+ function shopFor(cartEnv, {buyer=false, cartTestScenario}={}) {
+  const scenarioOptions=buyer && multiCart?{cartTestScenario}:{};
+  if(tdSandboxOnly)return makeBuyerShop({env:cartEnv, ...scenarioOptions, td:uatTd, supplierEnvironment:'uat'});
+  if(!buyer)return createShopService({env:cartEnv});
+  if(multiCart || (accountTestPreview && Object.hasOwn(env,'TP_MARKETPLACE_LENOVO_TEST_COSTS'))) {
+   const settings=createLenovoTestPricingReader(multiCart?{env,multiCart:true}:{env});
+   return makeBuyerShop({env:cartEnv,...scenarioOptions,settings});
+  }
+  return service;
+ }
+ const sharedService=service||shopFor(env);
+ const checkout=createCartCheckoutHandler({env,rate,service:createCartCheckoutService({env,shop:sharedService})});
+ let buyerAuth;
+ const buyerHandler=()=>{
+  if(!buyerAuth){
+   const cartTestScenario=multiCart?marketplaceCartTestScenario(env):undefined;
+   const shop=shopFor(buyerEnv,{buyer:true,cartTestScenario});
+   buyerAuth=createMarketplaceBuyerAuthHandler({env:buyerEnv,rate,shop});
+  }
+  return buyerAuth;
+ };
+ if(!multiCart)buyerHandler();
  return async(req,res)=>{
  const url=new URL(req.url,'https://tripointgs.com'),view=url.searchParams.get('view')||'cart';res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Robots-Tag','noindex, nofollow');
  if(view.startsWith('marketplace-buyer-')){
